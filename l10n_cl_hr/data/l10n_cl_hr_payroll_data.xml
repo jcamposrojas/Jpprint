@@ -16,8 +16,8 @@
         </record>
 	-->
 	<record id="hr_struct_cl" model="hr.payroll.structure">
-		<field name="name">Codigo del Trabajo</field>
-		<field name="code">Codigo del Trabajo de Chile</field>
+		<field name="name">Código del Trabajo</field>
+		<field name="code">Código del Trabajo de Chile</field>
 		<field name="type_id">1</field>
 	</record>
 
@@ -46,9 +46,12 @@
             <field name="amount_python_compute">if (contract.contract_type_id.name == 'Sueldo Empresarial') and ( contract.wage >=round(payslip.indicadores_id.tope_imponible_afp*payslip.indicadores_id.uf)):
     result = contract.wage
 else:
-    result = result = round((contract.wage / 30) * worked_days.WORK100.number_of_days) </field>
-        </record>
+    dias_trabajados = worked_days.WORK100.number_of_days
+    if worked_days.FEST:
+        dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
 
+    result = result = round((contract.wage / 30) * dias_trabajados) </field>
+        </record>
 
 
 
@@ -61,7 +64,11 @@ else:
             <field name="condition_select">python</field>
             <field name="condition_python">result = payslip.indicadores_id.sueldo_minimo > contract.wage</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = round(((payslip.indicadores_id.sueldo_minimo - contract.wage) / 30) * worked_days.WORK100.number_of_days)
+	    <field name="amount_python_compute">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+result = round(((payslip.indicadores_id.sueldo_minimo - contract.wage) / 30) * dias_trabajados)
 </field>
 
         </record>
@@ -103,22 +110,16 @@ else:
             <field name="amount_python_compute">result = round(0.005185*contract.wage*inputs.HEXDE.amount)*(-1)</field>
         </record>
 
-        <record id="hr_rule_6" model="hr.salary.rule">
-            <field name="name">GRATIFICACION LEGAL</field>
-	    <field name="sequence" eval="8"/>
+        <record id="hr_rule_8" model="hr.salary.rule">
+            <field name="name">COMISIONES</field>
+	    <field name="sequence" eval="6"/>
 	    <field name="struct_id" ref="hr_struct_cl"/>
-            <field name="code">GRAT</field>
+            <field name="code">COMI</field>
             <field name="category_id" ref="IMPONIBLE"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = (contract.gratificacion_legal is False)</field>
+            <field name="condition_python">result = (inputs.COMI and inputs.COMI.amount > 0)</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">GRATI=round(categories.IMPONIBLE * 25 / 100 )
-if (contract.contract_type_id.name == 'Sueldo Empresarial'):
-    result = 0
-elif GRATI > (4.75 * payslip.indicadores_id.sueldo_minimo /12):
-    result = round(4.75 * payslip.indicadores_id.sueldo_minimo / 12)
-else:
-    result = GRATI</field>
+            <field name="amount_python_compute">result = inputs.COMI.amount</field>
         </record>
 
         <record id="hr_rule_7" model="hr.salary.rule">
@@ -133,21 +134,32 @@ else:
             <field name="amount_python_compute">result = inputs.PROD.amount</field>
         </record>
 
-         <record id="hr_rule_8" model="hr.salary.rule">
-            <field name="name">COMISIONES</field>
-	    <field name="sequence" eval="6"/>
+        <record id="hr_rule_6" model="hr.salary.rule">
+            <field name="name">GRATIFICACION LEGAL</field>
+	    <field name="sequence" eval="8"/>
 	    <field name="struct_id" ref="hr_struct_cl"/>
-            <field name="code">COMI</field>
+            <field name="code">GRAT</field>
             <field name="category_id" ref="IMPONIBLE"/>
             <field name="condition_select">python</field>
-            <field name="condition_python">result = (inputs.COMI and inputs.COMI.amount > 0)</field>
+            <field name="condition_python">result = (contract.gratificacion_legal is False)</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = inputs.COMI.amount</field>
+	    <field name="amount_python_compute">if (contract.contract_type_id.name == 'Sueldo Empresarial'):
+    result = 0
+else:
+    GRATI=round(categories.IMPONIBLE * 25 / 100 )
+    tope = (4.75 * payslip.indicadores_id.sueldo_minimo /12)
+    if worked_days.LEAVE110 and worked_days.LEAVE110.number_of_days > 0:
+        tope = (tope * (30 - worked_days.LEAVE110.number_of_days) ) / 30
+    if GRATI > tope:
+        result = tope
+    else:
+        result = GRATI
+            </field>
         </record>
 
 
         <record id="hr_rule_9" model="hr.salary.rule">
-            <field name="name">GRATIFICACION LEGAL</field>
+            <field name="name">GRATIFICACION LEGAL (MANUAL)</field>
 	    <field name="sequence" eval="9"/>
 	    <field name="struct_id" ref="hr_struct_cl"/>
             <field name="code">GRAT</field>
@@ -171,9 +183,6 @@ else:
         </record>
 
 
-
-
-
         <record id="hr_rule_11" model="hr.salary.rule">
             <field name="name">TOTAL IMPONIBLE</field>
 	    <field name="sequence" eval="11"/>
@@ -185,6 +194,7 @@ else:
             <field name="amount_python_compute">result = round(categories.IMPONIBLE)</field>
         </record>
 
+
         <record id="hr_rule_12" model="hr.salary.rule">
             <field name="name">ASIGNACION FAMILIAR</field>
 	    <field name="sequence" eval="12"/>
@@ -194,22 +204,27 @@ else:
             <field name="condition_select">python</field>
             <field name="condition_python">result = ((contract.carga_familiar != 0) or (contract.carga_familiar_maternal != 0) or (contract.carga_familiar_invalida != 0)) and (payslip.indicadores_id.asignacion_familiar_tercer >= contract.wage) and (contract.pension is False)</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">if worked_days.WORK100.number_of_days > 25:
- dias= 30
+	    <field name="amount_python_compute">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+if dias_trabajados > 25:
+    dias= 30
 else:
- dias= worked_days.WORK100.number_of_days
+    dias= dias_trabajados
 
 carga= contract.carga_familiar + contract.carga_familiar_maternal + contract.carga_familiar_invalida
 
 
-if worked_days.WORK100.number_of_days == 0:
+if dias_trabajados == 0:
     result = 0
 elif payslip.indicadores_id.asignacion_familiar_primer >= categories.IMPONIBLE:
     result = round(((payslip.indicadores_id.asignacion_familiar_monto_a*carga) / 30) * (dias))
 elif payslip.indicadores_id.asignacion_familiar_segundo  >= categories.IMPONIBLE:
     result = round(((payslip.indicadores_id.asignacion_familiar_monto_b*carga) / 30) * (dias))
 elif payslip.indicadores_id.asignacion_familiar_tercer  >= categories.IMPONIBLE:
-    result = round(((payslip.indicadores_id.asignacion_familiar_monto_c*carga) / 30) * (dias))</field>
+    result = round(((payslip.indicadores_id.asignacion_familiar_monto_c*carga) / 30) * (dias))
+</field>
         </record>
 
         <record id="hr_rule_13" model="hr.salary.rule">
@@ -221,7 +236,12 @@ elif payslip.indicadores_id.asignacion_familiar_tercer  >= categories.IMPONIBLE:
             <field name="condition_select">python</field>
             <field name="condition_python">result = contract.colacion > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = round((contract.colacion / 30) * worked_days.WORK100.number_of_days)</field>
+	    <field name="amount_python_compute">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+result = round((contract.colacion / 30) * dias_trabajados)
+</field>
         </record>
 
         <record id="hr_rule_14" model="hr.salary.rule">
@@ -233,7 +253,11 @@ elif payslip.indicadores_id.asignacion_familiar_tercer  >= categories.IMPONIBLE:
             <field name="condition_select">python</field>
             <field name="condition_python">result = contract.movilizacion > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = round((contract.movilizacion / 30) * worked_days.WORK100.number_of_days)</field>
+	    <field name="amount_python_compute">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+result = round((contract.movilizacion / 30) * dias_trabajados)</field>
         </record>
 
         <record id="hr_rule_15" model="hr.salary.rule">
@@ -245,7 +269,11 @@ elif payslip.indicadores_id.asignacion_familiar_tercer  >= categories.IMPONIBLE:
             <field name="condition_select">python</field>
             <field name="condition_python">result = contract.otro_no_imp > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = round((contract.otro_no_imp / 30) * worked_days.WORK100.number_of_days)</field>
+	    <field name="amount_python_compute">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+result = round((contract.otro_no_imp / 30) * dias_trabajados)</field>
         </record>
 
         <record id="hr_rule_16" model="hr.salary.rule">
@@ -257,7 +285,11 @@ elif payslip.indicadores_id.asignacion_familiar_tercer  >= categories.IMPONIBLE:
             <field name="condition_select">python</field>
             <field name="condition_python">result = contract.viatico_santiago > 0</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = round((contract.viatico_santiago / 30) * worked_days.WORK100.number_of_days)</field>
+	    <field name="amount_python_compute">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+result = round((contract.viatico_santiago / 30) * dias_trabajados)</field>
         </record>
 
         <record id="hr_rule_17" model="hr.salary.rule">
@@ -465,7 +497,7 @@ else:
         </record>
 
 
-                <record id="hr_rule_24" model="hr.salary.rule">
+        <record id="hr_rule_24" model="hr.salary.rule">
             <field name="name">SEGURO COMPLEMENTARIO</field>
 	    <field name="sequence" eval="24"/>
 	    <field name="struct_id" ref="hr_struct_cl"/>
@@ -503,44 +535,6 @@ else:
         </record>
 
 
-<record id="hr_rule_26" model="hr.salary.rule">
-            <field name="name">SALUD</field>
-	    <field name="sequence" eval="26"/>
-	    <field name="struct_id" ref="hr_struct_cl"/>
-            <field name="code">SALUD</field>
-            <field name="category_id" ref="SALUD"/>
-            <field name="condition_select">python</field>
-            <field name="condition_python">result = contract.isapre_id.name != 'FONASA'</field>
-            <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = 0
-Salud=round(7 * round(TOTIM)/100)
-if contract.isapre_cuenta_propia:
-     result = False
-elif Salud >= round((payslip.indicadores_id.tope_imponible_salud*payslip.indicadores_id.tope_imponible_afp/100)*payslip.indicadores_id.uf):
-    result = round((payslip.indicadores_id.tope_imponible_salud*payslip.indicadores_id.tope_imponible_afp/100)*payslip.indicadores_id.uf)
-else:
-    result = round(7 * round(TOTIM)/100)</field>
-        </record>
-
-
-        <record id="hr_rule_27" model="hr.salary.rule">
-            <field name="name">ADICIONAL ISAPRE</field>
-	    <field name="sequence" eval="27"/>
-	    <field name="struct_id" ref="hr_struct_cl"/>
-            <field name="code">ADISA</field>
-            <field name="category_id" ref="SALUD"/>
-            <field name="condition_select">python</field>
-            <field name="condition_python">if contract.isapre_id.name == 'FONASA':
-    result = False
-elif worked_days.WORK100.number_of_days == 0:
-     result = False
-elif contract.isapre_cuenta_propia:
-     result = False
-else:
-    result = round((payslip.indicadores_id.uf / 30 * (worked_days.WORK100.number_of_days)) * contract.isapre_cotizacion_uf) > round(SALUD)</field>
-            <field name="amount_select">code</field>
-            <field name="amount_python_compute">result =round ((((payslip.indicadores_id.uf / 30) *30) * contract.isapre_cotizacion_uf)  - round(SALUD))</field>
-        </record>
 
 
         <record id="hr_rule_28" model="hr.salary.rule">
@@ -556,7 +550,6 @@ else:
             <field name="amount_python_compute">result = categories.SALUD</field>
 			    <!-- <field name="register_id" ref="contrib_register_previred"/> -->
         </record>
-
 
 
         <record id="hr_rule_33" model="hr.salary.rule">
@@ -586,7 +579,7 @@ else:
             <field name="condition_select">python</field>
             <field name="condition_python">result = contract.isapre_id.name == 'FONASA'</field>
             <field name="amount_select">code</field>
-            <field name="appears_on_payslip" eval="True"/>
+            <field name="appears_on_payslip" eval="False"/>
             <field name="amount_python_compute">result = 0
 Salud=round(7 * round(TOTIM)/100)
 if Salud >= round((payslip.indicadores_id.tope_imponible_salud*payslip.indicadores_id.tope_imponible_afp/100)*payslip.indicadores_id.uf):
@@ -596,9 +589,29 @@ else:
 		    <!-- <field name="register_id" ref="contrib_register_previred"/> -->
         </record>
 
+        <record id="hr_rule_26" model="hr.salary.rule">
+            <field name="name">SALUD</field>
+	    <field name="sequence" eval="35"/>
+	    <field name="struct_id" ref="hr_struct_cl"/>
+            <field name="code">SALUD</field>
+            <field name="category_id" ref="SALUD"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="appears_on_payslip" eval="True"/>
+	    <field name="amount_python_compute">if contract.isapre_id.name == 'FONASA':
+    result = CAJACOMP + FONASA
+else:
+    result = 0
+    Salud=round(7 * round(TOTIM)/100)
+    if contract.isapre_cuenta_propia:
+        result = False
+    elif Salud >= round((payslip.indicadores_id.tope_imponible_salud*payslip.indicadores_id.tope_imponible_afp/100)*payslip.indicadores_id.uf):
+        result = round((payslip.indicadores_id.tope_imponible_salud*payslip.indicadores_id.tope_imponible_afp/100)*payslip.indicadores_id.uf)
+    else:
+        result = round(7 * round(TOTIM)/100)</field>
+        </record>
 
-
-<record id="hr_rule_35" model="hr.salary.rule">
+        <record id="hr_rule_35" model="hr.salary.rule">
             <field name="name">TRIBUTABLE</field>
 	    <field name="sequence" eval="35"/>
 	    <field name="struct_id" ref="hr_struct_cl"/>
@@ -606,6 +619,7 @@ else:
             <field name="category_id" ref="SUBT"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
+            <field name="appears_on_payslip" eval="True"/>
             <field name="amount_python_compute">saludtotal = categories.SALUD
 if (saludtotal > (payslip.indicadores_id.uf*(payslip.indicadores_id.tope_imponible_salud*payslip.indicadores_id.tope_imponible_afp/100))):
 
@@ -614,9 +628,6 @@ if (saludtotal > (payslip.indicadores_id.uf*(payslip.indicadores_id.tope_imponib
 else:
     result = round(TOTIM - saludtotal - PREV - SECE)</field>
         </record>
-
-
-
 
 
         <record id="hr_rule_36" model="hr.salary.rule">
@@ -628,6 +639,7 @@ else:
             <field name="condition_select">python</field>
             <field name="condition_python">result = TRIBU > payslip.indicadores_id.utm*13.5</field>
             <field name="amount_select">code</field>
+            <field name="appears_on_payslip" eval="True"/>
             <field name="amount_python_compute">if payslip.indicadores_id.utm*13.5 > TRIBU :
     result = 0
 elif payslip.indicadores_id.utm*30 > TRIBU:
@@ -645,7 +657,30 @@ elif payslip.indicadores_id.utm*150 > TRIBU:
 else:
  result = TRIBU*0.40-(payslip.indicadores_id.utm*30.67)</field>
 	<!-- <field name="register_id" ref="contrib_register_sii"/> -->
+        </record>
 
+        <record id="hr_rule_27" model="hr.salary.rule">
+            <field name="name">ADICIONAL ISAPRE</field>
+	    <field name="sequence" eval="37"/>
+	    <field name="struct_id" ref="hr_struct_cl"/>
+            <field name="code">ADISA</field>
+            <field name="category_id" ref="SALUD"/>
+            <field name="condition_select">python</field>
+            <field name="appears_on_payslip" eval="True"/>
+	    <field name="condition_python">dias_trabajados = worked_days.WORK100.number_of_days
+if worked_days.FEST:
+    dias_trabajados = worked_days.FEST.number_of_days + worked_days.WORK100.number_of_days
+
+if contract.isapre_id.name == 'FONASA':
+    result = False
+elif dias_trabajados == 0:
+     result = False
+elif contract.isapre_cuenta_propia:
+     result = False
+else:
+    result = round((payslip.indicadores_id.uf / 30 * (dias_trabajados)) * contract.isapre_cotizacion_uf) > round(SALUD)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result =round ((((payslip.indicadores_id.uf / 30) *30) * contract.isapre_cotizacion_uf)  - round(SALUD))</field>
         </record>
 
 

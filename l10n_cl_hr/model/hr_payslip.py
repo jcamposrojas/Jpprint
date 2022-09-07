@@ -38,7 +38,7 @@ class HrPayslip(models.Model):
 
 
     #@api.onchange('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to')
-    @api.onchange('date_from', 'date_to')
+    #@api.onchange('date_from', 'date_to', 'struct_id')
     def _compute_fest(self):
         fest_entry = self.env['hr.work.entry.type'].search([('code', '=', 'FEST')])
         for payslip in self:
@@ -92,15 +92,13 @@ class HrPayslip(models.Model):
 
     @api.model
     def create(self, vals):
-        #JCR revisar. Es necesario?
-        _logger.info(' ANTESDECREAR ')
+        #JCR revisar. 
         if 'parameters_ids' in self.env.context:
             vals['parameters_ids'] = self.env.context.get('parameters_ids')
         if 'indicadores_id' in self.env.context:
             vals['indicadores_id'] = self.env.context.get('indicadores_id')
         if 'movimientos_personal' in self.env.context:
             vals['movimientos_personal'] = self.env.context.get('movimientos_personal')
-        _logger.info(vals)
         return super(HrPayslip, self).create(vals)
 
     @api.model
@@ -154,6 +152,7 @@ class HrPayslip(models.Model):
 
         self.parameters_ids = [(0,0,effective)]
 
+        self._compute_fest()
 
         res.extend(leaves)
         return res
@@ -176,4 +175,22 @@ class HrPayslip(models.Model):
             }
         }
         return res_localdict
+
+    @api.depends('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to', 'struct_id')
+    def _compute_input_line_ids(self):
+
+        super()._compute_input_line_ids()
+
+        types_to_show  = self.env['hr.payslip.input.type'].search([('show_input','=',True)])
+        for slip in self:
+            input_line_vals = [(5,0,0)]
+
+            for type_to_show in types_to_show:
+                values = {
+                        'name': type_to_show.name,
+                        'amount': 0,
+                        'input_type_id': type_to_show.id,
+                    }
+                input_line_vals += [(0,0,values)]
+            slip.update({'input_line_ids': input_line_vals})
 

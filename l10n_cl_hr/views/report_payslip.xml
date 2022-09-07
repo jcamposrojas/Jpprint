@@ -127,6 +127,9 @@
                           <t t-if="('WORK100' == p.code)">
                             <t t-set= "f" t-value="f+p.number_of_days"/>
                           </t>
+                          <t t-if="('FEST' == p.code)">
+                            <t t-set= "f" t-value="f+p.number_of_days"/>
+                          </t>
                         </t>
                         <span><t t-esc="str(int(f))"/></span>
                       </td>
