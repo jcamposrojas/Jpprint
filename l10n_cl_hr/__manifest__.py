@@ -11,7 +11,6 @@
     'external_dependencies': {
         'python': [
                 'num2words',
-                'pdf417gen',
                 ]
         },
     'contributors': [
