@@ -10,7 +10,7 @@
         ],
     'external_dependencies': {
         'python': [
-                'num2words',
+                'num2words'
                 ]
         },
     'contributors': [
