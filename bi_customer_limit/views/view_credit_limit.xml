@@ -1,0 +1,100 @@
+<odoo>
+    <data>
+        <record id="view_res_partner_form" model="ir.ui.view">
+            <field name="name">res.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account.view_partner_property_form"></field>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook" position="inside">
+		<page string="Crédito">
+                    <group name="customer_credit" string="Crédito de Cliente">
+			<group>
+	                        <field name="company_currency_id" attrs="{'invisible': 1}"/>
+	                        <field name="is_credit_limit"/>
+       	                 	<field name="credit_limit" widget="monetary" attrs="{'invisible': [('is_credit_limit', '!=',True )]}"/>
+       	                 	<field name="blocking_limit" widget="monetary" attrs="{'invisible': [('is_credit_limit', '!=',True)]}"/>
+       	                 	<field name="credit" string="Monto en Facturas Pendientes" widget="monetary" options="{'currency_field': 'company_currency_id'}" attrs="{'invisible': [('is_credit_limit', '!=',True)]}" alt="(Resto en facturas - Pagos)"/>
+       	                 	<field name="so_credit" widget="monetary" attrs="{'invisible': [('is_credit_limit', '!=',True)]}"/>
+			</group>
+			<group>
+                        	<field name="credit_on_hold" />
+       	                 	<field name="used_credit" widget="monetary" string="Crédito total usado" attrs="{'invisible': [('is_credit_limit', '!=',True)]}" readonly="1"/>
+			</group>
+                    </group>
+                    <group>
+                        <field name="balance_invoice_ids">
+			<tree>
+                        	<field name="name"/>
+                        	<field name="invoice_date"/>
+                        	<field name="invoice_date_due"/>
+				<!--<field string="Total Sin Impuesto" name="amount_untaxed_signed"/>-->
+				<!--<field string="Total" name="amount_total_signed" sum="Total"/>-->
+                        	<field string="Total" name="amount_total_signed"/>
+                        	<field string="Resto" name="amount_residual" sum="Total Adeudado" widget="monetary"/>
+                        	<field name="payment_state"/>
+                        	<field name="state"/>
+			</tree>
+			</field>
+                    </group>
+                    <group>
+			<field name="res_partner_credits" string="Pagos no conciliados (Anticipos)" colspan="4" widget="pagos"/>
+			<!--
+                        <field name="res_partner_credits">
+				<tree>
+                        		<field name="payment_date"/>
+                        		<field name="journal_name"/>
+				</tree>
+			</field>
+			-->
+                    </group>
+                    <group>
+			<field name="balance_sale_order_ids" string="Notas de Venta no facturadas">
+			<tree>
+                        	<field name="name"/>
+                        	<field name="state"/>
+                        	<field name="date_order"/>
+                        	<field name="amount_total" sum="Total en NV" widget="monetary"/>
+                        	<field name="invoice_status"/>
+			</tree>
+			</field>
+                    </group>
+	    	</page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_sale_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"></field>
+            <field name="arch" type="xml">
+                <field name="payment_term_id" position="after">
+                    <field name="credit_limit" string="Límite de Crédito" readonly="1"/>
+		    <!--
+                </field>
+                <field name="credit_limit_id" position="after">
+                    <field name="total_receivable" />
+                </field>
+                <field name="credit_limit_id" position="after">
+		    -->
+
+                    <field name="used_credit" string="Crédito total usado"/>
+                    <field name="is_confirm" invisible='1'/>
+                    <field name="is_warning" invisible='1'/>
+                    <field name="customer_due_amt" invisible='1'/>
+                </field>
+                <xpath expr="//header" position="after">
+			<div groups="account.group_account_invoice" class="alert alert-info" role="alert" style="margin-bottom: 10px;font-weight: bold;color: black;" attrs="{'invisible': ['|',('partner_id', '=',False),('customer_due_amt','&lt;=',0.0)]}">
+                    Deuda por Facturas Impagas del cliente, es de <bold><field name="customer_due_amt"/></bold>
+                </div>
+                </xpath>
+
+                <xpath expr="//sheet/div[@name='button_box']" position="after">
+                    <div groups="account.group_account_invoice" class="oe_title alert alert-danger" role="alert" style="margin-bottom: 10px;font-weight: bold;text-align: center;color: black;" attrs="{'invisible': ['|',('partner_id', '=',False),('is_warning','!=',True)]}">
+		    El límite de Credito del cliente ha sido sobrepasado
+                </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
