@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Adhesivos -->
+        <record id="cotizador_adhesivo1" model="cotizador.adhesivo">
+            <field name="name">STANDARD</field>
+            <field name="nombre_corto">STANDARD</field>
+            <field name="codigo">STANDARD</field>
+        </record>
+        <record id="cotizador_adhesivo2" model="cotizador.adhesivo">
+            <field name="name">P4</field>
+            <field name="nombre_corto">P4</field>
+            <field name="codigo">P4</field>
+        </record>
+        <record id="cotizador_adhesivo3" model="cotizador.adhesivo">
+            <field name="name">RH15</field>
+            <field name="nombre_corto">RH15</field>
+            <field name="codigo">RH15</field>
+        </record>
+        <record id="cotizador_adhesivo4" model="cotizador.adhesivo">
+            <field name="name">TS</field>
+            <field name="nombre_corto">TS</field>
+            <field name="codigo">TS</field>
+        </record>
+        <record id="cotizador_adhesivo5" model="cotizador.adhesivo">
+            <field name="name">903</field>
+            <field name="nombre_corto">903</field>
+            <field name="codigo">903</field>
+        </record>
+        <record id="cotizador_adhesivo6" model="cotizador.adhesivo">
+            <field name="name">1009</field>
+            <field name="nombre_corto">1009</field>
+            <field name="codigo">1009</field>
+        </record>
+    </data> 
+</odoo> 

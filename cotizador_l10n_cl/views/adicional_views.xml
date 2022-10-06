@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+	<record id="adicional_cotizador_form" model="ir.ui.view">
+	    <field name="name">cotizador.adicional.form</field>
+	    <field name="model">cotizador.adicional</field>
+	    <field name="arch" type="xml">
+		<form string="Adicionales">
+		    <sheet>
+			<div class="oe_title">
+			    <label for="name" string="Entradas Adicionales" />
+			    <h1>
+			        <field name="name" />
+			    </h1>
+			    <group>
+                                <field name="product_product_id" />
+			    </group>
+			    <group>
+                                <field name="uom_id" />
+                                <field name="rendimiento" />
+			    </group>
+			</div>
+		    </sheet>
+		</form>
+	    </field>
+	</record>
+
+	<record id="adicional_cotizador_tree" model="ir.ui.view">
+	    <field name="name">cotizador.adicional.tree</field>
+	    <field name="model">cotizador.adicional</field>
+	    <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                    <field name="product_product_id" />
+		</tree>
+
+	    </field>
+	</record>
+
+        <record id="adicional_mng_cotizador_action" model="ir.actions.act_window">
+	    <field name="name">Adicionales</field>
+	    <field name="res_model">cotizador.adicional</field>
+	    <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="adicional_mng_menu" parent="menu_mng_cotizador" action="adicional_mng_cotizador_action" sequence="30" />
+
+    </data>
+</odoo>
