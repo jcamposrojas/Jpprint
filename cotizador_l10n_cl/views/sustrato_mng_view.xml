@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+	<record id="sustrato_calc_form" model="ir.ui.view">
+	    <field name="name">cotizador.sustrato.form</field>
+	    <field name="model">cotizador.sustrato</field>
+	    <field name="arch" type="xml">
+		<form string="Sustratos">
+		    <sheet>
+			<div class="oe_title">
+			    <label for="name" string="Sustrato" />
+			    <h1>
+			        <field name="name" />
+			    </h1>
+			</div>
+			<group>
+			    <group>
+			        <field name="nombre_corto" />
+			        <field name="codigo" />
+			    </group>
+			    <group>
+				<field name="product_product_id" string="Producto/Insumo"/>
+				<field name="uom_id"/>
+				<field name="rendimiento"/>
+			    </group>
+			</group>
+		    </sheet>
+		</form>
+	    </field>
+	</record>
+
+	<record id="sustrato_calc_tree" model="ir.ui.view">
+	    <field name="name">cotizador.sustrato.tree</field>
+	    <field name="model">cotizador.sustrato</field>
+	    <field name="arch" type="xml">
+                <tree>
+                    <field name="name" />
+                    <field name="nombre_corto" />
+                    <field name="codigo" />
+                    <field name="product_product_id" />
+		</tree>
+
+	    </field>
+	</record>
+
+        <record id="sustrato_mng_cotizador_action" model="ir.actions.act_window">
+	    <field name="name">Sustratos</field>
+	    <field name="res_model">cotizador.sustrato</field>
+	    <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="sustrato_mng_menu" parent="menu_mng_cotizador" action="sustrato_mng_cotizador_action" sequence="20" />
+
+    </data>
+</odoo>

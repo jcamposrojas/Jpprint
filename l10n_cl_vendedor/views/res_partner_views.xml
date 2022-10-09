@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_partner_vendedor_tree" model="ir.ui.view">
+            <field name="name">res.partner.vendedor.tree</field>
+            <field name="model">res.partner</field>
+            <field eval="8" name="priority"/>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+
+            <field name="user_id" position="after">
+                <field name="vendedor_name"/>
+            </field>
+            <xpath expr="//field[@name='user_id']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+
+            </field>
+        </record>
+
+
+        <record id="view_partner_vendedor_form" model="ir.ui.view">
+            <field name="name">res.partner.vendedor.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <field name="category_id" position="after">
+                    <field name="vendedor_name"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>

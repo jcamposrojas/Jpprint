@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="hr_payslip_input_type_view_form_inherit" model="ir.ui.view">
+            <field name="name">hr.payslip.input.type.view.form.inherit</field>
+            <field name="model">hr.payslip.input.type</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payslip_input_type_view_form"/>
+            <field name="arch" type="xml">
+
+                <field name="code" position="after">
+                    <field name="invisible_show_input" invisible="1"/>  
+		    <field name="show_input" attrs="{'invisible': [('invisible_show_input','=',True)]}"/>  
+                </field>
+
+            </field>
+        </record>
+
+        <record id="hr_payslip_input_type_view_tree_inherit" model="ir.ui.view">
+            <field name="name">hr.payslip.input.type.view.tree.inherit</field>
+            <field name="model">hr.payslip.input.type</field>
+            <field name="inherit_id" ref="hr_payroll.hr_payslip_input_type_view_tree"/>
+            <field name="arch" type="xml">
+
+                <field name="struct_ids" position="after">
+                    <field name="show_input"/>  
+                </field>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

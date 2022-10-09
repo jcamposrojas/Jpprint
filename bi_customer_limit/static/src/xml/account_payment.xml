@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="ShowPaymentInfo">
+        <div>
+        <t t-if="outstanding">
+            <table style="width:100%;">
+            <tr>
+		    <th style="text-align:left;"><strong>Número</strong></th>
+		    <th style="text-align:right;"><strong>Fecha</strong></th>
+		    <th style="text-align:right;"><strong>Monto restante</strong></th>
+	    </tr>
+                <t t-foreach="lines" t-as="line">
+                    <tr>
+                        <td style="max-width: 30em;">
+                            <div class="oe_form_field" style="margin-right: 30px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" t-att-title="line.payment_date" data-toggle="tooltip"><t t-esc="line.journal_name"></t></div>
+                        </td>
+                        <td style="text-align:right;">
+                                <t t-esc="line.payment_date"></t>
+                        </td>
+                        <td style="text-align:right;">
+                            <span class="oe_form_field oe_form_field_float oe_form_field_monetary" style="margin-left: -10px;">
+                                <t t-if="line.position === 'before'">
+                                    <t t-esc="line.currency"/>
+                                </t>
+                                <t t-esc="line.amount"></t>
+                                <t t-if="line.position === 'after'">
+                                    <t t-esc="line.currency"/>
+                                </t>
+                            </span>
+                        </td>
+                    </tr>
+                </t>
+                    <tr>
+			    <td colspan="3" style="text-align:right">
+				<t t-if="total > 0">
+					<strong>$ <t t-esc="total"/></strong>
+                                </t>
+			    </td> 
+		    </tr>
+            </table>
+        </t>
+	<t t-else="">Sin pagos.</t>
+        </div>
+    </t>
+
+</templates>
