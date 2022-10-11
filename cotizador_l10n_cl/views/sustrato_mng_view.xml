@@ -21,7 +21,8 @@
 			    <group>
 				<field name="product_product_id" string="Producto/Insumo"/>
 				<field name="uom_id"/>
-				<field name="rendimiento"/>
+				<field name="cost_currency_id" invisible="1"/>
+				<field name="standard_price" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
 			    </group>
 			</group>
 		    </sheet>

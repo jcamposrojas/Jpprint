@@ -21,15 +21,18 @@ class CotizadorProducto(models.Model):
         column2="sustrato_id",
     )
 
-    adicional_ids = fields.Many2many(comodel_name="cotizador.adicional",string="Adicionales")
-    #adicional_ids = fields.Many2many(
-    #    comodel_name="cotizador.adicional",
-    #    relation="cotizador_producto_adicional_rel",
-    #    string="Adicionales",
-    #    column1="producto_id",
-    #    column2="adicional_id",
-    #)
+#    adicional_ids = fields.Many2many(comodel_name="cotizador.adicional",string="Adicionales")
+    def _get_default_product_uom_id(self):
+        return self.env.ref('uom.uom_square_meter')
+
+    uom_id = fields.Many2one('uom.uom', string='Unidad de medida Sustrato', default=_get_default_product_uom_id, required=True)
+
+    adicional_ids = fields.One2many("rendimiento.adicional",'producto_id', string="Rendimiento de Adicionales")
+
     sequence     = fields.Integer( 'Sequence', default=100)
+
+    consumo_ids = fields.One2many("cotizador.consumo",'producto_id', string="Consumos")
+
 
 
 

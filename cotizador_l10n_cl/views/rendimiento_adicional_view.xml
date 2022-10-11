@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="rendimiento_adicional_tree" model="ir.ui.view">
+	    <field name="name">rendimiento.adicional.tree</field>
+	    <field name="model">rendimiento.adicional</field>
+	    <field name="arch" type="xml">
+                <tree>
+                    <field name="producto_id" invisible="1"/>
+                    <field name="adicional_id" /> 
+                    <field name="producto_uom_id" /> 
+                    <field name="standard_price_adicional" /> 
+			    <!-- widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"-->
+                    <field name="adicional_uom_id" /> 
+                    <field name="rendimiento" />
+		</tree>
+
+	    </field>
+	</record>
+
+	<record id="rendimiento_adicional_form" model="ir.ui.view">
+	    <field name="name">cotizador_l10n_cl.rendimiento.adicional.form</field>
+	    <field name="model">rendimiento.adicional</field>
+	    <field name="arch" type="xml">
+		<form string="Consumos">
+		    <sheet>
+			<group>
+			    <group>
+			        <field name="adicional_id" />
+			        <field name="producto_uom_id" />
+			    </group>
+			    <group>
+			        <field name="adicional_uom_id" />
+			        <field name="rendimiento" />
+			    </group>
+                        </group>
+		    </sheet>
+		</form>
+	    </field>
+	</record>
+
+    </data>
+</odoo>

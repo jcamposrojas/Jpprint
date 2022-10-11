@@ -36,12 +36,10 @@
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
                         <field name="cantidad" />
-			<label for="largo_ocupado" string="Papel ocupado / Superficie" />
-			<div class="o_row" id="largo_superficie" >
-			    <field name="largo_ocupado" /> / <field name="area_ocupada" />
-                        </div>
+			<field name="area_ocupada" />
+                        <field name="merma_estimada" string="% Merma estimada"/>
 			<!--
-                        <field name="sustrato_id" domain="sustrato_id_domain"/>
+                        <field name="merma_estimada" widget="percentage"/>
 			-->
                     </group>
                     <group>
@@ -53,10 +51,7 @@
 			<field name="adhesivo_id" />
                         <field name="product_uom_id"/>
                         <field name="datos_adicionales" />
-			<label for="largo_ocupado" string="Papel ocupado / Superficie C/MERMA" />
-			<div class="o_row" id="largo_superficie_cmerma" >
-			    <field name="largo_ocupado_con_merma" /> / <field name="area_ocupada_con_merma" />
-                        </div>
+			<field name="area_ocupada_con_merma" />
                     </group>
                 </group>
 		<notebook>
@@ -77,9 +72,11 @@
 		            </group>
 		        </group>
 		    </page>
+		    <page string="Materias Primas" name="insumos">
+                        <field name="insumo_ids" />
+		    </page>
 		    <page string="Otros atributos">
 		        <group>
-                            <field name="merma_estimada" widget="percentage"/>
                             <field name="ancho_papel"/>
                             <field name="etiquetas_al_desarrollo"/>
                             <field name="etiquetas_al_ancho"/>

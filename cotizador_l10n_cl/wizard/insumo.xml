@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="cotizador_insumo_tree" model="ir.ui.view">
+            <field name="name">cotizador.insumo.tree</field>
+            <field name="model">cotizador.insumo</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="product_product_id" />
+                    <field name="cost_currency_id" invisible="1"/>
+                    <field name="cantidad" />
+                    <field name="uom_id" />
+                    <field name="costo_consumo" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                    <field name="incluido_en_ldm" />
+                </tree>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

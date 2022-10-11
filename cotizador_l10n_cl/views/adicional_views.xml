@@ -13,11 +13,13 @@
 			        <field name="name" />
 			    </h1>
 			    <group>
+                                <field name="cost_currency_id" invisible="1"/>
                                 <field name="product_product_id" />
 			    </group>
 			    <group>
-                                <field name="uom_id" />
-                                <field name="rendimiento" />
+                                <field name="uom_id" string="Unidad de Medida"/>
+                                <field name="standard_price" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                                <field name="incluido_en_ldm" />
 			    </group>
 			</div>
 		    </sheet>

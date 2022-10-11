@@ -25,7 +25,7 @@ class SelectProducts(models.TransientModel):
     gap         = fields.Float(string="GAP entre etiquetas", default=3)
     engranaje   = fields.Float(string="Engranaje", default=3.175)
     etiquetas_al_desarrollo = fields.Float(string="Etiquetas al desarrollo", default=1)
-    merma_estimada = fields.Float(string="Merma estimada")
+    merma_estimada = fields.Float(string="Merma estimada", default=0.0)
     ancho_papel    = fields.Float(string="Ancho de papel", default=100)
     # salidas de etiqueta en maquina
     etiquetas_al_ancho = fields.Float(string="Etiquetas al ancho", default=2)
@@ -35,10 +35,10 @@ class SelectProducts(models.TransientModel):
     z_calculado      = fields.Float(string='Z calculado', compute="_calc_z", store=True)
     z_ingreso        = fields.Integer(string='Z ingreso', compute="_calc_z", store=True)
     etiqueta_con_gap = fields.Float(string="GAP entre etiquetas calculado", compute="_calc_z", store=True)
+
     largo_ocupado    = fields.Float(string="Papel ocupado", compute="_calc_z", store=True)
-    area_ocupada     = fields.Float(string="Superficie ocupada", compute="_calc_z", store=True)
-    largo_ocupado_con_merma = fields.Float(string="Papel ocupado C/MERMA", compute="_calc_z", store=True)
-    area_ocupada_con_merma  = fields.Float(string="Superficie ocupada C/MERMA", compute="_calc_z", store=True)
+    area_ocupada     = fields.Float(string="Superficie ocupada", compute="_calc_area", store=True)
+    area_ocupada_con_merma  = fields.Float(string="Superficie C/MERMA", compute="_calc_area", store=True)
     cilindros        = fields.Integer(string='Cilindros', compute="_calc_z", store=True)
 
     def _get_default_uom_id(self):
@@ -51,9 +51,8 @@ class SelectProducts(models.TransientModel):
     product_uom_id = fields.Many2one( 'uom.uom', 'Unidad de medida', default=_get_default_product_uom_id, required=True)
 
     buje = fields.Selection( string="Buje", required=True,
-        selection=[("buje1", "BUJE 1"), ("buje3", "BUJE 3"),("buje40", "BUJE 40")],
-        default="buje1",
-    )
+        selection=[("buje1", "BUJE 1"), ("buje3", "BUJE 3"),("buje40", "BUJE 40")], default="buje1")
+
     rotulado_embalaje = fields.Boolean(string="Rotulado y embalaje", default=True)
     efecto_espejo     = fields.Boolean(string="Efecto Espejo", default=False)
     laminado          = fields.Boolean(string="Laminado", default=True)
@@ -67,7 +66,23 @@ class SelectProducts(models.TransientModel):
         default="aisa1",
     )
 
+    #========== Valores ==========
+    insumo_ids = fields.One2many('cotizador.insumo','select_id',copy=True, readonly=True, store=True)
     posible_adicionales = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
+
+    @api.depends('largo', 'ancho', 'cantidad', 'merma_estimada')
+    def _calc_area(self):
+        if self.largo > 0.0 and self.ancho > 0.0 and self.cantidad > 0.0:
+            n14 = 210
+            o14 = round(n14 / self.largo - 0.5,0)
+            p14 = round(n14 / self.ancho - 0.5,0)
+            f15 = self.ancho / 1000.0 if o14 > p14 else self.largo / 1000.0
+            q14 = max(o14,p14)
+            self.area_ocupada = round((self.cantidad / q14) * f15 * 0.22, 0)
+            self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 0)
+        else:
+            self.area_ocupada = 0
+            self.area_ocupada_con_merma = 0
 
     @api.onchange('product_id')
     def _get_posible_adicionales(self):
@@ -102,7 +117,7 @@ class SelectProducts(models.TransientModel):
                 cilindros       = cil.unidades
             return valor_propuesto, cilindros
 
-    @api.depends('product_id','sustrato_id', 'largo', 'ancho', 'adhesivo_id', 'texto_adicional')
+    @api.depends('product_id', 'sustrato_id', 'largo', 'ancho', 'adhesivo_id', 'texto_adicional')
     def _compute_codigo_nombre(self):
         nombre = ""
         if self.product_id:
@@ -135,7 +150,6 @@ class SelectProducts(models.TransientModel):
             products_count = self.env['product.template'].search_count([('name','ilike',self.nombre_producto)])
             self.count_coincidencias = products_count
 
-    #sustrato_id_domain = fields.Char( compute="_compute_sustrato_id_domain", readonly=False, store=True)
 
     # Calculo de Z
     @api.onchange('largo', 'ancho', 'cantidad', 'gap', 'engranaje', 'ancho_papel', 'etiquetas_al_desarrollo', 'etiquetas_al_ancho', 'merma_estimada')
@@ -147,12 +161,14 @@ class SelectProducts(models.TransientModel):
 
         self.etiqueta_con_gap = (self.z_ingreso * self.engranaje) / self.etiquetas_al_desarrollo
 
-        self.largo_ocupado   = (self.etiqueta_con_gap * self.cantidad ) / self.etiquetas_al_ancho
-        self.area_ocupada    = self.largo_ocupado * self.ancho_papel
+        # Largo en metros
+        self.largo_ocupado   = ((self.etiqueta_con_gap * self.cantidad ) / self.etiquetas_al_ancho) / 1000.0
+        # Area en metros cuadrados
+        #self.area_ocupada    = (self.largo_ocupado * self.ancho_papel)/1000000.0
 
         # C/MERMA
-        self.largo_ocupado_con_merma  = self.largo_ocupado * (1.0 + self.merma_estimada / 100.0)
-        self.area_ocupada_con_merma   = self.area_ocupada * (1.0 + self.merma_estimada / 100.0)
+        # Area en metros cuadrados
+        #self.area_ocupada_con_merma   = (self.area_ocupada * (1.0 + self.merma_estimada / 100.0))/1000000.0
 
     @api.onchange('product_id')
     def _compute_sustrato_id_domain(self):
@@ -164,6 +180,56 @@ class SelectProducts(models.TransientModel):
             else:
                 domain = []
             return {'domain': {'sustrato_id':domain}}
+
+    @api.onchange('product_id', 'sustrato_id','posible_adicionales', 'largo','ancho','cantidad','merma_estimada')
+    def _update_insumos(self):
+        self.insumo_ids = [(5,0)]
+
+        # Sustrato
+        if self.sustrato_id.product_product_id:
+            vals = {
+                    'select_id': self.id,
+                    'product_product_id': self.sustrato_id.product_product_id.id,
+                    'cantidad': self.area_ocupada_con_merma, # Aun por llenar
+                    'costo_consumo': self.sustrato_id.standard_price * self.area_ocupada_con_merma, # Aun por llenar
+                    'uom_id': self.sustrato_id.product_product_id.uom_id.id,
+                    'incluido_en_ldm': True,
+                }
+            self.insumo_ids = [(0,0,vals)]
+
+        # Consumos obligatorios
+        for line in self.product_id.consumo_ids:
+            vals = {
+                    'select_id': self.id,
+                    'product_product_id': line.product_product_id.id,
+                    'cantidad': line.cantidad * self.area_ocupada_con_merma, # Aun por llenar
+                    #'porcentaje': 0, # Aun por llenar
+                    'costo_consumo': line.standard_price * self.area_ocupada_con_merma, # Aun por llenar
+                    'uom_id': line.consumo_uom_id.id,
+                    'incluido_en_ldm': line.incluido_en_ldm,
+                }
+            self.insumo_ids = [(0,0,vals)]
+
+
+        for line in self.posible_adicionales:
+            if line.product_product_id:
+                vals = {
+                    'select_id': self.id,
+                    'product_product_id': line.product_product_id.id,
+                    'cantidad': 1, # Aun por llenar
+                    #'porcentaje': 0, # Aun por llenar
+                    'costo_consumo': line.standard_price,
+                    'uom_id': line.product_product_id.uom_id.id,
+                    'incluido_en_ldm': line.incluido_en_ldm,#line.incluido_en_ldm,
+                }
+                self.insumo_ids = [(0,0,vals)]
+
+
+#    @api.onchange('largo', 'ancho', 'cantidad')
+#    def _update_cantidades_insumo(self):
+#        for line in self.insumo_ids:
+#            line.cantidad = 
+
 
     #@api.depends('product_calc_id')
     #def _compute_sustrato_id_domain(self):
@@ -194,20 +260,38 @@ class SelectProducts(models.TransientModel):
                     "product_qty": self.cantidad,
                     }
             mrp = self.env["mrp.bom"].create(vals)
-            if self.sustrato_id.product_product_id:
-                vals = {
-                    'bom_id': mrp.id,
-                    'product_id': self.sustrato_id.product_product_id.id,
-                    'product_qty': 0,
-                }
-                mrp.bom_line_ids = [(0,0,vals)]
-            for adicional in self.posible_adicionales:
-                values = {
-                    'bom_id': mrp.id,
-                    'product_id': adicional.product_product_id.id,
-                    'product_qty': 0,
-                }
-                mrp.bom_line_ids = [(0,0,values)]
+
+            # BOM lines
+            self._update_insumos()
+            _logger.info(' 1 ')
+            _logger.info(self.insumo_ids)
+            _logger.info(' 2 ')
+            for line in self.insumo_ids:
+                _logger.info(' INSUMO ')
+                _logger.info(line.incluido_en_ldm)
+                if line.incluido_en_ldm:
+                    vals = {
+                        'bom_id': mrp.id,
+                        'product_id': line.product_product_id.id,
+                        'product_qty': line.cantidad,
+                    }
+                    #'uom_id': self.sustrato_id.product_product_id.uom_id.id,
+                    mrp.bom_line_ids = [(0,0,vals)]
+
+#            if self.sustrato_id.product_product_id:
+#                vals = {
+#                    'bom_id': mrp.id,
+#                    'product_id': self.sustrato_id.product_product_id.id,
+#                    'product_qty': 0,
+#                }
+#                mrp.bom_line_ids = [(0,0,vals)]
+#            for adicional in self.posible_adicionales:
+#                values = {
+#                    'bom_id': mrp.id,
+#                    'product_id': adicional.product_product_id.id,
+#                    'product_qty': 0,
+#                }
+#                mrp.bom_line_ids = [(0,0,values)]
 
 
             values = {
