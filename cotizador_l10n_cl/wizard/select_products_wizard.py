@@ -252,7 +252,7 @@ class SelectProducts(models.TransientModel):
 
             # Rutas de producto (MTO y fabricar)
             # Dejar parametrizable (JCR pendiente)
-            product.route_ids = [(5,0)] + [(4,1),(4,6)]
+            product.route_ids = [(5,0)] + [(4,1),(4,5)]
 
             # Crear BoM
             vals = {"product_tmpl_id": product.product_tmpl_id.id,
