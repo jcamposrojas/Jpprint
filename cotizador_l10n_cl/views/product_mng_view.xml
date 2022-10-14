@@ -26,12 +26,14 @@
 			<notebook>
 			    <page string="Sustratos Permitidos">
 			        <group>
-			            <field name="sustratos_ids" nolabel="1">
-					<tree>
+			            <field name="producto_sustrato_ids" nolabel="1">
+					<tree editable="bottom">
 					    <field name="sequence" widget="handle" />
-		                            <field name="name" />
+		                            <field name="sustrato_id" />
+		                            <field name="product_product_id" />
                                             <field name="nombre_corto" />
                                             <field name="codigo" />
+                                            <field name="merma" string="Merma (%)"/>
 				        </tree>
 			            </field>
 

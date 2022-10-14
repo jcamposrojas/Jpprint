@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.0.3',
+    'version': '15.0.1.0.4',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -9,7 +9,7 @@
     'sequence': 1,
     'author': 'JIC',
     'website': 'http://www.vanguardchile.cl',
-    'depends': ['base', 'product', 'sale_management', 'purchase','mrp'],
+    'depends': ['base', 'product', 'sale_management', 'purchase', 'stock', 'mrp'],
     'data': [
         'wizard/select_products_wizard_view.xml',
         'views/menu_root.xml',
@@ -23,7 +23,9 @@
         'views/rendimiento_adicional_view.xml',
         'views/consumo.xml',
         'data/ir_sequence_data.xml',
-        'data/cotizador_data.xml',
+        'data/sustratos.xml',
+        'data/productos.xml',
+        'data/producto_sustratos.xml',
         'data/cotizador_adhesivo.xml',
         'data/cotizador_cilindro.xml',
         'wizard/insumo.xml',

@@ -31,13 +31,13 @@
 
                 <group>
                     <group>
-                        <field name="product_id" />
+                        <field name="producto_id" />
 			<!--<field name="sustrato_id_domain" invisible="0"/>-->
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
                         <field name="cantidad" />
 			<field name="area_ocupada" />
-                        <field name="merma_estimada" string="% Merma estimada"/>
+                        <field name="merma_estimada"/>
 			<!--
                         <field name="merma_estimada" widget="percentage"/>
 			-->
@@ -73,7 +73,7 @@
 		        </group>
 		    </page>
 		    <page string="Materias Primas" name="insumos">
-                        <field name="insumo_ids" />
+			    <field name="insumo_ids"/>
 		    </page>
 		    <page string="Otros atributos">
 		        <group>

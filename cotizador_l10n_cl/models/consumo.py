@@ -25,6 +25,7 @@ class CotizadorConsumoProducto(models.Model):
     cantidad           = fields.Float(string='Cantidad', default=0.0, digits=(20,10))
     costo_consumo      = fields.Float(string='Costo', compute='_compute_costo_consumo', digits=(20,10))
     incluido_en_ldm    = fields.Boolean(string="En LdM?", default=True)
+    merma              = fields.Float(string="Merma (%)", default=0.0)
 
     @api.depends('consumo_uom_id','standard_price','cantidad')
     def _compute_costo_consumo(self):

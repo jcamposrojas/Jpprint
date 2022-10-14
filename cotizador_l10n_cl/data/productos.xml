@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Productos -->
+        <record id="producto1" model="cotizador.producto">
+            <field name="name">ET. ADH. BLANCA TROQUELADA</field>
+            <field name="nombre_corto">ET. ADH.</field>
+            <field name="codigo">ETB</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto2" model="cotizador.producto">
+            <field name="name">ET. ADH. IMPRESA DIGITAL JETRION</field>
+            <field name="nombre_corto">JETRION</field>
+            <field name="codigo">EDJ</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto3" model="cotizador.producto">
+            <field name="name">ET. ADH. IMPRESA FLEXOGRAFIA</field>
+            <field name="nombre_corto">FLEXOGRAFIA</field>
+            <field name="codigo">EF</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto4" model="cotizador.producto">
+            <field name="name">ET. ADH. IMPRESA DIGITAL PANTER</field>
+            <field name="nombre_corto">PANTER</field>
+            <field name="codigo">EDP</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto5" model="cotizador.producto">
+            <field name="name">ET. ADH. IMPRESA TTR</field>
+            <field name="nombre_corto">TTR</field>
+            <field name="codigo">EIMTTR</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto6" model="cotizador.producto">
+            <field name="name">ET. ADH IMPRESA DIGITAL PLANO ( PLOTTER )</field>
+            <field name="nombre_corto">PLOTTER</field>
+            <field name="codigo">DPVC</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto7" model="cotizador.producto">
+            <field name="name">ET.ADH.IMPRESA RICHO</field>
+            <field name="nombre_corto">RICHO</field>
+            <field name="codigo">IMD</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+        <record id="producto8" model="cotizador.producto">
+            <field name="name">ET.NO ADH IMPRESA PLANO RICHO</field>
+            <field name="nombre_corto">PLANO RICHO</field>
+            <field name="codigo">IMD</field>
+	    <field name="category_id" ref="product.product_category_all" />
+        </record>
+
+    </data>
+</odoo>
+

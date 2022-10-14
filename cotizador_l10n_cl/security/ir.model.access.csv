@@ -9,3 +9,4 @@ access_cotizador_adicional,access_cotizador_adicional,model_cotizador_adicional,
 access_cotizador_insumo,access_cotizador_insumo,model_cotizador_insumo,base.group_user,1,1,1,1
 access_rendimiento_adicional,access_rendimiento_adicional,model_rendimiento_adicional,base.group_user,1,1,1,1
 access_cotizador_consumo,access_cotizador_consumo,model_cotizador_consumo,base.group_user,1,1,1,1
+access_producto_sustrato,access_producto_sustrato,model_producto_sustrato,base.group_user,1,1,1,1

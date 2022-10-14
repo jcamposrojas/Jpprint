@@ -15,6 +15,7 @@
                     <field name="consumo_uom_id" domain="[('category_id','=',uom_category_id)]"/> 
                     <field name="cantidad" /> 
                     <field name="costo_consumo" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/> 
+                    <field name="merma"/> 
                     <field name="incluido_en_ldm" /> 
 		</tree>
 

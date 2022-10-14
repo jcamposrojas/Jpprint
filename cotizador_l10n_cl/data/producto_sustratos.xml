@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Productos -->
+        <!-- Producto 1 -->
+        <record id="producto1_sustrato1" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato1"/>
+        </record>
+        <record id="producto1_sustrato2" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato2"/>
+        </record>
+        <record id="producto1_sustrato3" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato3"/>
+        </record>
+        <record id="producto1_sustrato4" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato4"/>
+        </record>
+        <record id="producto1_sustrato5" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato5"/>
+        </record>
+        <record id="producto1_sustrato6" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato6"/>
+        </record>
+        <record id="producto1_sustrato7" model="producto.sustrato">
+	    <field name="producto_id" ref="producto1"/>
+	    <field name="sustrato_id" ref="sustrato7"/>
+        </record>
+
+        <!-- Producto 2 -->
+        <record id="producto2_sustrato1" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato1"/>
+        </record>
+        <record id="producto2_sustrato2" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato2"/>
+        </record>
+        <record id="producto2_sustrato3" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato3"/>
+        </record>
+        <record id="producto2_sustrato4" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato4"/>
+        </record>
+        <record id="producto2_sustrato5" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato5"/>
+        </record>
+        <record id="producto2_sustrato6" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato6"/>
+        </record>
+        <record id="producto2_sustrato7" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato7"/>
+        </record>
+        <record id="producto2_sustrato8" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato8"/>
+        </record>
+        <record id="producto2_sustrato9" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato9"/>
+        </record>
+        <record id="producto2_sustrato10" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato10"/>
+        </record>
+        <record id="producto2_sustrato11" model="producto.sustrato">
+	    <field name="producto_id" ref="producto2"/>
+	    <field name="sustrato_id" ref="sustrato11"/>
+        </record>
+
+        <!-- Producto 3 -->
+        <record id="producto3_sustrato1" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato1"/>
+        </record>
+        <record id="producto3_sustrato2" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato2"/>
+        </record>
+        <record id="producto3_sustrato3" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato3"/>
+        </record>
+        <record id="producto3_sustrato4" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato4"/>
+        </record>
+        <record id="producto3_sustrato5" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato5"/>
+        </record>
+        <record id="producto3_sustrato6" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato6"/>
+        </record>
+        <record id="producto3_sustrato7" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato7"/>
+        </record>
+        <record id="producto3_sustrato8" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato8"/>
+        </record>
+        <record id="producto3_sustrato9" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato9"/>
+        </record>
+        <record id="producto3_sustrato10" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato10"/>
+        </record>
+        <record id="producto3_sustrato11" model="producto.sustrato">
+	    <field name="producto_id" ref="producto3"/>
+	    <field name="sustrato_id" ref="sustrato11"/>
+        </record>
+
+        <!-- Producto 4 -->
+        <record id="producto4_sustrato1" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato1"/>
+        </record>
+        <record id="producto4_sustrato2" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato2"/>
+        </record>
+        <record id="producto4_sustrato3" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato3"/>
+        </record>
+        <record id="producto4_sustrato4" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato4"/>
+        </record>
+        <record id="producto4_sustrato5" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato5"/>
+        </record>
+        <record id="producto4_sustrato6" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato6"/>
+        </record>
+        <record id="producto4_sustrato7" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato7"/>
+        </record>
+        <record id="producto4_sustrato8" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato8"/>
+        </record>
+        <record id="producto4_sustrato9" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato9"/>
+        </record>
+        <record id="producto4_sustrato10" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato10"/>
+        </record>
+        <record id="producto4_sustrato11" model="producto.sustrato">
+	    <field name="producto_id" ref="producto4"/>
+	    <field name="sustrato_id" ref="sustrato11"/>
+        </record>
+
+        <!-- Producto 5 -->
+        <record id="producto5_sustrato1" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato1"/>
+        </record>
+        <record id="producto5_sustrato2" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato2"/>
+        </record>
+        <record id="producto5_sustrato4" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato4"/>
+        </record>
+        <record id="producto5_sustrato5" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato5"/>
+        </record>
+        <record id="producto5_sustrato6" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato6"/>
+        </record>
+        <record id="producto5_sustrato7" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato7"/>
+        </record>
+        <record id="producto5_sustrato12" model="producto.sustrato">
+	    <field name="producto_id" ref="producto5"/>
+	    <field name="sustrato_id" ref="sustrato12"/>
+        </record>
+
+        <!-- Producto 6 -->
+        <record id="producto6_sustrato13" model="producto.sustrato">
+	    <field name="producto_id" ref="producto6"/>
+	    <field name="sustrato_id" ref="sustrato13"/>
+        </record>
+        <record id="producto6_sustrato14" model="producto.sustrato">
+	    <field name="producto_id" ref="producto6"/>
+	    <field name="sustrato_id" ref="sustrato14"/>
+        </record>
+
+        <!-- Producto 7 -->
+        <record id="producto7_sustrato15" model="producto.sustrato">
+	    <field name="producto_id" ref="producto7"/>
+	    <field name="sustrato_id" ref="sustrato15"/>
+        </record>
+
+        <!-- Producto 8 -->
+        <record id="producto8_sustrato16" model="producto.sustrato">
+	    <field name="producto_id" ref="producto8"/>
+	    <field name="sustrato_id" ref="sustrato16"/>
+        </record>
+        <record id="producto8_sustrato17" model="producto.sustrato">
+	    <field name="producto_id" ref="producto8"/>
+	    <field name="sustrato_id" ref="sustrato17"/>
+        </record>
+
+    </data>
+</odoo>
+

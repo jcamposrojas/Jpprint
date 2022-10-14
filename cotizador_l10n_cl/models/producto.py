@@ -13,13 +13,14 @@ class CotizadorProducto(models.Model):
 
     operation_ids = fields.One2many('mrp.routing.workcenter.tmp', 'cotizador_producto_id', string='Operaciones')
 
-    sustratos_ids = fields.Many2many(
-        comodel_name="cotizador.sustrato",
-        relation="cotizador_producto_sustrato_rel",
-        string="Sustratos",
-        column1="producto_id",
-        column2="sustrato_id",
-    )
+#    sustratos_ids = fields.Many2many(
+#        comodel_name="cotizador.sustrato",
+#        relation="cotizador_producto_sustrato_rel",
+#        string="Sustratos",
+#        column1="producto_id",
+#        column2="sustrato_id",
+#    )
+
 
 #    adicional_ids = fields.Many2many(comodel_name="cotizador.adicional",string="Adicionales")
     def _get_default_product_uom_id(self):
@@ -32,6 +33,8 @@ class CotizadorProducto(models.Model):
     sequence     = fields.Integer( 'Sequence', default=100)
 
     consumo_ids = fields.One2many("cotizador.consumo",'producto_id', string="Consumos")
+
+    producto_sustrato_ids = fields.One2many("producto.sustrato",'producto_id', string="Sustratos")
 
 
 

@@ -14,6 +14,7 @@ class CotizadorInsumo(models.TransientModel):
     cantidad           = fields.Float("Cantidad")
 #    porcentaje   = fields.Float(string='Rendimiento')
     costo_consumo      = fields.Float(string='Costo')
+    merma              = fields.Float(string="Merma (%)", default=0.0)
     incluido_en_ldm    = fields.Boolean(string="En LdM?")
 
 
