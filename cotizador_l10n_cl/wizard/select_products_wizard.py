@@ -68,8 +68,8 @@ class SelectProducts(models.TransientModel):
     )
 
     #========== Valores ==========
-    insumo_ids = fields.One2many('cotizador.insumo','select_id',copy=True, readonly=True, store=True)
-    posible_adicionales = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
+    insumo_ids    = fields.One2many('cotizador.insumo','select_id',copy=True, readonly=True, store=True)
+    adicional_ids = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
 
     @api.depends('sustrato_id','producto_id')
     def _compute_merma(self):
@@ -192,7 +192,7 @@ class SelectProducts(models.TransientModel):
             return {'domain': {'sustrato_id':domain}}
 
     # Actualiza listado de materias primas
-    @api.onchange('producto_id', 'sustrato_id','posible_adicionales', 'largo','ancho','cantidad','merma_estimada')
+    @api.onchange('producto_id', 'sustrato_id','adicional_ids', 'largo','ancho','cantidad','merma_estimada')
     def _update_insumos(self):
         self.insumo_ids = [(5,0)]
 
@@ -201,6 +201,7 @@ class SelectProducts(models.TransientModel):
             vals = {
                     'select_id': self.id,
                     'product_product_id': self.sustrato_id.product_product_id.id,
+                    'name': self.sustrato_id.product_product_id.name,
                     'cantidad': self.area_ocupada_con_merma,
                     'costo_consumo': self.sustrato_id.standard_price * self.area_ocupada_con_merma,
                     'uom_id': self.sustrato_id.product_product_id.uom_id.id,
@@ -214,6 +215,7 @@ class SelectProducts(models.TransientModel):
             vals = {
                     'select_id': self.id,
                     'product_product_id': line.product_product_id.id,
+                    'name': line.product_product_id.name,
                     'cantidad': line.cantidad * self.area_ocupada * (1 + line.merma / 100.0),
                     'costo_consumo': line.costo_consumo * self.area_ocupada * (1 + line.merma / 100.0),
                     'uom_id': line.consumo_uom_id.id,
@@ -223,18 +225,22 @@ class SelectProducts(models.TransientModel):
             self.insumo_ids = [(0,0,vals)]
 
 
-        for line in self.posible_adicionales:
-            if line.product_product_id:
-                vals = {
+        for line in self.producto_id.adicional_ids:
+            if self.producto_id.uom_id.id == line.uom_id.id:
+                costo = line.standard_price * line.cantidad * self.area_ocupada
+            else:
+                costo = line.standard_price * line.cantidad
+            vals = {
                     'select_id': self.id,
-                    'product_product_id': line.product_product_id.id,
-                    'cantidad': 1, # Aun por llenar
-                    'costo_consumo': line.standard_price,
-                    'uom_id': line.product_product_id.uom_id.id,
-                    'merma': 0.0, # por definir
+                    #'product_product_id': line.product_product_id.id,
+                    'name': line.name, # Aun por llenar
+                    'cantidad': line.cantidad, # Aun por llenar
+                    'costo_consumo': costo,
+                    'uom_id': line.uom_id.id,
+                    #'merma': 0.0, # por definir
                     'incluido_en_ldm': line.incluido_en_ldm,#line.incluido_en_ldm,
                 }
-                self.insumo_ids = [(0,0,vals)]
+            self.insumo_ids = [(0,0,vals)]
 
 
 #    @api.onchange('largo', 'ancho', 'cantidad')
@@ -331,7 +337,8 @@ class SelectProducts(models.TransientModel):
                 mrp.operation_ids = [(0,0,values)]
 
             # Calcula costo en base a LdM
-            product.button_bom_cost()
+            # Revisar si es necesario
+            #product.button_bom_cost()
 
             # Insertar producto en SO
             order_id = self.env['sale.order'].browse(self._context.get('active_id', False))

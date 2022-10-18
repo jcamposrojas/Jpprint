@@ -62,8 +62,9 @@
                                 <field name="buje" />
 		            </group>
 			    <group>
-                                <field name="posible_adicionales"  widget="many2many_tags" />
+                                <field name="adicional_ids"/>
 				<!--
+                                <field name="adicional_ids"  widget="many2many_tags" />
                                 <field name="rotulado_embalaje" />
                                 <field name="efecto_espejo" />
                                 <field name="laminado" />
@@ -73,7 +74,16 @@
 		        </group>
 		    </page>
 		    <page string="Materias Primas" name="insumos">
-			    <field name="insumo_ids"/>
+			<field name="insumo_ids">
+			    <tree editable="bottom">
+			        <field name="name"/>
+			        <field name="cantidad"/>
+			        <field name="uom_id"/>
+			        <field name="costo_consumo" sum="Costo Total"/>
+			        <field name="merma"/>
+			        <field name="incluido_en_ldm"/>
+			    </tree>
+			</field>
 		    </page>
 		    <page string="Otros atributos">
 		        <group>

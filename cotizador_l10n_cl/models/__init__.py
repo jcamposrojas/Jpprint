@@ -6,7 +6,7 @@ from . import producto
 from . import sustrato
 from . import sale_order_line
 from . import adicional
-from . import rendimiento_adicional
+#from . import rendimiento_adicional
 
 from . import consumo
 from . import producto_sustrato

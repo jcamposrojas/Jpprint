@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.0.5',
+    'version': '15.0.1.0.3',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -19,8 +19,8 @@
         'views/purchase_views.xml',
         'views/mrp_routing_views.xml',
 #        'views/sale_order_view.xml',
-        'views/adicional_views.xml',
-        'views/rendimiento_adicional_view.xml',
+#        'views/adicional_views.xml',
+#        'views/rendimiento_adicional_view.xml',
         'views/consumo.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',

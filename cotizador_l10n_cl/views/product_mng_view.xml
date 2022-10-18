@@ -46,7 +46,14 @@
 			    </page>
 			    <page string="Entradas Adicionales">
 			        <group>
-			            <field name="adicional_ids" nolabel="1"/>
+			            <field name="adicional_ids" nolabel="1">
+				        <tree editable="bottom">
+			                    <field name="name"/>
+			                    <field name="uom_id"/>
+			                    <field name="standard_price"/>
+			                    <field name="cantidad"/>
+				        </tree>
+				    </field>
                                 </group>
 			    </page>
 			    <page string="Consumos Obligatorios">
