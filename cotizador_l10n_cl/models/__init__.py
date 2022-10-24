@@ -10,3 +10,5 @@ from . import adicional
 
 from . import consumo
 from . import producto_sustrato
+from . import troquel
+from . import buje

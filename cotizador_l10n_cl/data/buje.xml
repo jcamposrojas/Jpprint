@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Bujes -->
+        <record id="buje1" model="cotizador.buje">
+            <field name="name">BUJE 1</field>
+            <field name="longitud">60</field>
+        </record>
+        <record id="buje3" model="cotizador.buje">
+            <field name="name">BUJE 3</field>
+            <field name="longitud">120</field>
+        </record>
+        <record id="buje40" model="cotizador.buje">
+            <field name="name">BUJE 40</field>
+            <field name="longitud">25</field>
+        </record>
+
+    </data>
+</odoo>
+

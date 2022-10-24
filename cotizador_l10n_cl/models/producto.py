@@ -33,9 +33,3 @@ class CotizadorProducto(models.Model):
     operation_ids         = fields.One2many('mrp.routing.workcenter.tmp', 'cotizador_producto_id', string='Operaciones')
     adicional_ids         = fields.One2many("cotizador.adicional",'producto_id', string="Adicionales")
 
-
-
-
-
-
-

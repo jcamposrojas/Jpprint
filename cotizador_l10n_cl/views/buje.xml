@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="buje_cotizador_tree" model="ir.ui.view">
+	    <field name="name">cotizador.buje.tree</field>
+	    <field name="model">cotizador.buje</field>
+	    <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="name" />
+                    <field name="longitud" />
+                    <field name="product_product_id" />
+                    <field name="uom_id" />
+                    <field name="standard_price" />
+                    <field name="cost_currency_id" />
+		</tree>
+
+	    </field>
+	</record>
+
+        <record id="buje_mng_cotizador_action" model="ir.actions.act_window">
+	    <field name="name">Bujes</field>
+	    <field name="res_model">cotizador.buje</field>
+	    <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="buje_mng_menu" parent="menu_mng_cotizador" action="buje_mng_cotizador_action" sequence="40" />
+
+    </data>
+</odoo>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Troqueles -->
+        <record id="cotizador_troquel1" model="cotizador.troquel">
+            <field name="name">PSB-S1</field>
+            <field name="z">97</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel2" model="cotizador.troquel">
+            <field name="name">PSB-S2</field>
+            <field name="z">69</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel3" model="cotizador.troquel">
+            <field name="name">PSB-S3</field>
+            <field name="z">80</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel4" model="cotizador.troquel">
+            <field name="name">PSB-S4</field>
+            <field name="z">64</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel5" model="cotizador.troquel">
+            <field name="name">PSB-S5</field>
+            <field name="z">127</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel6" model="cotizador.troquel">
+            <field name="name">PSB-S6</field>
+            <field name="z">76</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel7" model="cotizador.troquel">
+            <field name="name">PSB-S7</field>
+            <field name="z">74</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel8" model="cotizador.troquel">
+            <field name="name">PSB-S8</field>
+            <field name="z">78</field>
+            <field name="tipo">solido</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel9" model="cotizador.troquel">
+            <field name="name">PSB-F1</field>
+            <field name="z">73</field>
+            <field name="tipo">flexible</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel10" model="cotizador.troquel">
+            <field name="name">PSB-F2</field>
+            <field name="z">65</field>
+            <field name="tipo">flexible</field>
+            <field name="unidades">10</field>
+        </record>
+        <record id="cotizador_troquel11" model="cotizador.troquel">
+            <field name="name">PSB-F3</field>
+            <field name="z">63</field>
+            <field name="tipo">flexible</field>
+            <field name="unidades">10</field>
+        </record>
+
+    </data>
+</odoo>
+

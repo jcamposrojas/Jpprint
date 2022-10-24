@@ -43,7 +43,7 @@
             <field name="codigo">MITO</field>
         </record>
         <record id="sustrato9" model="cotizador.sustrato">
-            <field name="name">PAPEL ADHEISVOI MARTELE</field>
+            <field name="name">PAPEL ADHESIVO MARTELE</field>
             <field name="nombre_corto">MARTELE</field>
             <field name="codigo">MTE</field>
         </record>

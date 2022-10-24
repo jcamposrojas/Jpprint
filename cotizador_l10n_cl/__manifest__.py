@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.0.3',
+    'version': '15.0.1.0.7',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -19,15 +19,17 @@
         'views/purchase_views.xml',
         'views/mrp_routing_views.xml',
 #        'views/sale_order_view.xml',
-#        'views/adicional_views.xml',
+        'views/troquel_views.xml',
 #        'views/rendimiento_adicional_view.xml',
         'views/consumo.xml',
+        'views/buje.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',
         'data/productos.xml',
         'data/producto_sustratos.xml',
         'data/cotizador_adhesivo.xml',
-        'data/cotizador_cilindro.xml',
+        'data/troquel.xml',
+        'data/buje.xml',
         'wizard/insumo.xml',
         'security/ir.model.access.csv'
     ],

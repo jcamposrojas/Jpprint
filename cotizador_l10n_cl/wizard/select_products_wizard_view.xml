@@ -32,10 +32,16 @@
                 <group>
                     <group>
                         <field name="producto_id" />
-			<!--<field name="sustrato_id_domain" invisible="0"/>-->
+                        <field name="codigo_producto" invisible="1"/>
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
-                        <field name="cantidad" />
+
+			<label for="cantidad" string="Cantidad" />
+			<div class="o_row" id="cantidad_uom" >
+                            <field name="cantidad" />
+                            <field name="product_uom_id" nolabel="1"/>
+                        </div>
+
 			<field name="area_ocupada" />
                         <field name="merma_estimada"/>
 			<!--
@@ -49,7 +55,6 @@
                             <span><field name="uom_id" readonly="1" nolabel="1"/></span>
                         </div>
 			<field name="adhesivo_id" />
-                        <field name="product_uom_id"/>
                         <field name="datos_adicionales" />
 			<field name="area_ocupada_con_merma" />
                     </group>
@@ -58,8 +63,8 @@
 		    <page string="General" name="general_information">
 			<group>
 			    <group>
-                                <field name="aisa" widget="radio"/>
-                                <field name="buje" />
+                                <field name="aisa"/>
+                                <field name="buje_id" />
 		            </group>
 			    <group>
                                 <field name="adicional_ids"/>
@@ -74,31 +79,56 @@
 		        </group>
 		    </page>
 		    <page string="Materias Primas" name="insumos">
-			<field name="insumo_ids">
-			    <tree editable="bottom">
+			<group>
+			<field name="insumo_ids" nolabel="1">
+			    <tree editable="bottom" options="{'no_create': True}">
 			        <field name="name"/>
 			        <field name="cantidad"/>
 			        <field name="uom_id"/>
 			        <field name="costo_consumo" sum="Costo Total"/>
 			        <field name="merma"/>
 			        <field name="incluido_en_ldm"/>
+			        <field name="flag_adicional" invisible="1"/>
 			    </tree>
 			</field>
-		    </page>
-		    <page string="Otros atributos">
-		        <group>
-                            <field name="ancho_papel"/>
-                            <field name="etiquetas_al_desarrollo"/>
-                            <field name="etiquetas_al_ancho"/>
-                            <field name="gap"/>
-                            <field name="engranaje"/>
-                            <field name="z_calculado"/>
-			    <label for="z_ingreso" string="Z ingreso / Cilindros" />
-			    <div class="o_row" id="z_unidades" >
-			        <field name="z_ingreso" style="max-width:20px"/> / <field name="cilindros"/>
-                            </div>
-                            <field name="etiqueta_con_gap"/>
 		        </group>
+		    </page>
+		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','ETB'),('codigo_producto','!=','EF')]}">
+		        <group>
+		            <group>
+                                <field name="ancho_papel"/>
+                                <field name="engranaje"/>
+                                <field name="etiquetas_al_desarrollo"/>
+                                <field name="etiquetas_al_ancho"/>
+                                <field name="gap"/>
+			    </group>
+		            <group>
+                                <field name="z_calculado"/>
+				<label for="z_ingreso" string="Troquel / Z / Cilindros" />
+			        <div class="o_row" id="z_unidades" >
+					<field name="troquel" style="max-width:100px"/> / <field name="z_ingreso" style="max-width:20px"/> / <field name="cilindros"/>
+                                </div>
+                                <field name="etiqueta_con_gap"/>
+                                <field name="gap_etiqueta"/>
+
+				<label for="ss" string="SS / SX / RF" />
+			        <div class="o_row" id="ancho_ss_sx" >
+					<field name="ss" style="max-width:20px"/> / <field name="sx" style="max-width:20px"/> / <field name="rf" style="max-width:20px" readonly="1"/>
+                                </div>
+                                <field name="ancho_bobina"/>
+                                <field name="longitud_papel"/>
+		            </group>
+		        </group>
+		    </page>
+		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','EDJ')]}">
+		        <group>
+		            <group>
+                                <field name="ancho_papel"/>
+			    </group>
+		            <group>
+                                <field name="longitud_papel"/>
+			    </group>
+			</group>
 		    </page>
 		</notebook>
                 <footer>
