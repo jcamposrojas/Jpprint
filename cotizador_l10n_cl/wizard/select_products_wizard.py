@@ -329,7 +329,7 @@ class SelectProducts(models.TransientModel):
                     'name': self.buje_id.name,
                     'cantidad': cantidad,
                     'costo_consumo': cantidad * self.buje_id.standard_price,
-                    'uom_id': self.buje_id.uom_id,
+                    'uom_id': self.buje_id.uom_id.id,
                     'merma': 0,
                     'incluido_en_ldm': True,
                     'flag_adicional': False,
@@ -455,6 +455,7 @@ class SelectProducts(models.TransientModel):
             self.env['sale.order.line'].create({
                     'product_id': product.id,
                     'product_uom': product.uom_id.id,
+                    'product_uom_qty': self.cantidad,
                     'price_unit': product.list_price,
                     'order_id': order_id.id
                 })
@@ -486,6 +487,12 @@ class SelectProducts(models.TransientModel):
     def create_product(self):
         if self.nombre_producto:
             #standard_price, list_price = self.get_final_product_prices()
+            standard_price = 0.0
+            for item in self.insumo_ids:
+                standard_price += item.costo_consumo
+            standard_price = standard_price / self.cantidad
+            list_price = standard_price # precio/costo unitario
+
             seq = self.env['ir.sequence'].next_by_code('cotizador_l10n_cl.product')
             vals = {
                 "type": "product",
@@ -494,10 +501,8 @@ class SelectProducts(models.TransientModel):
                 "purchase_ok": False,  # Producto no se compra
                 #"description": self.datos_adicionales,
                 "categ_id": self.producto_id.category_id.id,
-                #"standard_price": standard_price,
-                #"list_price": list_price,
-                "standard_price": 0,
-                "list_price": 0,
+                "standard_price": standard_price,
+                "list_price": list_price,
                 "uom_id": self.product_uom_id.id,
             }
             product = self.env["product.product"].create(vals)
@@ -507,8 +512,8 @@ class SelectProducts(models.TransientModel):
 
     def genera_descripcion(self):
         texto = ""
-        if self.buje:
-            texto =  "BUJE: " + self.buje +"<br>"
+        if self.buje_id:
+            texto =  "BUJE: " + self.buje_id.name +"<br>"
         if self.aisa:
             texto += "AISA: " + self.aisa +"<br>"
         if self.adhesivo_id:
