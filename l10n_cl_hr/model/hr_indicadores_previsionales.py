@@ -15,17 +15,18 @@ locale._override_localeconv["thousands_sep"] = "."
 locale._override_localeconv["decimal_point"] = ","
 
 
-URL_PREVIRED = "https://www.previred.com/web/previred/indicadores-previsionales"
+#URL_PREVIRED = "https://www.previred.com/web/previred/indicadores-previsionales"
+URL_PREVIRED = "https://www.previred.com/indicadores-previsionales"
 
 _logger = logging.getLogger(__name__)
 
-MONTH_LIST= [('1', 'Enero'), 
-        ('2', 'Febrero'), ('3', 'Marzo'), 
-        ('4', 'Abril'), ('5', 'Mayo'), 
-        ('6', 'Junio'), ('7', 'Julio'), 
-        ('8', 'Agosto'), ('9', 'Septiembre'), 
-        ('10', 'Octubre'), ('11', 'Noviembre'),
-        ('12', 'Diciembre')]
+MONTH_LIST= [
+        ('1',  'ENERO'),      ('2',  'FEBRERO'),
+        ('3',  'MARZO'),      ('4',  'ABRIL'),
+        ('5',  'MAYO'),       ('6',  'JUNIO'),
+        ('7',  'JULIO'),      ('8',  'AGOSTO'),
+        ('9',  'SEPTIEMBRE'), ('10', 'OCTUBRE'),
+        ('11', 'NOVIEMBRE'),  ('12', 'DICIEMBRE')]
 
 STATES = {'draft': [('readonly', False)]}
 
@@ -59,51 +60,53 @@ class hr_indicadores_previsionales(models.Model):
         readonly=True, states=STATES, help="Contrato Plazo Indefinido 11 anos Trabajador")
     contrato_plazo_indefinido_trabajador = fields.Float( 'Contrato Plazo Indefinido Trabajador', readonly=True, states=STATES,
         help="Contrato Plazo Indefinido Trabajador")
-    caja_compensacion  = fields.Float( 'Caja Compensación', readonly=True, states=STATES, help="Caja de Compensacion")
     deposito_convenido = fields.Float( 'Deposito Convenido', readonly=True, states=STATES, help="Deposito Convenido")
-    fonasa = fields.Float('Fonasa', readonly=True, states=STATES, help="Fonasa")
-    mutual_seguridad = fields.Float( 'Mutualidad', readonly=True, states=STATES, help="Mutual de Seguridad")
-    isl = fields.Float( 'ISL', readonly=True, states=STATES, help="Instituto de Seguridad Laboral")
-    pensiones_ips = fields.Float( 'Pensiones IPS', readonly=True, states=STATES, help="Pensiones IPS")
-    sueldo_minimo = fields.Float( 'Trab. Dependientes e Independientes', readonly=True, states=STATES, help="Sueldo Minimo")
+    caja_compensacion  = fields.Float( 'Caja Compensación', readonly=True, states=STATES, help="Caja de Compensacion")
+    fonasa             = fields.Float('Fonasa', readonly=True, states=STATES, help="Fonasa")
+    caja_compensacion_previred  = fields.Float('Caja Compensación Previred', readonly=True, states=STATES, help="Caja de Compensacion")
+    fonasa_previred             = fields.Float('Fonasa Previred', readonly=True, states=STATES, help="Fonasa")
+    mutual_seguridad   = fields.Float( 'Mutualidad', readonly=True, states=STATES, help="Mutual de Seguridad")
+    isl                = fields.Float( 'ISL', readonly=True, states=STATES, help="Instituto de Seguridad Laboral")
+    pensiones_ips      = fields.Float( 'Pensiones IPS', readonly=True, states=STATES, help="Pensiones IPS")
+    sueldo_minimo      = fields.Float( 'Trab. Dependientes e Independientes', readonly=True, states=STATES, help="Sueldo Minimo")
     sueldo_minimo_otro = fields.Float( 'Menores de 18 y Mayores de 65:', readonly=True, states=STATES,
         help="Sueldo Mínimo para Menores de 18 y Mayores a 65")
-    tasa_afp_cuprum  = fields.Float( 'Cuprum', readonly=True, states=STATES, help="Tasa AFP Cuprum")
-    tasa_afp_capital = fields.Float( 'Capital', readonly=True, states=STATES, help="Tasa AFP Capital")
-    tasa_afp_provida = fields.Float( 'ProVida', readonly=True, states=STATES, help="Tasa AFP Provida")
-    tasa_afp_modelo  = fields.Float( 'Modelo', readonly=True, states=STATES, help="Tasa AFP Modelo")
+    tasa_afp_cuprum    = fields.Float( 'Cuprum', readonly=True, states=STATES, help="Tasa AFP Cuprum")
+    tasa_afp_capital   = fields.Float( 'Capital', readonly=True, states=STATES, help="Tasa AFP Capital")
+    tasa_afp_provida   = fields.Float( 'ProVida', readonly=True, states=STATES, help="Tasa AFP Provida")
+    tasa_afp_modelo    = fields.Float( 'Modelo', readonly=True, states=STATES, help="Tasa AFP Modelo")
     tasa_afp_planvital = fields.Float( 'PlanVital', readonly=True, states=STATES, help="Tasa AFP PlanVital")
-    tasa_afp_habitat = fields.Float( 'Habitat',  help="Tasa AFP Habitat")
-    tasa_afp_uno = fields.Float( 'Uno', help="Tasa AFP Uno")
-    tasa_sis_cuprum  = fields.Float('SIS', readonly=True, states=STATES, help="Tasa SIS Cuprum")
-    tasa_sis_capital = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS Capital")
-    tasa_sis_provida = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS Provida")
+    tasa_afp_habitat   = fields.Float( 'Habitat',  help="Tasa AFP Habitat")
+    tasa_afp_uno       = fields.Float( 'Uno', help="Tasa AFP Uno")
+    tasa_sis_cuprum    = fields.Float('SIS', readonly=True, states=STATES, help="Tasa SIS Cuprum")
+    tasa_sis_capital   = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS Capital")
+    tasa_sis_provida   = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS Provida")
     tasa_sis_planvital = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS PlanVital")
-    tasa_sis_habitat = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS Habitat")
-    tasa_sis_modelo  = fields.Float( 'SIS',  help="Tasa SIS Modelo")
-    tasa_sis_uno = fields.Float( 'SIS', help="Tasa SIS Uno")
-    tasa_independiente_cuprum = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Cuprum")
-    tasa_independiente_capital = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Capital")
-    tasa_independiente_provida = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Provida")
+    tasa_sis_habitat   = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa SIS Habitat")
+    tasa_sis_modelo    = fields.Float( 'SIS',  help="Tasa SIS Modelo")
+    tasa_sis_uno       = fields.Float( 'SIS', help="Tasa SIS Uno")
+    tasa_independiente_cuprum    = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Cuprum")
+    tasa_independiente_capital   = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Capital")
+    tasa_independiente_provida   = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Provida")
     tasa_independiente_planvital = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes PlanVital")
-    tasa_independiente_habitat = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Habitat")
-    tasa_independiente_modelo = fields.Float( 'SIS',  help="Tasa Independientes Modelo")
-    tasa_independiente_uno = fields.Float( 'SIS', help="Tasa Independientes Uno")
-    tope_anual_apv = fields.Float( 'Tope Anual APV', readonly=True, states=STATES, help="Tope Anual APV")
-    tope_mensual_apv = fields.Float( 'Tope Mensual APV', readonly=True, states=STATES, help="Tope Mensual APV")
-    tope_imponible_afp = fields.Float( 'Tope imponible AFP', readonly=True, states=STATES, help="Tope Imponible AFP")
-    tope_imponible_ips = fields.Float( 'Tope Imponible IPS', readonly=True, states=STATES, help="Tope Imponible IPS")
+    tasa_independiente_habitat   = fields.Float( 'SIS', readonly=True, states=STATES, help="Tasa Independientes Habitat")
+    tasa_independiente_modelo    = fields.Float( 'SIS',  help="Tasa Independientes Modelo")
+    tasa_independiente_uno       = fields.Float( 'SIS', help="Tasa Independientes Uno")
+    tope_anual_apv       = fields.Float( 'Tope Anual APV', readonly=True, states=STATES, help="Tope Anual APV")
+    tope_mensual_apv     = fields.Float( 'Tope Mensual APV', readonly=True, states=STATES, help="Tope Mensual APV")
+    tope_imponible_afp   = fields.Float( 'Tope imponible AFP', readonly=True, states=STATES, help="Tope Imponible AFP")
+    tope_imponible_ips   = fields.Float( 'Tope Imponible IPS', readonly=True, states=STATES, help="Tope Imponible IPS")
     tope_imponible_salud = fields.Float( 'Tope Imponible Salud', readonly=True, states=STATES,)
     tope_imponible_seguro_cesantia = fields.Float( 'Tope Imponible Seguro Cesantía', readonly=True, states=STATES,
         help="Tope Imponible Seguro de Cesantía")
-    uf  = fields.Float('UF', required=True, readonly=True, states=STATES, help="UF fin de Mes")
-    utm = fields.Float('UTM', required=True, readonly=True, states=STATES, help="UTM Fin de Mes")
-    uta = fields.Float('UTA', readonly=True, states=STATES, help="UTA Fin de Mes")
+    uf       = fields.Float('UF', required=True, readonly=True, states=STATES, help="UF fin de Mes")
+    utm      = fields.Float('UTM', required=True, readonly=True, states=STATES, help="UTM Fin de Mes")
+    uta      = fields.Float('UTA', readonly=True, states=STATES, help="UTA Fin de Mes")
     uf_otros = fields.Float( 'UF Otros', readonly=True, states=STATES, help="UF Seguro Complementario")
     mutualidad_id = fields.Many2one('hr.mutual', 'MUTUAL', readonly=True, states=STATES)
-    ccaf_id = fields.Many2one('hr.ccaf', 'CCAF', readonly=True, states=STATES)
-    month = fields.Selection(MONTH_LIST, string='Mes', required=True, readonly=True, states=STATES)
-    year = fields.Integer('Año', required=True, default=datetime.now().strftime('%Y'), readonly=True, states=STATES)
+    ccaf_id       = fields.Many2one('hr.ccaf', 'CCAF', readonly=True, states=STATES)
+    month         = fields.Selection(MONTH_LIST, string='Mes', required=True, readonly=True, states=STATES)
+    year          = fields.Integer('Año', required=True, default=datetime.now().date().strftime('%Y'), readonly=True, states=STATES)
     gratificacion_legal = fields.Boolean('Gratificación L. Manual', readonly=True, states=STATES)
     mutual_seguridad_bool = fields.Boolean('Mutual Seguridad', default=True, readonly=True, states=STATES)
     ipc = fields.Float('IPC',  required=True, readonly=True, states=STATES, help="Indice de Precios al Consumidor (IPC)")
@@ -118,7 +121,13 @@ class hr_indicadores_previsionales(models.Model):
 
     @api.onchange('month')
     def get_name(self):
-        self.name = str(self.month).replace('10', 'Octubre').replace('11', 'Noviembre').replace('12', 'Diciembre').replace('1', 'Enero').replace('2', 'Febrero').replace('3', 'Marzo').replace('4', 'Abril').replace('5', 'Mayo').replace('6', 'Junio').replace('7', 'Julio').replace('8', 'Agosto').replace('9', 'Septiembre') + " " + str(self.year)
+        # Convierte lista de tuplas den dictionary
+        meses = dict(MONTH_LIST)
+        if self.month:
+            self.name = meses[self.month] + ' ' + str(self.year)
+        else:
+            self.name = ''
+
 
     def find_between_r(self, s, first, last ):
         try:
@@ -128,37 +137,12 @@ class hr_indicadores_previsionales(models.Model):
         except ValueError:
             return ""
 
-    def find_month(self, s):
-        if s == '1':
-            return 'Enero'
-        if s == '2':
-            return 'Febrero'
-        if s == '3':
-            return 'Marzo'
-        if s == '4':
-            return 'Abril'
-        if s == '5':
-            return 'Mayo'
-        if s == '6':
-            return 'Junio'
-        if s == '7':
-            return 'Julio'
-        if s == '8':
-            return 'Agosto'
-        if s == '9':
-            return 'Septiembre'
-        if s == '10':
-            return 'Octubre'
-        if s == '11':
-            return 'Noviembre'
-        if s == '12':
-            return 'Diciembre'
-
 
     def update_document(self):
         #self.update_date = datetime.today()
         try:
-            url = 'https://www.previred.com/web/previred/indicadores-previsionales'
+            #url = 'https://www.previred.com/web/previred/indicadores-previsionales'
+            url = URL_PREVIRED
             page = urlopen(url)
             html_bytes = page.read()
             html = html_bytes.decode("utf-8")
@@ -240,6 +224,11 @@ class hr_indicadores_previsionales(models.Model):
             self.tasa_afp_uno           = new_ind['TASA_UNO'][0]
             self.tasa_sis_uno           = new_ind['TASA_UNO'][1]
             self.tasa_independiente_uno = new_ind['TASA_UNO'][2]
+
+            # 9 DISTRIBUCION 7 % PARA EMPLEADORES CCAF
+            self.fonasa_previred            = new_ind['DISTRIBUCION_7P_FONASA']
+            self.caja_compensacion_previred = new_ind['DISTRIBUCION_7P_CCAF']
+
         except ValueError:
             return ""
 
@@ -269,8 +258,8 @@ class hr_indicadores_previsionales(models.Model):
             'SEGURO_CESANTIA_PLAZO_FIJO':[],
             'SEGURO_CESANTIA_11_ANNOS':[],
             'SEGURO_CESANTIA_CASA_PARTICULAR':[],
-            'DISTRIBUCION_7P_CCAF':[],
-            'DISTRIBUCION_7P_FONASA':[],
+            'DISTRIBUCION_7P_CCAF':0.0,
+            'DISTRIBUCION_7P_FONASA':0.0,
             'TASA_CAPITAL':[],
             'TASA_CUPRUM':[],
             'TASA_HABITAT':[],
@@ -295,9 +284,7 @@ class hr_indicadores_previsionales(models.Model):
         for div in div_journal:
             s = div.find_all(class_='encabezado_tabla_ind')
             for f in s:
-                #print('-'+f.get_text()+'-')
                 if f.get_text() == 'VALOR UF':
-                    #print(div)
                     for tr in div.find_all('tr'):
                         if f.get_text().strip() != tr.get_text().strip():
                             b = re.findall(r'al\s+(\d+)\s+de\s+(\w+)\s+(\d+)',str(tr),re.IGNORECASE)
@@ -375,17 +362,21 @@ class hr_indicadores_previsionales(models.Model):
                             if b:
                                 valor_clp = re_monto_porcentaje.findall(str(tr))
                                 indicadores['SEGURO_CESANTIA_CASA_PARTICULAR'] = locale.atof(valor_clp[0])
-                elif f.get_text() == 'DISTRIBUCIÓN DEL 7% SALUD, PARA EMPLEADORES AFILIADOS A CCAF (*)':
+                elif f.get_text() == 'DISTRIBUCIÓN DEL 7% SALUD, PARA EMPLEADORES AFILIADO A CCAF (*)':
                     for tr in div.find_all('tr'):
                         if f.get_text().strip() != tr.get_text().strip():
                             b = re.findall(r'>\s*CCAF\s*<',str(tr),re.IGNORECASE)
                             if b:
                                 valor_clp = re_monto_porcentaje.findall(str(tr))
-                                indicadores['DISTRIBUCION_7P_CCAF'] = valor_clp
+                                indicadores['DISTRIBUCION_7P_CCAF'] = locale.atof(valor_clp[0])
+                                _logger.info('DISTRIBUCION_7P_CCAF')
+                                _logger.info(valor_clp)
                             b = re.findall(r'>\s*FONASA\s*<',str(tr),re.IGNORECASE)
                             if b:
                                 valor_clp = re_monto_porcentaje.findall(str(tr))
-                                indicadores['DISTRIBUCION_7P_FONASA'] = valor_clp
+                                indicadores['DISTRIBUCION_7P_FONASA'] = locale.atof(valor_clp[0])
+                                _logger.info('DISTRIBUCION_7P_FONASA')
+                                _logger.info(valor_clp)
                 elif f.get_text() == 'TASA COTIZACIÓN OBLIGATORIO AFP':
                     for tr in div.find_all('tr'):
                         if f.get_text().strip() != tr.get_text().strip():
@@ -468,7 +459,7 @@ class hr_indicadores_previsionales(models.Model):
                             if b:
                                 valor_clp = re_monto_porcentaje.findall(str(tr))
                                 indicadores['COTIZACION_TRAB_MENOS_PESADO'] = valor_clp
-                elif f.get_text().strip() == 'VALOR UTM UTA':
+                elif f.get_text().strip() == 'VALOR\nUTM\nUTA':
                     for tr in div.find_all('tr'):
                         if f.get_text().strip() != tr.get_text().strip():
                             #print(str(tr))
@@ -487,5 +478,4 @@ class hr_indicadores_previsionales(models.Model):
                             indicadores['UTA'] = locale.atof(uta)
 
         return indicadores
-
 

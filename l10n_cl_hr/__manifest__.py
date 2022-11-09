@@ -18,12 +18,13 @@
         "KONOS",
     ],
     'license': 'AGPL-3',
-    'version': '15.0.1.0.3',
+    'version': '15.0.1.0.4',
     'description': """
 Chilean Payroll & Human Resources.
 ==================================
     -Payroll configuration for Chile localization.
     Basado en versión KONOS
+    20221101 Actualicacion sitio Previred
   """,
     'category': 'Localization/Chile',
     'data': [
