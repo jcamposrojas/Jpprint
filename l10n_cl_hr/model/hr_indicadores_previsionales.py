@@ -11,6 +11,7 @@ import re
 
 import locale
 
+
 locale._override_localeconv["thousands_sep"] = "."
 locale._override_localeconv["decimal_point"] = ","
 
