@@ -74,25 +74,30 @@
 		    <div class="row">
                     <div name="left-upper-side" class="col-8">
 		        <div class="row">
-	                    <strong><span t-field="o.company_id.partner_id.name"/></strong>
-                            <br/>
-                            <span name="company_activity" t-field="o.company_id.l10n_cl_activity_description"/>
-                            <br/>
-		        </div>
-		        <div class="row">
-                            <div class="col-6" style="padding-left:0px;">
-	                    <div style="font-size:9px;">
-		                <span t-if="o.company_id.l10n_cl_info_sucursales" name="l10n_cl_info_sucursales" t-field="o.company_id.l10n_cl_info_sucursales"/>
-		            </div>
-		            </div>
-                            <div class="col-6">
-                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 50px;" alt="Logo"/>
-		            </div>
-		        </div>
-		        <div class="row">
-                            <span t-if="header_address.website">
-                                <span t-esc="' - '.join([item for item in [header_address.email,header_address.website.replace('https://', '').replace('http://', '')] if item])"/>
-                            </span>
+			    <div class="col-4">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 150px;" alt="Logo"/>
+                            </div>
+                            <div class="col-8" style="padding-left:0px;">
+                                <div style="font-size:9px;font-size: 12px;">
+                                    <strong><span t-field="o.company_id.partner_id.vat"/></strong>
+                                    <br/>
+                                    <strong><span t-field="o.company_id.partner_id.name"/></strong>
+                                </div>
+                                <div style="font-size:9px;font-size: 10px;">
+                                    <strong>GIRO: </strong><span name="company_activity" t-field="o.company_id.l10n_cl_activity_description"/>
+                                    <br/>
+                                    <strong>DIRECCIÓN: </strong><span name="company_dir" t-field="o.company_id.street"/>
+                                    <br/>
+                                    <strong>COMUNA: </strong><span t-field="o.company_id.city"/> - <strong>CIUDAD: </strong><span t-field="o.company_id.street2"/>
+                                    <br/>
+                                    <strong>TELEFONOS: </strong><span t-field="o.company_id.partner_id.phone"/> - <span t-field="o.company_id.partner_id.mobile"/>
+                                    <br/>
+                                    <strong>EMAIL: </strong><span name="company_email" t-field="o.company_id.email"/>
+                                    <br/>
+                                    <strong>WEB: </strong><span name="company_web" t-field="o.company_id.website"/>
+                                </div>
+                            </div>
+
 		        </div>
 			    <!--
 		        <div class="row" style="padding-left: 0px;">

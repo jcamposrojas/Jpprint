@@ -1,12 +1,12 @@
 {
     'name': 'Adecuaciones. Formato Factura',
-    'version': '15.0.9',
+    'version': '15.0.10',
     'category': '',
     'sequence': 6,
     'license': 'LGPL-3',
     'summary': '',
     'description': """
-    Versión para Cliente DICOMAC
+    Versión para Cliente JPPRINT
 
     UPDATE:
     20220930 Agrega Número de OC a Guia
