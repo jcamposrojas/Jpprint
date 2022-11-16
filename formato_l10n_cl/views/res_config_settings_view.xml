@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.info</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="l10n_cl_edi.res_config_settings_view_cl_form"/>
+        <field name="arch" type="xml">
+			<!--<xpath expr="//div[@id='l10n_cl_section']" position="inside">-->
+            <xpath expr="//div[@name='chilean_electronic_invoicing']" position="inside">
+
+
+			    <!--                <div class="row" name="chilean_electronic_invoicing_format" attrs="{'invisible':[('country_code', '!=', 'CL')]}">-->
+		    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane"/>
+                        <div class="o_setting_right_pane">
+
+                            <span class="o_form_label">Información Adicional Sucursales</span>
+                            <span class="fa fa-lg fa-building-o" title="Información adicional de sucursales en facturas." aria-label="Información adicional de sucursales en facturas." groups="base.group_multi_company" role="img"/>
+                            <div class="text-muted">
+				    Define información adicional de sucursales en el documento factura.
+                            </div>
+                            <div class="content-group">
+                                <div class="row mt16">
+                                    <label string="" for="l10n_cl_info_sucursales" class="col-lg-4 o_light_label"/>
+                                    <field name="l10n_cl_info_sucursales" widget="html" style="width:80%;" class="oe-bordered-editor" options="{'style-inline': true, 'codeview': true }"/>
+                                </div>
+                            </div>
+
+
+
+
+                        </div>
+                    </div>
+		    <!--</div>-->
+            </xpath>
+
+
+
+        </field>
+    </record>
+
+</odoo>
+

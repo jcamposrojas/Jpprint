@@ -1,0 +1,93 @@
+		<div class="header" style="font-size: 12px;">
+                    <t t-set="report_date"        t-value="o.invoice_date"/>
+                    <t t-set="report_number"      t-value="int(o.l10n_latam_document_number)"/>
+                    <t t-set="pre_printed_report" t-value="report_type == 'pdf'"/>
+                    <t t-set="report_name"        t-value="o.l10n_latam_document_type_id.name"/>
+                    <t t-set="header_address"     t-value="o.company_id.partner_id"/>
+                    <t t-set="sale_orders"        t-value="o._get_sale_orders()"/>
+                    <t t-set="sale_sellers"       t-value="o._get_sellers()"/>
+                    <t t-set="oc_clients"         t-value="o._get_ref_clients()"/>
+
+		    <!-- Evita el wrap -->
+		    <div class="row">
+                    <div name="left-upper-side" class="col-8">
+		        <div class="row">
+	                    <strong><span t-field="o.company_id.partner_id.name"/></strong>
+                            <br/>
+                            <span name="company_activity" t-field="o.company_id.l10n_cl_activity_description"/>
+                            <br/>
+		        </div>
+		        <div class="row">
+                            <div class="col-6" style="padding-left:0px;">
+	                    <div style="font-size:9px;">
+		                <span t-if="o.company_id.l10n_cl_info_sucursales" name="l10n_cl_info_sucursales" t-field="o.company_id.l10n_cl_info_sucursales"/>
+		            </div>
+		            </div>
+                            <div class="col-6">
+                                <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 50px;" alt="Logo"/>
+		            </div>
+		        </div>
+		        <div class="row">
+                            <span t-if="header_address.website">
+                                <span t-esc="' - '.join([item for item in [header_address.email,header_address.website.replace('https://', '').replace('http://', '')] if item])"/>
+                            </span>
+		        </div>
+			    <!--
+		        <div class="row" style="padding-left: 0px;">
+                            <img t-if="o.company_id.logo" t-att-src="image_data_uri(o.company_id.logo)" style="max-height: 55px;" alt="Logo"/>
+	                </div>
+                        <strong><span t-field="o.company_id.partner_id.name"/></strong>
+                        <br/>
+                        <span name="company_activity" t-field="o.company_id.l10n_cl_activity_description"/>
+                        <br/>
+	                <t t-esc="' - '.join([item for item in [
+                        ', '.join([item for item in [header_address.street, header_address.street2] if item]),
+                        header_address.city,
+                        header_address.state_id and header_address.state_id.name,
+                        header_address.zip,
+                        header_address.country_id and header_address.country_id.name] if item])"/>
+                        <span t-if="header_address.phone">
+                            <br/>
+                        </span>
+                        <span t-if="header_address.phone" style="white-space: nowrap;"
+                          t-esc="'Tel: ' + header_address.phone"/>
+
+                        <span t-if="header_address.website">
+				<span>- </span><span t-esc="' - '.join([item for item in [header_address.email,header_address.website.replace('https://', '').replace('http://', '')] if item])"/>
+                        </span>
+			    -->
+	            </div>
+		    <!--
+		    <div class="col-2">
+	            </div>
+                        <div class="row border border-dark">
+                                <h6 t-att-style="'color: %s;' % o.company_id.primary_color">
+                                <strong t-att-style="'color: %s;' % o.company_id.primary_color">
+		    -->
+	    	    <div class="col-4">
+                        <div class="row" style="color:red;border: 2px solid red">
+                            <div class="col-12 text-center">
+                                <h6>
+                                <strong>
+                                <br/>
+                                <span style="line-height: 180%;">RUT:</span>
+                                <span t-esc="o.company_id.partner_id._format_dotted_vat_cl(o.company_id.partner_id.vat)"/>
+                                <br/>
+                                <span class="text-uppercase" t-esc="report_name"/>
+                                <br/>
+                                <span>Nº:</span>
+                                <span style="line-height: 200%;" t-esc="report_number"/>
+                                <br/>
+                                <br/>
+                                </strong>
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="row text-center" style="color:red">
+                            <div class="col-12 text-center" name="regional_office" style="text-transform: uppercase;">
+			        <strong>S.I.I. - <span t-field="o.company_id.l10n_cl_sii_regional_office"/></strong>
+			    </div>
+                        </div>
+                    </div>
+	            </div> <!-- Evita el wrap -->
+		</div>
