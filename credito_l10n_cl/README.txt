@@ -1,0 +1,1 @@
+15.0.0.1 (25-10-2021) : Fixed In mail getting link in text instead of the word 'this link'.
