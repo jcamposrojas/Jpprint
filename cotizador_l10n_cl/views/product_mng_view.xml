@@ -50,6 +50,7 @@
 				        <tree editable="bottom">
 			                    <field name="name"/>
 			                    <field name="uom_id"/>
+			                    <field string="Moneda" name="cost_currency_id"/>
 			                    <field name="standard_price"/>
 			                    <field name="cantidad"/>
 				        </tree>

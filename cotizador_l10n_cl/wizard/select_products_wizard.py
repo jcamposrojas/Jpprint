@@ -25,7 +25,6 @@ class SelectProducts(models.TransientModel):
     cantidad      = fields.Integer(string="Cantidad")
     gap           = fields.Float(string="GAP entre etiquetas", default=3, digits=(10,3))
     engranaje     = fields.Float(string="Paso Engranaje", default=3.175, digits=(10,3))
-    ancho_papel   = fields.Float(string="Ancho de papel", default=100)
     etiquetas_al_desarrollo = fields.Integer(string="Etiquetas al desarrollo", default=1)
     # salidas de etiqueta en maquina
     etiquetas_al_ancho      = fields.Integer(string="Etiquetas al ancho", default=2)
@@ -50,7 +49,7 @@ class SelectProducts(models.TransientModel):
     longitud_papel = fields.Integer(string="Longitud Papel", compute="_calc_z")
 
     def _get_default_uom_id(self):
-        return self.env.ref('uom.product_uom_millimeter')
+        return self.env.ref('uom.product_uom_millimeter').id
 
     def _get_default_product_uom_id(self):
         return self.env.ref('uom.product_uom_unit')
@@ -70,11 +69,11 @@ class SelectProducts(models.TransientModel):
     codigo            = fields.Char(string="Código Producción", compute="_compute_codigo_nombre", store=True)
     nombre_producto   = fields.Char(string="Nombre producto", compute="_compute_codigo_nombre", store=True)
     texto_adicional   = fields.Char(string="Texto adicional")
-    aisa              = fields.Selection( string="AISA", required=True,
-        selection=[("aisa1", "AISA 1"), ("aisa2", "AISA 2"),("aisa3", "AISA 3"),("aisa4", "AISA 4"),
-        ("aisa5", "AISA 5"), ("aisa6", "AISA 6"),("aisa7", "AISA 7"),("aisa8", "AISA 8")],
-        default="aisa1",
-    )
+    def _default_aisa(self):
+        return self.env.ref('cotizador_l10n_cl.aisa_4')
+
+    aisa_id           = fields.Many2one('ir.attachment', string='Etiqueta AISA', domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]", default=_default_aisa)
+
 
     #========== Valores ==========
     insumo_ids    = fields.One2many('cotizador.insumo','select_id',copy=True, store=True)
@@ -274,15 +273,19 @@ class SelectProducts(models.TransientModel):
     @api.onchange('producto_id', 'sustrato_id','adicional_ids', 'largo','ancho','cantidad','area_ocupada','merma_estimada', 'buje_id')
     def _update_insumos(self):
         # Copia items insertados automaticamente para luego recalcularlos
-        lst_tmp = []
+        lst_tmp  = []
         for item in self.insumo_ids:
             if item.flag_adicional == True:
-                line_dict = {'name': item.name,
-                        'cantidad': item.cantidad,
-                        'uom_id': item.uom_id,
-                        'costo_consumo': item.costo_consumo,
-                        'merma': item.merma,
-                        'flag_adicional': True}
+                line_dict = {
+                    'name'          : item.name,
+                    'cantidad'      : item.cantidad,
+                    'uom_id'        : item.uom_id.id,
+                    'costo_consumo' : item.costo_consumo,
+                    'cost_currency_id' : item.cost_currency_id.id,
+                    'merma'            : item.merma,
+                    'incluido_en_ldm'  : item.incluido_en_ldm,
+                    'flag_adicional'   : item.flag_adicional,
+                }
                 lst_tmp.append(line_dict)
                 #self.insumo_ids = [(2,item.id)]
         self.insumo_ids = [(5,0)]
@@ -293,6 +296,7 @@ class SelectProducts(models.TransientModel):
                     'select_id': 0,
                     #'select_id': self.id,
                     'product_product_id': self.sustrato_id.product_product_id.id,
+                    'cost_currency_id': self.sustrato_id.product_product_id.currency_id.id,
                     'name': self.sustrato_id.product_product_id.name,
                     'cantidad': self.area_ocupada_con_merma,
                     'costo_consumo': self.sustrato_id.standard_price * self.area_ocupada_con_merma,
@@ -309,6 +313,7 @@ class SelectProducts(models.TransientModel):
                     'select_id': 0,
                     #'select_id': self.id,
                     'product_product_id': line.product_product_id.id,
+                    'cost_currency_id': line.product_product_id.currency_id.id,
                     'name': line.product_product_id.name,
                     'cantidad': line.cantidad * self.area_ocupada * (1 + line.merma / 100.0),
                     'costo_consumo': line.costo_consumo * self.area_ocupada * (1 + line.merma / 100.0),
@@ -322,10 +327,11 @@ class SelectProducts(models.TransientModel):
         # Buje
         if self.buje_id:
             producto = self.buje_id.product_product_id
-            cantidad = round((self.longitud_papel / 1000.0) / self.buje_id.longitud, 0)
+            cantidad = round((self.longitud_papel / 1000.0) / self.buje_id.longitud, 0) * self.etiquetas_al_ancho
             vals = {
                     'select_id': 0,
                     'product_product_id': producto.id if producto else None,
+                    'cost_currency_id': producto.currency_id.id if producto else None,
                     'name': self.buje_id.name,
                     'cantidad': cantidad,
                     'costo_consumo': cantidad * self.buje_id.standard_price,
@@ -345,7 +351,7 @@ class SelectProducts(models.TransientModel):
             vals = {
                     'select_id': 0,
                     #'select_id': self.id,
-                    #'product_product_id': line.product_product_id.id,
+                    'cost_currency_id': line.cost_currency_id.id,
                     'name': line.name, # Aun por llenar
                     'cantidad': line.cantidad, # Aun por llenar
                     'costo_consumo': costo,
@@ -380,21 +386,25 @@ class SelectProducts(models.TransientModel):
         if product:
             product.product_tmpl_id.gen_cotizador = True
 
+            ############### FABRICACION ###################
             # Rutas de producto (MTO y fabricar)
             stock_id = self.env.ref('stock.route_warehouse0_mto').id
             mrp_id   = self.env.ref('mrp.route_warehouse0_manufacture').id
             product.route_ids = [(5,0)] + [(4,stock_id),(4,mrp_id)]
 
             # Crear BoM
-            vals = {"product_tmpl_id": product.product_tmpl_id.id,
-                    "type": "normal", # Fabricar este producto
-                    "product_qty": self.cantidad,
+            vals = {
+                    "product_tmpl_id": product.product_tmpl_id.id,
+                    "type"           : "normal", # Fabricar este producto
+                    "product_qty"    : self.cantidad,
                 }
             mrp = self.env["mrp.bom"].create(vals)
 
-            # BOM lines
-            self._update_insumos() # Se vuelve a llamar. Los valores llegan en 0.
+            list_parametros = {'content':[]}
+            count_parametros = 0
+            self._update_insumos() # Se vuelve a llamar. Los valores llegaban en 0.
             for line in self.insumo_ids:
+                # BOM lines
                 if line.incluido_en_ldm:
                     vals = {
                         'bom_id':         mrp.id,
@@ -404,6 +414,34 @@ class SelectProducts(models.TransientModel):
                     }
                     #'uom_id': self.sustrato_id.product_product_id.uom_id.id,
                     mrp.bom_line_ids = [(0,0,vals)]
+
+                # Parametros
+                if line.product_product_id:
+                    name = line.product_product_id.name
+                else:
+                    name = line.name
+                val = {
+                    'producto'  : name or '',
+                    #'moneda'    : line.cost_currency_id.symbol if line.flag_adicional else line.product_product_id.currency_id.symbol,
+                    'moneda'    : line.cost_currency_id.symbol if not line.incluido_en_ldm else line.product_product_id.currency_id.symbol,
+                    'uom'       : line.uom_id.name or '',
+                    'cantidad'  : line.cantidad or '',
+                    'monto'     : round(line.costo_consumo) or '',
+                    'merma'     : line.merma or '',
+                    'incluido_en_ldm': line.incluido_en_ldm or '',
+                    'flag_adicional' : line.flag_adicional or '',
+                }
+                list_parametros['content'].append(val)
+                count_parametros += 1
+
+            list_parametros['data'] = []
+            list_parametros['count_parametros'] = count_parametros
+            if self.buje_id:
+                list_parametros['aisa'] = self.aisa_id.name
+            else:
+                list_parametros['aisa'] = ''
+
+            product.lista_parametros = json.dumps(list_parametros)
 
 #            if self.sustrato_id.product_product_id:
 #                vals = {
@@ -460,6 +498,7 @@ class SelectProducts(models.TransientModel):
                     'order_id': order_id.id
                 })
             product.description = self.genera_descripcion()
+#            product.lista_parametros = json.dumps(self.insumo_ids)
 
 #        if self.flag_order == 'so':
 #            order_id = self.env['sale.order'].browse(self._context.get('active_id', False))
@@ -514,8 +553,8 @@ class SelectProducts(models.TransientModel):
         texto = ""
         if self.buje_id:
             texto =  "BUJE: " + self.buje_id.name +"<br>"
-        if self.aisa:
-            texto += "AISA: " + self.aisa +"<br>"
+        if self.aisa_id:
+            texto += "AISA: " + self.aisa_id.name +"<br>"
         if self.adhesivo_id:
             texto += "ADHESIVO: " + self.adhesivo_id.name +"<br>"
         if self.datos_adicionales:

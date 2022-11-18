@@ -63,7 +63,7 @@
 		    <page string="General" name="general_information">
 			<group>
 			    <group>
-                                <field name="aisa"/>
+				<field class="d-flex flex-wrap" name="aisa_id" widget="radio_image_aisa" options="{'horizontal': true}"/>
                                 <field name="buje_id" />
 		            </group>
 			    <group>

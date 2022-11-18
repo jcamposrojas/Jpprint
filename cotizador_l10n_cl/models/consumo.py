@@ -22,9 +22,9 @@ class CotizadorConsumoProducto(models.Model):
     consumo_uom_id     = fields.Many2one('uom.uom', string='Unidad de Consumo', default=_get_default_product_uom_id)
     standard_price     = fields.Float(string='Costo de producto', related='product_product_id.standard_price')
     cost_currency_id   = fields.Many2one('res.currency', 'Moneda de costo', related="product_product_id.cost_currency_id")
-    cantidad           = fields.Float(string='Cantidad', default=0.0, digits=(20,10))
-    costo_consumo      = fields.Float(string='Costo', compute='_compute_costo_consumo', digits=(20,10))
-    incluido_en_ldm    = fields.Boolean(string="En LdM?", default=True)
+    cantidad           = fields.Float(string='Cantidad', default=0.0, digits=(20,3))
+    costo_consumo      = fields.Float(string='Costo', compute='_compute_costo_consumo', digits=(20,0))
+    incluido_en_ldm    = fields.Boolean(string="En LdM?", default=True, readonly=True)
     merma              = fields.Float(string="Merma (%)", default=0.0)
 
     @api.depends('consumo_uom_id','standard_price','cantidad')

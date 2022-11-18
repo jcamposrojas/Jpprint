@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="aisa_1" model="ir.attachment">
+            <field name="name">aisa1.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa1.png</field>
+        </record>
+        <record id="aisa_2" model="ir.attachment">
+            <field name="name">aisa2.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa2.png</field>
+        </record>
+        <record id="aisa_3" model="ir.attachment">
+            <field name="name">aisa3.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa3.png</field>
+        </record>
+        <record id="aisa_4" model="ir.attachment">
+            <field name="name">aisa4.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa4.png</field>
+        </record>
+        <record id="aisa_5" model="ir.attachment">
+            <field name="name">aisa5.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa5.png</field>
+        </record>
+        <record id="aisa_6" model="ir.attachment">
+            <field name="name">aisa6.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa6.png</field>
+        </record>
+        <record id="aisa_7" model="ir.attachment">
+            <field name="name">aisa7.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa7.png</field>
+        </record>
+        <record id="aisa_8" model="ir.attachment">
+            <field name="name">aisa8.png</field>
+            <field name="res_model">select.products</field>
+            <field name="res_field">aisa_id</field>
+            <field name="public" eval="True"/>
+            <field name="type">url</field>
+	    <field name="url">/cotizador_l10n_cl/static/src/img/icons/aisa8.png</field>
+        </record>
+
+    </data>
+</odoo>

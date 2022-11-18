@@ -10,12 +10,17 @@ class CotizadorInsumo(models.TransientModel):
     name               = fields.Char('Nombre', default="/")
 
     product_product_id = fields.Many2one('product.product', string="Producto")
-    cost_currency_id   = fields.Many2one('res.currency', 'Moneda de costo', related="product_product_id.cost_currency_id")
+
+    @api.model
+    def _default_currency_id(self):
+        return self.env.user.company_id.currency_id.id
+
+    cost_currency_id   = fields.Many2one('res.currency', 'Moneda de costo', default=_default_currency_id)
     uom_id             = fields.Many2one('uom.uom', string='Unidad de Consumo')
     cantidad           = fields.Float("Cantidad", digits=(10,3))
     costo_consumo      = fields.Float(string='Costo')
     merma              = fields.Float(string="Merma (%)", default=0.0)
-    incluido_en_ldm    = fields.Boolean(string="En LdM?")
+    incluido_en_ldm    = fields.Boolean(string="En LdM?", default=False)
     flag_adicional     = fields.Boolean(string="Item agregado por el usuario", default=True)
 
 #    @api.model
