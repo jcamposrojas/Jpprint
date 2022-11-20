@@ -32,4 +32,6 @@ class CotizadorProducto(models.Model):
     consumo_ids           = fields.One2many("cotizador.consumo",'producto_id', string="Consumos")
     operation_ids         = fields.One2many('mrp.routing.workcenter.tmp', 'cotizador_producto_id', string='Operaciones')
     adicional_ids         = fields.One2many("cotizador.adicional",'producto_id', string="Adicionales")
+    analytic_account_id   = fields.Many2one('account.analytic.account', 'Cuenta Analítica')
+
 

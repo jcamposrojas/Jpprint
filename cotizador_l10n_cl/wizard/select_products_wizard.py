@@ -148,15 +148,16 @@ class SelectProducts(models.TransientModel):
     @api.depends('producto_id', 'sustrato_id', 'largo', 'ancho', 'adhesivo_id', 'texto_adicional')
     def _compute_codigo_nombre(self):
         nombre = ""
+        codigo = ""
         if self.producto_id:
             prod_id = self.env['cotizador.producto'].search([('id','=',self.producto_id.id)])
             if prod_id:
-                self.codigo = prod_id.codigo
+                codigo = prod_id.codigo
                 nombre = prod_id.nombre_corto
         if self.sustrato_id:
             sust_id = self.env['cotizador.sustrato'].search([('id','=',self.sustrato_id.id)])
             if sust_id:
-                self.codigo += sust_id.codigo
+                codigo = codigo + sust_id.codigo
                 nombre += " " + sust_id.nombre_corto
 
         if self.largo > 0:
@@ -172,6 +173,7 @@ class SelectProducts(models.TransientModel):
             nombre += " " + self.texto_adicional
 
         self.nombre_producto = nombre
+        self.codigo          = codigo
 
         # Calcula numero de coincidencias de nombre
         if self.nombre_producto:
@@ -195,7 +197,7 @@ class SelectProducts(models.TransientModel):
         self.ancho_bobina   = 0
         self.longitud_papel = 0
 
-        if self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto1').id or self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto3').id:
+        if self.producto_id and (self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto1').id or self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto3').id):
             self.z_calculado = ((self.largo + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
 
             #Ingreso de cilindro
@@ -231,7 +233,7 @@ class SelectProducts(models.TransientModel):
             self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
         # JETRION
-        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto2').id:
+        elif self.producto_id and self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto2').id:
             if self.largo > 0.0 and self.ancho > 0.0 and self.cantidad > 0.0:
                 #n14 = 210
                 n14 = self.ancho_papel
@@ -277,10 +279,11 @@ class SelectProducts(models.TransientModel):
         for item in self.insumo_ids:
             if item.flag_adicional == True:
                 line_dict = {
-                    'name'          : item.name,
-                    'cantidad'      : item.cantidad,
-                    'uom_id'        : item.uom_id.id,
-                    'costo_consumo' : item.costo_consumo,
+                    'name'             : item.name,
+                    'cantidad'         : item.cantidad,
+                    'uom_id'           : item.uom_id.id,
+                    'costo_unitario'   : item.costo_unitario,
+                    'costo_consumo'    : item.costo_consumo,
                     'cost_currency_id' : item.cost_currency_id.id,
                     'merma'            : item.merma,
                     'incluido_en_ldm'  : item.incluido_en_ldm,
@@ -296,14 +299,15 @@ class SelectProducts(models.TransientModel):
                     'select_id': 0,
                     #'select_id': self.id,
                     'product_product_id': self.sustrato_id.product_product_id.id,
-                    'cost_currency_id': self.sustrato_id.product_product_id.currency_id.id,
-                    'name': self.sustrato_id.product_product_id.name,
-                    'cantidad': self.area_ocupada_con_merma,
-                    'costo_consumo': self.sustrato_id.standard_price * self.area_ocupada_con_merma,
-                    'uom_id': self.sustrato_id.product_product_id.uom_id.id,
-                    'merma': self.merma_estimada,
+                    'cost_currency_id'  : self.sustrato_id.product_product_id.currency_id.id,
+                    'name'           : self.sustrato_id.product_product_id.name,
+                    'cantidad'       : self.area_ocupada_con_merma,
+                    'costo_unitario' : self.sustrato_id.standard_price,
+                    'costo_consumo'  : self.sustrato_id.standard_price * self.area_ocupada_con_merma,
+                    'uom_id'         : self.sustrato_id.product_product_id.uom_id.id,
+                    'merma'          : self.merma_estimada,
                     'incluido_en_ldm': True,
-                    'flag_adicional': False,
+                    'flag_adicional' : False,
                 }
             self.insumo_ids = [(0,0,vals)]
 
@@ -316,6 +320,7 @@ class SelectProducts(models.TransientModel):
                     'cost_currency_id': line.product_product_id.currency_id.id,
                     'name': line.product_product_id.name,
                     'cantidad': line.cantidad * self.area_ocupada * (1 + line.merma / 100.0),
+                    'costo_unitario': line.costo_consumo,
                     'costo_consumo': line.costo_consumo * self.area_ocupada * (1 + line.merma / 100.0),
                     'uom_id': line.consumo_uom_id.id,
                     'merma': line.merma,
@@ -334,6 +339,7 @@ class SelectProducts(models.TransientModel):
                     'cost_currency_id': producto.currency_id.id if producto else None,
                     'name': self.buje_id.name,
                     'cantidad': cantidad,
+                    'costo_unitario': self.buje_id.standard_price,
                     'costo_consumo': cantidad * self.buje_id.standard_price,
                     'uom_id': self.buje_id.uom_id.id,
                     'merma': 0,
@@ -354,6 +360,7 @@ class SelectProducts(models.TransientModel):
                     'cost_currency_id': line.cost_currency_id.id,
                     'name': line.name, # Aun por llenar
                     'cantidad': line.cantidad, # Aun por llenar
+                    'costo_unitario': line.standard_price,
                     'costo_consumo': costo,
                     'uom_id': line.uom_id.id,
                     #'merma': 0.0, # por definir
@@ -435,6 +442,7 @@ class SelectProducts(models.TransientModel):
                 count_parametros += 1
 
             list_parametros['data'] = []
+            #list_parametros['data'].append({'count_parametros':count_parametros})
             list_parametros['count_parametros'] = count_parametros
             if self.buje_id:
                 list_parametros['aisa'] = self.aisa_id.name
@@ -484,20 +492,32 @@ class SelectProducts(models.TransientModel):
                 }
                 mrp.operation_ids = [(0,0,values)]
 
+
             # Calcula costo en base a LdM
             # Revisar si es necesario
             #product.button_bom_cost()
 
-            # Insertar producto en SO
+            #----------- Insertar producto en SO ------------------
             order_id = self.env['sale.order'].browse(self._context.get('active_id', False))
-            self.env['sale.order.line'].create({
+            order_line_id = self.env['sale.order.line'].create({
                     'product_id': product.id,
                     'product_uom': product.uom_id.id,
                     'product_uom_qty': self.cantidad,
                     'price_unit': product.list_price,
-                    'order_id': order_id.id
+                    'order_id': order_id.id,
                 })
+
+            #---------- TAG Analitico -----------------
+            if order_line_id:
+                order_line_id.analytic_tag_ids = [(0,0,{'name':order_id.name})]
+
             product.description = self.genera_descripcion()
+
+
+            #----------- Actualiza Cuenta Analitica en SO ------------
+            if self.producto_id.analytic_account_id:
+                order_id.analytic_account_id =  self.producto_id.analytic_account_id
+
 #            product.lista_parametros = json.dumps(self.insumo_ids)
 
 #        if self.flag_order == 'so':
@@ -561,3 +581,6 @@ class SelectProducts(models.TransientModel):
             texto += "DATOS ADICIONALES:<br>" + self.datos_adicionales +"<br>"
 
         return texto
+
+#    def _area_negocio(self):
+#        if self.producto_id and (self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto1').id or self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto3').id):

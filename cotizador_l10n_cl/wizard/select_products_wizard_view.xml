@@ -85,6 +85,7 @@
 			        <field name="name"/>
 			        <field name="cantidad"/>
 			        <field name="uom_id"/>
+			        <field name="costo_unitario" invisible="1"/>
 			        <field name="costo_consumo" sum="Costo Total"/>
 			        <field name="merma"/>
 			        <field name="incluido_en_ldm"/>

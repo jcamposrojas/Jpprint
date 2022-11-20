@@ -11,6 +11,7 @@
                     <field name="cost_currency_id" invisible="1"/>
                     <field name="cantidad" />
                     <field name="uom_id" />
+                    <field name="costo_unitario" invisible="0"/>
                     <field name="costo_consumo" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
                     <field name="merma" />
                     <field name="incluido_en_ldm" />

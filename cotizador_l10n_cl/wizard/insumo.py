@@ -1,5 +1,9 @@
 from odoo import api, fields, models, tools, _
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 class CotizadorInsumo(models.TransientModel):
     _name = 'cotizador.insumo'
@@ -18,17 +22,21 @@ class CotizadorInsumo(models.TransientModel):
     cost_currency_id   = fields.Many2one('res.currency', 'Moneda de costo', default=_default_currency_id)
     uom_id             = fields.Many2one('uom.uom', string='Unidad de Consumo')
     cantidad           = fields.Float("Cantidad", digits=(10,3))
-    costo_consumo      = fields.Float(string='Costo')
+    costo_unitario     = fields.Float(string='Costo Unitario')
+    costo_consumo      = fields.Float(string='Costo Total')
     merma              = fields.Float(string="Merma (%)", default=0.0)
     incluido_en_ldm    = fields.Boolean(string="En LdM?", default=False)
     flag_adicional     = fields.Boolean(string="Item agregado por el usuario", default=True)
 
-#    @api.model
+    @api.onchange('cantidad')
+    def _onchange_cantidad(self):
+        _logger.info(' CANTIDAD ')
+        _logger.info(self.cantidad)
+        _logger.info(self.costo_unitario)
+        self.costo_consumo = self.cantidad * self.costo_unitario
+
 #    def create(self,vals):
 #        for rec in self:
 #            if rec.product_product_id:
 #                vals['name'] = rec.product_product_id.name
 #            return super(CotizadorInsumo,self).create(vals)
-
-
-

@@ -21,6 +21,7 @@
 			    <group>
 			        <field name="category_id" />
 			        <field name="uom_id" />
+			        <field name="analytic_account_id" />
 			    </group>
                         </group>
 			<notebook>
@@ -77,6 +78,7 @@
                     <field name="nombre_corto" />
                     <field name="codigo" />
 		    <field name="category_id" />
+		    <field name="analytic_account_id" />
 		</tree>
 
 	    </field>
