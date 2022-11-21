@@ -533,7 +533,7 @@ class SelectProducts(models.TransientModel):
                     'product_id': product.id,
                     'product_uom': product.uom_id.id,
                     'product_uom_qty': self.cantidad,
-                    'price_unit': product.list_price,
+                    #'price_unit': product.list_price,
                     'order_id': order_id.id,
                 })
 
