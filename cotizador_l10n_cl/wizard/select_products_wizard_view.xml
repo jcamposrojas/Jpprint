@@ -97,7 +97,7 @@
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','ETB'),('codigo_producto','!=','EF')]}">
 		        <group>
 		            <group>
-                                <field name="ancho_papel"/>
+                                <field name="ancho_papel" invisible="1"/>
                                 <field name="engranaje"/>
                                 <field name="etiquetas_al_desarrollo"/>
                                 <field name="etiquetas_al_ancho"/>

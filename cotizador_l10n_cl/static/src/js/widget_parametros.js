@@ -33,7 +33,9 @@ var ShowParametrosLineWidget = AbstractField.extend({
 	    */
         });
         this.$el.html(QWeb.render('ShowParametrosWidget', {
+            data: info.data,
             lines: info.content,
+            param: info.param,
 	    count_parametros: info.count_parametros,
 	    aisa: info.aisa,
 		/*

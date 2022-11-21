@@ -9,8 +9,10 @@
 	        <xpath expr="//notebook" position="inside">
                     <page string="Parámetros Creación" attrs="{'invisible':[('gen_cotizador','=',False)]}">
                         <group name="product_params" string="Parámetros">
+		        <div class="row" style="width:100%;margin-left:20px">
 			    <field name="gen_cotizador" invisible="1"/>
 			    <field name="lista_parametros" widget="widget_parametros" nolabel="1"/>
+		        </div>
 			</group>
 		    </page>
 		</xpath>

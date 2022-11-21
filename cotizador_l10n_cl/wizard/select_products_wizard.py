@@ -65,7 +65,7 @@ class SelectProducts(models.TransientModel):
     efecto_espejo     = fields.Boolean(string="Efecto Espejo", default=False)
     laminado          = fields.Boolean(string="Laminado", default=True)
     folia             = fields.Boolean(string="Folia", default=True)
-    datos_adicionales = fields.Text(string="Datos adicionales", copy=True)
+    datos_adicionales = fields.Text(string="Comentarios", copy=True)
     codigo            = fields.Char(string="Código Producción", compute="_compute_codigo_nombre", store=True)
     nombre_producto   = fields.Char(string="Nombre producto", compute="_compute_codigo_nombre", store=True)
     texto_adicional   = fields.Char(string="Texto adicional")
@@ -197,7 +197,8 @@ class SelectProducts(models.TransientModel):
         self.ancho_bobina   = 0
         self.longitud_papel = 0
 
-        if self.producto_id and (self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto1').id or self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto3').id):
+        # Blanca TROQUELADA
+        if self._area_negocio() == '1' or self._area_negocio() == '3':
             self.z_calculado = ((self.largo + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
 
             #Ingreso de cilindro
@@ -233,7 +234,7 @@ class SelectProducts(models.TransientModel):
             self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
         # JETRION
-        elif self.producto_id and self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto2').id:
+        elif self._area_negocio() == '2':
             if self.largo > 0.0 and self.ancho > 0.0 and self.cantidad > 0.0:
                 #n14 = 210
                 n14 = self.ancho_papel
@@ -441,13 +442,40 @@ class SelectProducts(models.TransientModel):
                 list_parametros['content'].append(val)
                 count_parametros += 1
 
-            list_parametros['data'] = []
-            #list_parametros['data'].append({'count_parametros':count_parametros})
             list_parametros['count_parametros'] = count_parametros
+            list_parametros['data'] = {}
+            list_parametros['data']['largo'] = self.largo
+            list_parametros['data']['ancho'] = self.ancho
+            list_parametros['data']['texto_adicional']   = self.texto_adicional
+            list_parametros['data']['datos_adicionales'] = self.datos_adicionales
+            list_parametros['data']['longitud_papel']    = self.longitud_papel
+            list_parametros['data']['area_ocupada']      = self.area_ocupada
+            list_parametros['data']['area_ocupada_con_merma'] = self.area_ocupada_con_merma
             if self.buje_id:
-                list_parametros['aisa'] = self.aisa_id.name
+                list_parametros['data']['aisa'] = self.aisa_id.name.replace('.png','').upper()
             else:
-                list_parametros['aisa'] = ''
+                list_parametros['data']['aisa'] = ''
+
+            #-------------- Parametros relacionados al area de negocio ----------------
+            list_parametros['param'] = {}
+            list_parametros['param']['area_negocio'] = self._area_negocio()
+            if self._area_negocio() == '1' or self._area_negocio() == '3':
+                list_parametros['param']['engranaje'] = self.engranaje
+                list_parametros['param']['z_calculado'] = self.z_calculado
+                list_parametros['param']['z_ingreso']   = self.z_ingreso
+                list_parametros['param']['cilindros']   = self.cilindros
+                list_parametros['param']['troquel']     = self.troquel
+                list_parametros['param']['gap_etiqueta']     = self.gap_etiqueta
+                list_parametros['param']['etiqueta_con_gap'] = self.etiqueta_con_gap
+                list_parametros['param']['rf'] = self.rf
+                list_parametros['param']['ss'] = self.ss
+                list_parametros['param']['sx'] = self.sx
+                list_parametros['param']['etiquetas_al_ancho'] = self.etiquetas_al_ancho
+                list_parametros['param']['etiquetas_al_desarrollo'] = self.etiquetas_al_desarrollo
+                list_parametros['param']['ancho_bobina']       = self.ancho_bobina
+            elif self._area_negocio() == '2':
+                list_parametros['param']['ancho_papel'] = self.ancho_papel
+
 
             product.lista_parametros = json.dumps(list_parametros)
 
@@ -489,6 +517,8 @@ class SelectProducts(models.TransientModel):
                     'workcenter_id': operation.workcenter_id.id, #ID
                     'bom_id': mrp.id, #ID
                     #Agregar resto de campos de mrp.routing.workcenter.tmp
+                    'worksheet_type': 'text',
+                    'note': product.lista_parametros,
                 }
                 mrp.operation_ids = [(0,0,values)]
 
@@ -582,5 +612,27 @@ class SelectProducts(models.TransientModel):
 
         return texto
 
-#    def _area_negocio(self):
-#        if self.producto_id and (self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto1').id or self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto3').id):
+
+    def _area_negocio(self):
+        if not self.producto_id:
+            return ''
+
+        if self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto1').id:
+            return '1'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto2').id:
+            return '2'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto3').id:
+            return '3'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto4').id:
+            return '4'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto5').id:
+            return '5'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto6').id:
+            return '6'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto7').id:
+            return '7'
+        elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto8').id:
+            return '8'
+
+
+
