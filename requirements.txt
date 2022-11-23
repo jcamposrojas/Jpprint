@@ -1,2 +1,4 @@
 pdf417gen
 transbank-sdk
+numpy
+numpy-financial<=1.0.0
