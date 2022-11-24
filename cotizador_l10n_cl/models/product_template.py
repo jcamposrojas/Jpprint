@@ -12,4 +12,5 @@ class ProductTemplate(models.Model):
 
     gen_cotizador    = fields.Boolean(string="Creado por Cotizador", default=False)
     lista_parametros = fields.Text(string="Parámetros")
+    ancho            = fields.Integer(string="Ancho")
 

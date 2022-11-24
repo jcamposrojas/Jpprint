@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.12',
+    'version': '15.0.1.13',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -9,7 +9,13 @@
     'sequence': 1,
     'author': 'JIC',
     'website': 'http://www.vanguardchile.cl',
-    'depends': ['base', 'product', 'sale_management', 'purchase', 'stock', 'mrp'],
+    'depends': ['base',
+        'product',
+        'sale_management',
+        'purchase',
+        'stock',
+        'mrp',
+        'account_so_l10n_cl'],
     'data': [
         'wizard/select_products_wizard_view.xml',
         'views/menu_root.xml',

@@ -21,7 +21,8 @@ class SelectProducts(models.TransientModel):
     #========== Datos ==========
     largo         = fields.Integer(string="Largo")
     ancho         = fields.Integer(string="Ancho")
-    ancho_papel   = fields.Integer(string="Ancho de papel",default=220)
+
+    ancho_papel   = fields.Integer(string="Ancho de papel",compute='_compute_ancho_papel', store=True)
     cantidad      = fields.Integer(string="Cantidad")
     gap           = fields.Float(string="GAP entre etiquetas", default=3, digits=(10,3))
     engranaje     = fields.Float(string="Paso Engranaje", default=3.175, digits=(10,3))
@@ -78,6 +79,14 @@ class SelectProducts(models.TransientModel):
     #========== Valores ==========
     insumo_ids    = fields.One2many('cotizador.insumo','select_id',copy=True, store=True)
     adicional_ids = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
+
+
+    @api.depends('sustrato_id')
+    def _compute_ancho_papel(self):
+        if self.sustrato_id and self.sustrato_id.product_product_id:
+            self.ancho_papel = self.sustrato_id.product_product_id.ancho
+        else:
+            self.ancho_papel = 0
 
 
     @api.depends('sustrato_id','producto_id')
@@ -182,7 +191,7 @@ class SelectProducts(models.TransientModel):
 
 
     # Calculo de Z
-    @api.onchange('producto_id', 'sustrato_id', 'largo', 'ancho', 'cantidad', 'gap', 'engranaje', 'etiquetas_al_desarrollo', 'etiquetas_al_ancho', 'merma_estimada', 'rf', 'etiqueta_con_gap', 'ancho_papel')
+    @api.onchange('producto_id', 'sustrato_id', 'largo', 'ancho', 'cantidad', 'gap', 'engranaje', 'etiquetas_al_desarrollo', 'etiquetas_al_ancho', 'merma_estimada', 'rf', 'etiqueta_con_gap')
     def _calc_z(self):
         self.ss          = 0
         self.sx          = 0
@@ -234,7 +243,9 @@ class SelectProducts(models.TransientModel):
             self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
         # JETRION
-        elif self._area_negocio() == '2':
+        # JCR comentado por ahora
+        #elif self._area_negocio() == '2':
+        else:
             if self.largo > 0.0 and self.ancho > 0.0 and self.cantidad > 0.0:
                 #n14 = 210
                 n14 = self.ancho_papel
@@ -395,16 +406,17 @@ class SelectProducts(models.TransientModel):
             product.product_tmpl_id.gen_cotizador = True
 
             ############### FABRICACION ###################
-            # Rutas de producto (MTO y fabricar)
+            #------- Rutas de producto (MTO y Fabricar) --------
             stock_id = self.env.ref('stock.route_warehouse0_mto').id
             mrp_id   = self.env.ref('mrp.route_warehouse0_manufacture').id
             product.route_ids = [(5,0)] + [(4,stock_id),(4,mrp_id)]
 
-            # Crear BoM
+            #---------------- Crear BoM ------------------------
             vals = {
-                    "product_tmpl_id": product.product_tmpl_id.id,
-                    "type"           : "normal", # Fabricar este producto
-                    "product_qty"    : self.cantidad,
+                    'product_tmpl_id'     : product.product_tmpl_id.id,
+                    'type'                : 'normal', # Fabricar este producto
+                    'product_qty'         : self.cantidad,
+                    'analytic_account_id' : self.producto_id.analytic_account_id.id or None, # Actualiza cta analitica en SO line
                 }
             mrp = self.env["mrp.bom"].create(vals)
 
@@ -529,49 +541,23 @@ class SelectProducts(models.TransientModel):
 
             #----------- Insertar producto en SO ------------------
             order_id = self.env['sale.order'].browse(self._context.get('active_id', False))
-            order_line_id = self.env['sale.order.line'].create({
-                    'product_id': product.id,
-                    'product_uom': product.uom_id.id,
-                    'product_uom_qty': self.cantidad,
+            if order_id:
+                order_line_id = self.env['sale.order.line'].create({
+                    'product_id'          : product.id,
+                    'product_uom'         : product.uom_id.id,
+                    'product_uom_qty'     : self.cantidad,
                     #'price_unit': product.list_price,
-                    'order_id': order_id.id,
+                    'analytic_account_id' : self.producto_id.analytic_account_id.id or None, # Actualiza cta analitica en SO line
+                    'order_id'            : order_id.id,
                 })
-
-            #---------- TAG Analitico -----------------
+            #------------ Agrega TAG Analitico -----------------
             if order_line_id:
                 order_line_id.analytic_tag_ids = [(0,0,{'name':order_id.name})]
 
-            product.description = self.genera_descripcion()
+            # JCR. No usado por ahora
+            #product.description = self.genera_descripcion()
 
 
-            #----------- Actualiza Cuenta Analitica en SO ------------
-            if self.producto_id.analytic_account_id:
-                order_id.analytic_account_id =  self.producto_id.analytic_account_id
-
-#            product.lista_parametros = json.dumps(self.insumo_ids)
-
-#        if self.flag_order == 'so':
-#            order_id = self.env['sale.order'].browse(self._context.get('active_id', False))
-#            for product in self.product_ids:
-#                self.env['sale.order.line'].create({
-#                    'product_id': product.id,
-#                    'product_uom': product.uom_id.id,
-#                    'price_unit': product.lst_price,
-#                    'order_id': order_id.id
-#                })
-#        elif self.flag_order == 'po':
-#            order_id = self.env['purchase.order'].browse(self._context.get('active_id', False))
-#            for product in self.product_ids:
-#                self.env['purchase.order.line'].create({
-#                    'product_id': product.id,
-#                    'name': product.name,
-#                    'date_planned': order_id.date_planned or datetime.today().strftime(DEFAULT_SERVER_DATETIME_FORMAT),
-#                    'product_uom': product.uom_id.id,
-#                    'price_unit': product.lst_price,
-#                    'product_qty': 1.0,
-#                    'display_type': False,
-#                    'order_id': order_id.id
-#                })
 
     def create_product(self):
         if self.nombre_producto:
