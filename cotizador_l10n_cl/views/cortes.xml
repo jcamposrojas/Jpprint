@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="cortes_cotizador_tree" model="ir.ui.view">
+	    <field name="name">cotizador.cortes.tree</field>
+	    <field name="model">cotizador.cortes</field>
+	    <field name="arch" type="xml">
+                <tree editable="top">
+		    <field name="codigo"/>
+                    <field name="ancho" />
+                    <field name="uom_id" />
+		</tree>
+
+	    </field>
+	</record>
+
+        <record id="cortes_mng_cotizador_action" model="ir.actions.act_window">
+	    <field name="name">Cortes</field>
+	    <field name="res_model">cotizador.cortes</field>
+	    <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="cortes_mng_menu" parent="menu_mng_cotizador" action="cortes_mng_cotizador_action" sequence="50" />
+
+    </data>
+</odoo>

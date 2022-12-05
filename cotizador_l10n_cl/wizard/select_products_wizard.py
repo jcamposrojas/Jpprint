@@ -22,7 +22,8 @@ class SelectProducts(models.TransientModel):
     largo         = fields.Integer(string="Largo")
     ancho         = fields.Integer(string="Ancho")
 
-    ancho_papel   = fields.Integer(string="Ancho de papel",compute='_compute_ancho_papel', store=True)
+    #ancho_papel   = fields.Integer(string="Ancho de papel",compute='_compute_ancho_papel', store=True)
+    ancho_papel   = fields.Integer(string="Ancho de papel",default=210)
     cantidad      = fields.Integer(string="Cantidad")
     gap           = fields.Float(string="GAP entre etiquetas", default=3, digits=(10,3))
     engranaje     = fields.Float(string="Paso Engranaje", default=3.175, digits=(10,3))
@@ -41,7 +42,7 @@ class SelectProducts(models.TransientModel):
     area_ocupada_con_merma  = fields.Float(string="Superficie C/MERMA", compute="_calc_z", store=True, digits=(10,3))
     cilindros        = fields.Integer(string='Cilindros', compute="_calc_z", store=True)
     troquel          = fields.Char(string='Troquel', compute="_calc_z", store=True)
-    # Al ancho (falta uom)
+    #---------- Al ancho (falta uom) -------------
     rf    = fields.Integer('RF', default=3)
     sx    = fields.Integer('SX', compute="_calc_z")
     ss    = fields.Integer('SS', compute="_calc_z")
@@ -70,23 +71,38 @@ class SelectProducts(models.TransientModel):
     codigo            = fields.Char(string="Código Producción", compute="_compute_codigo_nombre", store=True)
     nombre_producto   = fields.Char(string="Nombre producto", compute="_compute_codigo_nombre", store=True)
     texto_adicional   = fields.Char(string="Texto adicional")
+
     def _default_aisa(self):
-        return self.env.ref('cotizador_l10n_cl.aisa_4')
+        return self.env.ref('cotizador_l10n_cl.aisa_2')
 
-    aisa_id           = fields.Many2one('ir.attachment', string='Etiqueta AISA', domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]", default=_default_aisa)
-
+    aisa_id           = fields.Many2one('ir.attachment', string='Etiqueta AISA',
+                        domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]",
+                        default=_default_aisa)
 
     #========== Valores ==========
     insumo_ids    = fields.One2many('cotizador.insumo','select_id',copy=True, store=True)
     adicional_ids = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
 
+#    @api.onchange('aisa_id', 'largo', 'ancho')
+#    def _onchange_aisa_id(self):
+#        _logger.info(' AISA ')
+#        _logger.info(self.aisa_id.name)
+#        if 'aisa3' in self.aisa_id.name or 'aisa4' in self.aisa_id.name or \
+#           'aisa7' in self.aisa_id.name or 'aisa8' in self.aisa_id.name:
+#            self.largo_interno = self.ancho
+#            self.ancho_interno = self.largo
+#        else:
+#            self.largo_interno = self.largo
+#            self.ancho_interno = self.ancho
 
-    @api.depends('sustrato_id')
-    def _compute_ancho_papel(self):
-        if self.sustrato_id and self.sustrato_id.product_product_id:
-            self.ancho_papel = self.sustrato_id.product_product_id.ancho
-        else:
-            self.ancho_papel = 0
+
+# JCR. no se usa
+#    @api.depends('sustrato_id')
+#    def _compute_ancho_papel(self):
+#        if self.sustrato_id and self.sustrato_id.product_product_id:
+#            self.ancho_papel = self.sustrato_id.product_product_id.ancho
+#        else:
+#            self.ancho_papel = 0
 
 
     @api.depends('sustrato_id','producto_id')
@@ -113,10 +129,10 @@ class SelectProducts(models.TransientModel):
 #            self.area_ocupada = 0
 #            self.area_ocupada_con_merma = 0
 
-    @api.depends('longitud_papel','ancho_bobina')
-    def _calc_area(self):
-        self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
-        self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
+#    @api.depends('longitud_papel','ancho_bobina')
+#    def _calc_area(self):
+#        self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
+#        self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
 
 #    @api.onchange('producto_id')
 #    def _get_posible_adicionales(self):
@@ -190,8 +206,20 @@ class SelectProducts(models.TransientModel):
             self.count_coincidencias = products_count
 
 
-    # Calculo de Z
-    @api.onchange('producto_id', 'sustrato_id', 'largo', 'ancho', 'cantidad', 'gap', 'engranaje', 'etiquetas_al_desarrollo', 'etiquetas_al_ancho', 'merma_estimada', 'rf', 'etiqueta_con_gap')
+    #--------------- Calculo de Z ---------------
+    @api.onchange('producto_id',
+            'sustrato_id',
+            'largo',
+            'ancho',
+            'aisa_id',
+            'cantidad',
+            'gap',
+            'engranaje',
+            'etiquetas_al_desarrollo',
+            'etiquetas_al_ancho',
+            'merma_estimada',
+            'rf',
+            'etiqueta_con_gap')
     def _calc_z(self):
         self.ss          = 0
         self.sx          = 0
@@ -206,60 +234,84 @@ class SelectProducts(models.TransientModel):
         self.ancho_bobina   = 0
         self.longitud_papel = 0
 
+        largo_interno = self.largo # Usado después de aplicar AISA
+        ancho_interno = self.ancho # Usado después de aplicar AISA
+
+        if 'aisa3' in self.aisa_id.name or 'aisa4' in self.aisa_id.name or \
+           'aisa7' in self.aisa_id.name or 'aisa8' in self.aisa_id.name:
+            largo_interno = self.ancho
+            ancho_interno = self.largo
+
         # Blanca TROQUELADA
         if self._area_negocio() == '1' or self._area_negocio() == '3':
-            self.z_calculado = ((self.largo + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
+            self.z_calculado = ((largo_interno + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
 
             #Ingreso de cilindro
             self.z_ingreso, self.cilindros, self.troquel = self.asigna_z(self.z_calculado)
 
             self.etiqueta_con_gap = (self.z_ingreso * self.engranaje) / self.etiquetas_al_desarrollo
-            self.gap_etiqueta     = self.etiqueta_con_gap - self.largo
+            self.gap_etiqueta     = self.etiqueta_con_gap - largo_interno
 
             if self.etiquetas_al_ancho:
                 if self.etiquetas_al_ancho == 1:
                     self.ss = 0
                     self.sx = 0
                 elif self.etiquetas_al_ancho == 2:
-                    self.ss = 6
+                    self.ss = self.producto_id.SS # 6
                     self.sx = 0
-                elif self.etiquetas_al_ancho % 2 == 0: #par
-                    self.ss = 6
-                    self.sx = 3
-                elif self.etiquetas_al_ancho % 2 == 1: #impar
+                elif self.etiquetas_al_ancho % 2 == 0: # par > 2
+                    self.ss = self.producto_id.SS # 6
+                    self.sx = self.producto_id.SX # 3
+                elif self.etiquetas_al_ancho % 2 == 1: # impar
                     self.ss = 0
-                    self.sx = 6
+                    self.sx = self.producto_id.SS # 6
 
-                self.ancho_bobina = self.ancho * self.etiquetas_al_ancho + self.rf * 2
+                self.rf = self.producto_id.RF
+
+                self.ancho_bobina = ancho_interno * self.etiquetas_al_ancho + self.rf * 2
                 if self.etiquetas_al_ancho % 2 == 0:
                     self.ancho_bobina += (self.ss + 2*((self.etiquetas_al_ancho / 2 - 1)*(self.sx)))
                 else:
                     self.ancho_bobina += (self.etiquetas_al_ancho - 1) * self.sx
 
+                _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, self.ancho_bobina)
+
                 # Longitud
                 self.longitud_papel = (self.etiqueta_con_gap * self.cantidad) / self.etiquetas_al_ancho
 
             # Calcula area
-            self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
+            self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
         # JETRION
         # JCR comentado por ahora
         #elif self._area_negocio() == '2':
         else:
-            if self.largo > 0.0 and self.ancho > 0.0 and self.cantidad > 0.0:
+            if largo_interno > 0.0 and ancho_interno > 0.0 and self.cantidad > 0.0:
+                #_logger.info(sustrato_id.get_max_x_ancho(self.largo,self.ancho))
+               # get_cortes(self, producto_id):
+                #for c in self.producto_id.get_cortes(self.sustrato_id):
+                #    _logger.info(c.id)
+                #    _logger.info(c.codigo)
+
+
+                # Toma el primer corte
+                _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, 0)
+
                 #n14 = 210
                 n14 = self.ancho_papel
-                o14 = round(n14 / self.largo - 0.5,0)
-                p14 = round(n14 / self.ancho - 0.5,0)
-                f15 = self.ancho if o14 > p14 else self.largo
-                q14 = max(o14,p14)
-                #self.area_ocupada = round((self.cantidad / q14) * f15 * 0.22, 0)
+                o14 = round(n14 / largo_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo largo
+                p14 = round(n14 / ancho_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo ancho
+                f15 = ancho_interno if o14 > p14 else largo_interno # Avance
+                q14 = max(o14,p14) # Etiquetas al ancho
+
+                self.etiquetas_al_ancho = q14
                 self.longitud_papel = (self.cantidad * f15) / q14
 
                 f15 = f15 / 1000.0
                 self.area_ocupada = round((self.cantidad / q14) * f15 * (self.ancho_papel / 1000.0), 3)
                 self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
             else:
+                self.etiquetas_al_ancho = 0
                 self.area_ocupada = 0
                 self.area_ocupada_con_merma = 0
 
@@ -458,12 +510,12 @@ class SelectProducts(models.TransientModel):
             list_parametros['data'] = {}
             list_parametros['data']['largo'] = self.largo
             list_parametros['data']['ancho'] = self.ancho
-            list_parametros['data']['texto_adicional']   = self.texto_adicional
-            list_parametros['data']['datos_adicionales'] = self.datos_adicionales
+            list_parametros['data']['texto_adicional']   = self.texto_adicional or ''
+            list_parametros['data']['datos_adicionales'] = self.datos_adicionales or ''
             list_parametros['data']['longitud_papel']    = self.longitud_papel
             list_parametros['data']['area_ocupada']      = self.area_ocupada
             list_parametros['data']['area_ocupada_con_merma'] = self.area_ocupada_con_merma
-            if self.buje_id:
+            if self.aisa_id:
                 list_parametros['data']['aisa'] = self.aisa_id.name.replace('.png','').upper()
             else:
                 list_parametros['data']['aisa'] = ''
@@ -485,8 +537,10 @@ class SelectProducts(models.TransientModel):
                 list_parametros['param']['etiquetas_al_ancho'] = self.etiquetas_al_ancho
                 list_parametros['param']['etiquetas_al_desarrollo'] = self.etiquetas_al_desarrollo
                 list_parametros['param']['ancho_bobina']       = self.ancho_bobina
+                list_parametros['param']['ancho_papel']        = self.ancho_papel
             elif self._area_negocio() == '2':
-                list_parametros['param']['ancho_papel'] = self.ancho_papel
+                list_parametros['param']['etiquetas_al_ancho'] = self.etiquetas_al_ancho
+                list_parametros['param']['ancho_papel']        = self.ancho_papel
 
 
             product.lista_parametros = json.dumps(list_parametros)

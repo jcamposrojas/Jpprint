@@ -1,5 +1,9 @@
 from odoo import api, fields, models, tools, _
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 
 class CotizadorProducto(models.Model):
     _name = 'cotizador.producto'
@@ -10,16 +14,6 @@ class CotizadorProducto(models.Model):
     name         = fields.Char('Descripción', required=True)
     nombre_corto = fields.Char('Nombre corto', required=True, help="Texto incluido en el nombre de producto")
     category_id  = fields.Many2one('product.category', string="Categoría", required=True)
-
-
-#    sustratos_ids = fields.Many2many(
-#        comodel_name="cotizador.sustrato",
-#        relation="cotizador_producto_sustrato_rel",
-#        string="Sustratos",
-#        column1="producto_id",
-#        column2="sustrato_id",
-#    )
-
 
 #    adicional_ids = fields.Many2many(comodel_name="cotizador.adicional",string="Adicionales")
     def _get_default_product_uom_id(self):
@@ -34,4 +28,28 @@ class CotizadorProducto(models.Model):
     adicional_ids         = fields.One2many("cotizador.adicional",'producto_id', string="Adicionales")
     analytic_account_id   = fields.Many2one('account.analytic.account', 'Cuenta Analítica')
 
+    corte_default = fields.Many2many('cotizador.cortes',string='Cortes por defecto')
+
+    RF    = fields.Integer(string='RF', help='Ancho borde izquierdo y derecho', default=0)
+    SX    = fields.Integer(string='SX', help='Espacio entre Etiquetas en Dirección Ancho', default=0)
+    SS    = fields.Integer(string='SS', help='Espacio entre Etiquetas al Centro en Dirección Ancho', default=0)
+
+
+    def get_cortes(self, sustrato_id):
+        for producto_sustrato in self.producto_sustrato_ids:
+            #_logger.info(producto_sustrato.sustrato_id.id)
+            if producto_sustrato.sustrato_id.id == sustrato_id.id:
+                if producto_sustrato.corte_count > 0:
+                    return producto_sustrato.corte_ids
+                else:
+                    return self.corte_default
+
+        return self.corte_default
+
+    def get_best_corte(self, sustrato_id, ancho):
+        list_cortes = self.get_cortes(sustrato_id)
+        for corte in list_cortes:
+            if ancho <= corte.ancho:
+                return corte.id, corte.ancho
+        return -1, -1
 

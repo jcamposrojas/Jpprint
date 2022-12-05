@@ -17,6 +17,7 @@
 			    <group>
 			        <field name="nombre_corto" />
 			        <field name="codigo" />
+			        <field name="corte_ids" widget="many2many_tags"/>
 			    </group>
 			    <group>
 				<field name="product_product_id" string="Producto/Insumo"/>

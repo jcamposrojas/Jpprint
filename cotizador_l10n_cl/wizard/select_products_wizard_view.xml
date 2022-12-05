@@ -67,8 +67,8 @@
                                 <field name="buje_id" />
 		            </group>
 			    <group>
-                                <field name="adicional_ids"/>
 				<!--
+                                <field name="adicional_ids"/>
                                 <field name="adicional_ids"  widget="many2many_tags" />
                                 <field name="rotulado_embalaje" />
                                 <field name="efecto_espejo" />
@@ -97,7 +97,6 @@
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','ETB'),('codigo_producto','!=','EF')]}">
 		        <group>
 		            <group>
-                                <field name="ancho_papel" invisible="1"/>
                                 <field name="engranaje"/>
                                 <field name="etiquetas_al_desarrollo"/>
                                 <field name="etiquetas_al_ancho"/>
@@ -117,6 +116,7 @@
 					<field name="ss" style="max-width:20px"/> / <field name="sx" style="max-width:20px"/> / <field name="rf" style="max-width:20px" readonly="1"/>
                                 </div>
                                 <field name="ancho_bobina"/>
+                                <field name="ancho_papel" readonly='1'/>
                                 <field name="longitud_papel"/>
 		            </group>
 		        </group>
@@ -124,7 +124,8 @@
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','EDJ')]}">
 		        <group>
 		            <group>
-                                <field name="ancho_papel"/>
+                                <field name="ancho_papel" readonly='1'/>
+                                <field name="etiquetas_al_ancho" readonly='1'/>
 			    </group>
 		            <group>
                                 <field name="longitud_papel"/>

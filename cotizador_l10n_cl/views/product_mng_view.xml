@@ -17,6 +17,11 @@
 			    <group>
 			        <field name="nombre_corto" />
 			        <field name="codigo" />
+			        <field name="corte_default" widget="many2many_tags"/>
+                                <label for="SS" string="SS / SX / RF" />
+                                <div class="o_row" id="ancho_ss_sx" >
+                                    <field name="SS" style="max-width:20px"/> / <field name="SX" style="max-width:20px"/> / <field name="RF" style="max-width:20px" />
+                                </div>
 			    </group>
 			    <group>
 			        <field name="category_id" />
@@ -31,9 +36,10 @@
 					<tree editable="bottom">
 					    <field name="sequence" widget="handle" />
 		                            <field name="sustrato_id" />
-		                            <field name="product_product_id" />
+					    <field name="product_product_id" invisible="1"/>
                                             <field name="nombre_corto" />
                                             <field name="codigo" />
+                                            <field name="corte_ids" widget="many2many_tags"/>
                                             <field name="merma" string="Merma (%)"/>
 				        </tree>
 			            </field>

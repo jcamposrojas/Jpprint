@@ -8,6 +8,7 @@ from . import sale_order_line
 from . import adicional
 #from . import rendimiento_adicional
 
+from . import cortes
 from . import consumo
 from . import producto_sustrato
 from . import troquel
