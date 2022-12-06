@@ -57,6 +57,9 @@
 			<field name="adhesivo_id" />
                         <field name="datos_adicionales" />
 			<field name="area_ocupada_con_merma" />
+			<field name="currency_id" invisible='1'/>
+			<field name="precio_total" string='Costo Total' widget="monetary" options="{'currency_field': 'currency_id'}"/>
+			<field name="precio_unitario" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                     </group>
                 </group>
 		<notebook>

@@ -13,7 +13,10 @@ class SelectProducts(models.TransientModel):
     _name = 'select.products'
     _description = 'Select Products'
 
+    company_id      = fields.Many2one('res.company', default=lambda self: self.env.company)
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
+    currency_id     = fields.Many2one('res.currency', readonly=True, related='company_id.currency_id')
+
     codigo_producto = fields.Char(related='producto_id.codigo')
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
     adhesivo_id     = fields.Many2one(comodel_name="cotizador.adhesivo", string="Adhesivo", required=True)
@@ -83,6 +86,18 @@ class SelectProducts(models.TransientModel):
     #========== Valores ==========
     insumo_ids    = fields.One2many('cotizador.insumo','select_id',copy=True, store=True)
     adicional_ids = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
+
+    precio_total    = fields.Float(string='Precio Total', compute='_compute_price', store=True)
+    precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
+
+    @api.depends('insumo_ids')
+    def _compute_price(self):
+        for rec in self:
+            price = 0.0
+            for item in rec.insumo_ids:
+                price += item.costo_consumo
+            rec.precio_total    = price
+            rec.precio_unitario = price / rec.cantidad if rec.cantidad > 0 else 0
 
 #    @api.onchange('aisa_id', 'largo', 'ancho')
 #    def _onchange_aisa_id(self):
@@ -671,27 +686,25 @@ class SelectProducts(models.TransientModel):
             #product.description = self.genera_descripcion()
 
 
-
     def create_product(self):
         if self.nombre_producto:
-            #standard_price, list_price = self.get_final_product_prices()
-            standard_price = 0.0
-            for item in self.insumo_ids:
-                standard_price += item.costo_consumo
-            standard_price = standard_price / self.cantidad
-            list_price = standard_price # precio/costo unitario
+#            standard_price = 0.0
+#            for item in self.insumo_ids:
+#                standard_price += item.costo_consumo
+#            standard_price = standard_price / self.cantidad
+#            list_price = standard_price # precio/costo unitario
 
             seq = self.env['ir.sequence'].next_by_code('cotizador_l10n_cl.product')
             vals = {
-                "type": "product",
-                "name": self.nombre_producto,
-                "default_code": self.codigo + '-' + str(seq),
-                "purchase_ok": False,  # Producto no se compra
+                "type"           : "product",
+                "name"           : self.nombre_producto,
+                "default_code"   : self.codigo + '-' + str(seq),
+                "purchase_ok"    : False,  # Producto no se compra
                 #"description": self.datos_adicionales,
-                "categ_id": self.producto_id.category_id.id,
-                "standard_price": standard_price,
-                "list_price": list_price,
-                "uom_id": self.product_uom_id.id,
+                "categ_id"       : self.producto_id.category_id.id,
+                "standard_price" : self.precio_unitario,
+                "list_price"     : self.precio_unitario,
+                "uom_id"         : self.product_uom_id.id,
             }
             product = self.env["product.product"].create(vals)
             return product
@@ -732,6 +745,4 @@ class SelectProducts(models.TransientModel):
             return '7'
         elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto8').id:
             return '8'
-
-
 

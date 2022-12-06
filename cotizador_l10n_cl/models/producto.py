@@ -36,6 +36,10 @@ class CotizadorProducto(models.Model):
 
     homologo_ids          = fields.One2many('producto_homologo','producto_id', string="Homologados")
 
+    _sql_constraints = [
+        ('codigo_uniq', 'unique (codigo)', 'Campo código debe ser único!.'),
+        ]
+
     def get_cortes(self, sustrato_id):
         for producto_sustrato in self.producto_sustrato_ids:
             #_logger.info(producto_sustrato.sustrato_id.id)
