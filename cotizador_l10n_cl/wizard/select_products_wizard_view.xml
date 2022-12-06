@@ -132,6 +132,24 @@
 			    </group>
 			</group>
 		    </page>
+		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','EIMTTR'),('codigo_producto','!=','EDP'),('codigo_producto','!=','DPVC'),('codigo_producto','!=','IMD'),('codigo_producto','!=','IMDP')]}">
+		        <group>
+		            <group>
+                                <field name="etiquetas_al_ancho"/>
+                                <field name="gap"/>
+			    </group>
+		            <group>
+                                <field name="etiqueta_con_gap"/>
+				<label for="ss" string="SS / SX / RF" />
+			        <div class="o_row" id="ancho_ss_sx" >
+					<field name="ss" style="max-width:20px"/> / <field name="sx" style="max-width:20px"/> / <field name="rf" style="max-width:20px" readonly="1"/>
+                                </div>
+                                <field name="ancho_bobina" string="Ancho Calculado"/>
+                                <field name="ancho_papel" readonly='1'/>
+                                <field name="longitud_papel"/>
+			    </group>
+			</group>
+		    </page>
 		</notebook>
                 <footer>
                     <button name="add_product" string="Guardar" type="object" class="oe_highlight" />

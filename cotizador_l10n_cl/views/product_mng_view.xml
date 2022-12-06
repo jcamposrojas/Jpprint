@@ -69,6 +69,11 @@
 			            <field name="consumo_ids" nolabel="1"/>
                                 </group>
 			    </page>
+			    <page string="Productos Homologados">
+			        <group>
+			            <field name="homologo_ids" nolabel="1"/>
+                                </group>
+			    </page>
 		        </notebook>
 		    </sheet>
 		</form>

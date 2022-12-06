@@ -34,6 +34,7 @@ class CotizadorProducto(models.Model):
     SX    = fields.Integer(string='SX', help='Espacio entre Etiquetas en Dirección Ancho', default=0)
     SS    = fields.Integer(string='SS', help='Espacio entre Etiquetas al Centro en Dirección Ancho', default=0)
 
+    homologo_ids          = fields.One2many('producto_homologo','producto_id', string="Homologados")
 
     def get_cortes(self, sustrato_id):
         for producto_sustrato in self.producto_sustrato_ids:

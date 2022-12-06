@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.14',
+    'version': '15.0.1.15',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -30,6 +30,7 @@
         'views/consumo.xml',
         'views/buje.xml',
         'views/cortes.xml',
+        'views/homologo.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',
         'data/productos.xml',

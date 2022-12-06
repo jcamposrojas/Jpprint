@@ -14,3 +14,4 @@ from . import producto_sustrato
 from . import troquel
 from . import buje
 from . import product_template
+from . import homologo

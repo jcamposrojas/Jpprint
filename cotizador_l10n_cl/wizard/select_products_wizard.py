@@ -2,6 +2,7 @@
 from datetime import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api
+from math import ceil
 import json
 
 import logging
@@ -205,6 +206,30 @@ class SelectProducts(models.TransientModel):
             products_count = self.env['product.template'].search_count([('name','ilike',self.nombre_producto)])
             self.count_coincidencias = products_count
 
+    def _set_ancho_efectivo(self, ancho_etiqueta, etiquetas_al_ancho):
+        if etiquetas_al_ancho and etiquetas_al_ancho > 0:
+            if etiquetas_al_ancho == 1:
+                self.ss = 0
+                self.sx = 0
+            elif etiquetas_al_ancho == 2:
+                self.ss = self.producto_id.SS # 6
+                self.sx = 0
+            elif etiquetas_al_ancho % 2 == 0: # par > 2
+                self.ss = self.producto_id.SS # 6
+                self.sx = self.producto_id.SX # 3
+            elif etiquetas_al_ancho % 2 == 1: # impar
+                self.ss = 0
+                self.sx = self.producto_id.SS # 6
+
+            self.rf = self.producto_id.RF
+
+            ancho_efectivo = ancho_etiqueta * etiquetas_al_ancho + self.rf * 2
+            if etiquetas_al_ancho % 2 == 0:
+                ancho_efectivo += (self.ss + 2*((etiquetas_al_ancho / 2 - 1)*(self.sx)))
+            else:
+                ancho_efectivo += (etiquetas_al_ancho - 1) * self.sx
+            return ancho_efectivo
+        return 0
 
     #--------------- Calculo de Z ---------------
     @api.onchange('producto_id',
@@ -242,7 +267,7 @@ class SelectProducts(models.TransientModel):
             largo_interno = self.ancho
             ancho_interno = self.largo
 
-        # Blanca TROQUELADA
+        #------------------ Blanca TROQUELADA -------------------
         if self._area_negocio() == '1' or self._area_negocio() == '3':
             self.z_calculado = ((largo_interno + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
 
@@ -282,18 +307,9 @@ class SelectProducts(models.TransientModel):
             # Calcula area
             self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
-        # JETRION
-        # JCR comentado por ahora
-        #elif self._area_negocio() == '2':
-        else:
+        #--------------------- JETRION ---------------------
+        elif self._area_negocio() == '2':
             if largo_interno > 0.0 and ancho_interno > 0.0 and self.cantidad > 0.0:
-                #_logger.info(sustrato_id.get_max_x_ancho(self.largo,self.ancho))
-               # get_cortes(self, producto_id):
-                #for c in self.producto_id.get_cortes(self.sustrato_id):
-                #    _logger.info(c.id)
-                #    _logger.info(c.codigo)
-
-
                 # Toma el primer corte
                 _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, 0)
 
@@ -311,7 +327,29 @@ class SelectProducts(models.TransientModel):
                 self.area_ocupada = round((self.cantidad / q14) * f15 * (self.ancho_papel / 1000.0), 3)
                 self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
             else:
-                self.etiquetas_al_ancho = 0
+                #self.etiquetas_al_ancho = 0
+                self.area_ocupada = 0
+                self.area_ocupada_con_merma = 0
+        #--------------------- TTR  / RESTO ------------------------
+        else:
+            if largo_interno > 0.0 and ancho_interno > 0.0 and self.cantidad > 0.0:
+                # Entradas:
+                #    ancho_interno, self.etiquetas_al_ancho, self.gap
+
+                # En este caso corresponde a ancho calculado, pero se almacena en ancho_bobina
+                self.ancho_bobina = self._set_ancho_efectivo(ancho_interno, self.etiquetas_al_ancho)
+                self.etiqueta_con_gap = self.gap + largo_interno
+
+                _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, self.ancho_bobina)
+
+                # Longitud
+                self.longitud_papel = (self.etiqueta_con_gap * self.cantidad) / self.etiquetas_al_ancho
+
+                # Calcula area
+                self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
+                self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
+            else:
+                #self.etiquetas_al_ancho = 0
                 self.area_ocupada = 0
                 self.area_ocupada_con_merma = 0
 
@@ -391,6 +429,27 @@ class SelectProducts(models.TransientModel):
                     'incluido_en_ldm': line.incluido_en_ldm,
                     'flag_adicional': False,
                 }
+            self.insumo_ids = [(0,0,vals)]
+
+        #------------------ Productos homologados ---------------------
+        largo_total = round((self.longitud_papel / 1000.0), 0) * self.etiquetas_al_ancho
+        # Cantidad de productos homologados
+        for line in self.producto_id.homologo_ids:
+            qty_productos = ceil(largo_total / line.cantidad_homologo)
+            vals = {
+                'select_id': 0,
+                #'select_id': self.id,
+                'product_product_id': line.product_product_id.id,
+                'cost_currency_id'  : line.cost_currency_id.id,
+                'name'              : line.product_product_id.name,
+                'cantidad'          : ceil(largo_total / line.cantidad_homologo) , #line.cantidad * self.area_ocupada * (1 + line.merma / 100.0),
+                'costo_unitario'    : line.standard_price,
+                'costo_consumo'     : line.standard_price * qty_productos, #largo_totallargo_totaline.costo_consumo * self.area_ocupada * (1 + line.merma / 100.0),
+                'uom_id'            : line.consumo_uom_id.id,
+                'merma'             : line.merma,
+                'incluido_en_ldm'   : line.incluido_en_ldm,
+                'flag_adicional'    : False,
+            }
             self.insumo_ids = [(0,0,vals)]
 
         # Buje

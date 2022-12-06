@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="cotizador_homologo_tree" model="ir.ui.view">
+	    <field name="name">producto_homologo.tree</field>
+	    <field name="model">producto_homologo</field>
+	    <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="uom_category_id" invisible="1"/> 
+                    <field name="cost_currency_id" invisible="1"/> 
+                    <field name="product_product_id" />
+                    <field name="uom_id" /> 
+		    <field name="standard_price" widget="monetary" options="{'currency_field': 'cost_currency_id', 'field_digits': True}"/>
+                    <field name="cantidad_homologo" /> 
+                    <field name="consumo_uom_id"/> 
+                    <field name="merma"/> 
+                    <field name="incluido_en_ldm" /> 
+		</tree>
+
+	    </field>
+	</record>
+
+	<!--
+	<record id="cotizador_consumo_form" model="ir.ui.view">
+	    <field name="name">cotizador.consumo.form</field>
+	    <field name="model">cotizador.consumo</field>
+	    <field name="arch" type="xml">
+		<form string="Consumos">
+		    <sheet>
+			<group>
+			    <group>
+			        <field name="adicional_id" />
+			        <field name="producto_uom_id" />
+			    </group>
+			    <group>
+			        <field name="adicional_uom_id" />
+			        <field name="rendimiento" />
+			    </group>
+                        </group>
+		    </sheet>
+		</form>
+	    </field>
+	</record>
+	-->
+
+    </data>
+</odoo>

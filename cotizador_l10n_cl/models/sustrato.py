@@ -16,24 +16,24 @@ class CotizadorSustrato(models.Model):
     cost_currency_id = fields.Many2one('res.currency', string='Moneda de costo',
             related="product_product_id.cost_currency_id")
 
-    corte_ids = fields.Many2many('cotizador.cortes', string='Cortes')
+#    corte_ids = fields.Many2many('cotizador.cortes', string='Cortes')
 
-    def get_max_x_ancho(self,largo,ancho):
-        corte_id          = 0
-        corte_et_al_ancho = -1
-        corte_largo       = 0
-        corte_ancho       = 0
+#    def get_max_x_ancho(self,largo,ancho):
+#        corte_id          = 0
+#        corte_et_al_ancho = -1
+#        corte_largo       = 0
+#        corte_ancho       = 0
 
-        for corte in corte_ids:
-            # ID, ET. AL ANCHO, LARGO(AVANCE), ANCHO
-            c_id, c_et_al_ancho, c_largo, c_ancho = corte.get_max_etiquetas_al_ancho(largo,ancho)
-            if c_al_ancho > corte_al_ancho:
-                corte_id       = c_id
-                corte_al_ancho = c_et_al_ancho
-                corte_largo    = c_largo
-                corte_ancho    = c_ancho
-
-        return corte_id, corte_et_al_ancho, corte_largo, corte_ancho
+#        for corte in corte_ids:
+#            # ID, ET. AL ANCHO, LARGO(AVANCE), ANCHO
+#            c_id, c_et_al_ancho, c_largo, c_ancho = corte.get_max_etiquetas_al_ancho(largo,ancho)
+#            if c_al_ancho > corte_al_ancho:
+#                corte_id       = c_id
+#                corte_al_ancho = c_et_al_ancho
+#                corte_largo    = c_largo
+#                corte_ancho    = c_ancho
+#
+#        return corte_id, corte_et_al_ancho, corte_largo, corte_ancho
 
 
 
