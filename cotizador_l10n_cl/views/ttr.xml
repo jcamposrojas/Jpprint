@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="cotizador_ttr_tree" model="ir.ui.view">
+	    <field name="name">producto_ttr.tree</field>
+	    <field name="model">producto_ttr</field>
+	    <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="largo_uom_id" invisible="1"/> 
+                    <field name="ancho_uom_id" invisible="1"/> 
+                    <field name="area_uom_id" invisible="1"/> 
+
+                    <field name="product_product_id"/>
+                    <field name="cost_currency_symbol" string="CLP"/>
+                    <field name="standard_price" string="Costo"/>
+                    <field name="largo"/>
+		    <field name="largo_uom_id" string="UM"/>
+                    <field name="ancho" />
+		    <field name="ancho_uom_id" string="UM"/>
+                    <field name="area" />
+		    <field name="area_uom_id" string="UM"/>
+                    <field name="merma"/> 
+                    <field name="incluido_en_ldm" /> 
+		</tree>
+
+	    </field>
+	</record>
+
+    </data>
+</odoo>
+

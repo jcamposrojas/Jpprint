@@ -15,3 +15,4 @@ from . import troquel
 from . import buje
 from . import product_template
 from . import homologo
+from . import ttr

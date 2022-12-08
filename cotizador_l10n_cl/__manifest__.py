@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.16',
+    'version': '15.0.1.17',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -31,6 +31,7 @@
         'views/buje.xml',
         'views/cortes.xml',
         'views/homologo.xml',
+        'views/ttr.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',
         'data/productos.xml',
@@ -39,6 +40,7 @@
         'data/troquel.xml',
         'data/buje.xml',
         'data/aisa.xml',
+        'data/uom_data.xml',
 #        'wizard/insumo.xml',
         'security/ir.model.access.csv'
     ],

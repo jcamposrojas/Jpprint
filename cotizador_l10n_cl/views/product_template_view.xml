@@ -18,9 +18,14 @@
 		</xpath>
 
 	        <xpath expr="//label[@for='weight']" position="before">
+		    <field name="largo_ancho_category_uom_id" invisible='1'/>
+		    <label for="largo" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
+                    <div class="o_row" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
+                        <field name="largo"/><span><field name="largo_uom_id" domain="[('category_id','=',largo_ancho_category_uom_id)]"/></span>
+                    </div>
 		    <label for="ancho" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}"/>
-                    <div class="o_row" name="weight" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
-                        <field name="ancho"/><span>mm</span>
+                    <div class="o_row" attrs="{'invisible':[('product_variant_count', '&gt;', 1), ('is_product_variant', '=', False)]}">
+			    <field name="ancho"/><span><field name="ancho_uom_id" domain="[('category_id','=',largo_ancho_category_uom_id)]"/></span>
                     </div>
 		</xpath>
 

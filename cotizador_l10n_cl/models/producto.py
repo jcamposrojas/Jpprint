@@ -36,6 +36,8 @@ class CotizadorProducto(models.Model):
 
     homologo_ids          = fields.One2many('producto_homologo','producto_id', string="Homologados")
 
+    ttr_ids          = fields.One2many('producto_ttr','producto_id', string="Cintas TTR")
+
     _sql_constraints = [
         ('codigo_uniq', 'unique (codigo)', 'Campo código debe ser único!.'),
         ]
@@ -57,4 +59,10 @@ class CotizadorProducto(models.Model):
             if ancho <= corte.ancho:
                 return corte.id, corte.ancho
         return -1, -1
+
+    def get_best_ttr(self, ancho):
+        for ttr in self.ttr_ids.sorted('ancho_mm'):
+            if ancho <= ttr.ancho:
+                return ttr, ttr.ancho
+        return None, -1
 

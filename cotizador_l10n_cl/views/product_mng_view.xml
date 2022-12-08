@@ -74,6 +74,11 @@
 			            <field name="homologo_ids" nolabel="1"/>
                                 </group>
 			    </page>
+			    <page string="Cintas TTR">
+			        <group>
+			            <field name="ttr_ids" nolabel="1"/>
+                                </group>
+			    </page>
 		        </notebook>
 		    </sheet>
 		</form>
