@@ -30,7 +30,7 @@
         'views/consumo.xml',
         'views/buje.xml',
         'views/cortes.xml',
-        'views/homologo.xml',
+#        'views/homologo.xml',
         'views/ttr.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',

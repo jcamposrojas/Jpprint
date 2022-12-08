@@ -12,5 +12,4 @@ access_producto_sustrato,access_producto_sustrato,model_producto_sustrato,base.g
 access_cotizador_troquel,access_cotizador_troquel,model_cotizador_troquel,base.group_user,1,1,1,1
 access_cotizador_buje,access_cotizador_buje,model_cotizador_buje,base.group_user,1,1,1,1
 access_cotizador_cortes,access_cotizador_cortes,model_cotizador_cortes,base.group_user,1,1,1,1
-access_producto_homologo,access_producto_homologo,model_producto_homologo,base.group_user,1,1,1,1
 access_producto_ttr,access_producto_ttr,model_producto_ttr,base.group_user,1,1,1,1
