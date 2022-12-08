@@ -435,27 +435,6 @@ class SelectProducts(models.TransientModel):
                 }
             self.insumo_ids = [(0,0,vals)]
 
-        #------------------ Productos homologados ---------------------
-        largo_total = round((self.longitud_papel / 1000.0), 0) * self.etiquetas_al_ancho
-        # Cantidad de productos homologados
-        for line in self.producto_id.homologo_ids:
-            qty_productos = ceil(largo_total / line.cantidad_homologo)
-            vals = {
-                'select_id': 0,
-                #'select_id': self.id,
-                'product_product_id': line.product_product_id.id,
-                'cost_currency_id'  : line.cost_currency_id.id,
-                'name'              : line.product_product_id.name,
-                'cantidad'          : ceil(largo_total / line.cantidad_homologo) , #line.cantidad * self.area_ocupada * (1 + line.merma / 100.0),
-                'costo_unitario'    : line.standard_price,
-                'costo_consumo'     : line.standard_price * qty_productos, #largo_totallargo_totaline.costo_consumo * self.area_ocupada * (1 + line.merma / 100.0),
-                'uom_id'            : line.consumo_uom_id.id,
-                'merma'             : line.merma,
-                'incluido_en_ldm'   : line.incluido_en_ldm,
-                'flag_adicional'    : False,
-            }
-            self.insumo_ids = [(0,0,vals)]
-
         #------------------ Cintas TTR ---------------------
         # Solo para TTR
         if self._area_negocio() == '5':

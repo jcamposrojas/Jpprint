@@ -4,7 +4,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-
 class CotizadorProducto(models.Model):
     _name = 'cotizador.producto'
     _description = 'Producto genérico'
@@ -19,8 +18,9 @@ class CotizadorProducto(models.Model):
     def _get_default_product_uom_id(self):
         return self.env.ref('uom.uom_square_meter')
 
-    uom_id   = fields.Many2one('uom.uom', string='Unidad de medida Sustrato', default=_get_default_product_uom_id, required=True)
-    sequence = fields.Integer( 'Sequence', default=100)
+    uom_id       = fields.Many2one('uom.uom', string='Unidad de medida Sustrato',
+                   default=_get_default_product_uom_id, required=True)
+    sequence     = fields.Integer( 'Sequence', default=100)
 
     producto_sustrato_ids = fields.One2many("producto.sustrato",'producto_id', string="Sustratos")
     consumo_ids           = fields.One2many("cotizador.consumo",'producto_id', string="Consumos")
@@ -34,7 +34,7 @@ class CotizadorProducto(models.Model):
     SX    = fields.Integer(string='SX', help='Espacio entre Etiquetas en Dirección Ancho', default=0)
     SS    = fields.Integer(string='SS', help='Espacio entre Etiquetas al Centro en Dirección Ancho', default=0)
 
-    homologo_ids          = fields.One2many('producto_homologo','producto_id', string="Homologados")
+#    homologo_ids          = fields.One2many('producto_homologo','producto_id', string="Homologados")
 
     ttr_ids          = fields.One2many('producto_ttr','producto_id', string="Cintas TTR")
 
