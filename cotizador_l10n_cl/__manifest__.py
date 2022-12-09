@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.18',
+    'version': '15.0.1.19',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -27,9 +27,11 @@
         'views/troquel_views.xml',
 #        'views/rendimiento_adicional_view.xml',
         'views/product_template_view.xml',
+        'views/producto_sustrato.xml',
         'views/consumo.xml',
         'views/buje.xml',
         'views/cortes.xml',
+        'views/hojas.xml',
 #        'views/homologo.xml',
         'views/ttr.xml',
         'data/ir_sequence_data.xml',

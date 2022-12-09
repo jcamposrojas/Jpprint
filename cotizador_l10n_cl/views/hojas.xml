@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="producto_hojas_tree" model="ir.ui.view">
+	    <field name="name">producto_hojas.tree</field>
+	    <field name="model">producto_hojas</field>
+	    <field name="arch" type="xml">
+                <tree editable="top">
+		    <field name="name"/>
+                    <field name="ancho" />
+                    <field name="alto" />
+                    <field name="uom_id" />
+		</tree>
+
+	    </field>
+	</record>
+
+        <record id="hojas_mng_cotizador_action" model="ir.actions.act_window">
+	    <field name="name">Tamaños de Hoja</field>
+	    <field name="res_model">producto_hojas</field>
+	    <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="hojas_mng_menu" parent="menu_mng_cotizador" action="hojas_mng_cotizador_action" sequence="60" />
+
+    </data>
+</odoo>

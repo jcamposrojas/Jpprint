@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="cotizador_producto_sustrato_tree" model="ir.ui.view">
+	    <field name="name">producto.sustrato.tree</field>
+	    <field name="model">producto.sustrato</field>
+	    <field name="arch" type="xml">
+                <tree editable="bottom">
+			<field name="use_cortes" invisible='1'/>
+                        <field name="sequence" widget="handle" />
+                        <field name="sustrato_id" readonly='1'/>
+                        <field name="product_product_id" invisible="1"/>
+                        <field name="nombre_corto" />
+                        <field name="codigo" />
+                        <field name="corte_ids" attrs="{'invisible':[('use_cortes', '!=', True)]}" widget="many2many_tags" />
+                        <field name="merma" string="Merma (%)"/>
+
+		</tree>
+
+	    </field>
+	</record>
+
+    </data>
+</odoo>
+

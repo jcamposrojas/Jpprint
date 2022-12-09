@@ -15,7 +15,8 @@ class SelectProducts(models.TransientModel):
 
     company_id      = fields.Many2one('res.company', default=lambda self: self.env.company)
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
-    currency_id     = fields.Many2one('res.currency', readonly=True, related='company_id.currency_id')
+    currency_id     = fields.Many2one('res.currency', related='company_id.currency_id')
+    currency_symbol = fields.Char(string='Símbolo moneda', related='company_id.name')
 
     codigo_producto = fields.Char(related='producto_id.codigo')
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)

@@ -17,11 +17,15 @@
 			    <group>
 			        <field name="nombre_corto" />
 			        <field name="codigo" />
-			        <field name="corte_default" widget="many2many_tags"/>
-                                <label for="SS" string="SS / SX / RF" />
-                                <div class="o_row" id="ancho_ss_sx" >
+
+		                <field name='use_cortes'/>
+
+			        <field name="corte_default" attrs="{'invisible':[('use_cortes', '!=', True)]}" widget="many2many_tags" />
+                                <label for="SS" string="SS / SX / RF" attrs="{'invisible':[('use_cortes', '!=', True)]}"/>
+                                <div class="o_row" id="ancho_ss_sx" attrs="{'invisible':[('use_cortes', '!=', True)]}">
                                     <field name="SS" style="max-width:20px"/> / <field name="SX" style="max-width:20px"/> / <field name="RF" style="max-width:20px" />
                                 </div>
+			        <field name="hoja_ids" attrs="{'invisible':[('use_cortes', '=', True)]}" widget="many2many_tags" />
 			    </group>
 			    <group>
 			        <field name="category_id" />
@@ -32,18 +36,7 @@
 			<notebook>
 			    <page string="Sustratos Permitidos">
 			        <group>
-			            <field name="producto_sustrato_ids" nolabel="1">
-					<tree editable="bottom">
-					    <field name="sequence" widget="handle" />
-		                            <field name="sustrato_id" />
-					    <field name="product_product_id" invisible="1"/>
-                                            <field name="nombre_corto" />
-                                            <field name="codigo" />
-                                            <field name="corte_ids" widget="many2many_tags"/>
-                                            <field name="merma" string="Merma (%)"/>
-				        </tree>
-			            </field>
-
+				    <field name="producto_sustrato_ids" nolabel="1"/>
                                 </group>
 			    </page>
 			    <page string="Operaciones">

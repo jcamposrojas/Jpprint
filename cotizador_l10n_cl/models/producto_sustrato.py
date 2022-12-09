@@ -27,6 +27,8 @@ class CotizadorSustrato(models.Model):
     corte_ids   = fields.Many2many('cotizador.cortes', string='Cortes')
     corte_count = fields.Integer(string='N° Cortes', compute='_count_cortes')
 
+    use_cortes  = fields.Boolean(string='Usa Cortes', related="producto_id.use_cortes")
+
     @api.depends('corte_ids')
     def _count_cortes(self):
         for rec in self:

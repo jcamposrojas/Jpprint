@@ -28,7 +28,10 @@ class CotizadorProducto(models.Model):
     adicional_ids         = fields.One2many("cotizador.adicional",'producto_id', string="Adicionales")
     analytic_account_id   = fields.Many2one('account.analytic.account', 'Cuenta Analítica')
 
-    corte_default = fields.Many2many('cotizador.cortes',string='Cortes por defecto')
+    use_cortes            = fields.Boolean(string='Usa Cortes', default=True,
+                            help='Usa Cortes o Tamaños de Hoja')
+
+    corte_default = fields.Many2many('cotizador.cortes', string='Cortes por defecto')
 
     RF    = fields.Integer(string='RF', help='Ancho borde izquierdo y derecho', default=0)
     SX    = fields.Integer(string='SX', help='Espacio entre Etiquetas en Dirección Ancho', default=0)
@@ -36,7 +39,9 @@ class CotizadorProducto(models.Model):
 
 #    homologo_ids          = fields.One2many('producto_homologo','producto_id', string="Homologados")
 
-    ttr_ids          = fields.One2many('producto_ttr','producto_id', string="Cintas TTR")
+    ttr_ids          = fields.One2many('producto_ttr', 'producto_id', string="Cintas TTR")
+
+    hoja_ids         = fields.Many2many('producto_hojas', string="Tamaños de Hoja")
 
     _sql_constraints = [
         ('codigo_uniq', 'unique (codigo)', 'Campo código debe ser único!.'),
