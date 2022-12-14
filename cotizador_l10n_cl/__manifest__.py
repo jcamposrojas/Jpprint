@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.19',
+    'version': '15.0.1.20',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -18,6 +18,7 @@
         'account_so_l10n_cl'],
     'data': [
         'wizard/select_products_wizard_view.xml',
+        'wizard/insumo.xml',
         'views/menu_root.xml',
         'views/product_mng_view.xml',
         'views/sustrato_mng_view.xml',
@@ -43,7 +44,6 @@
         'data/buje.xml',
         'data/aisa.xml',
         'data/uom_data.xml',
-#        'wizard/insumo.xml',
         'security/ir.model.access.csv'
     ],
     'images': [

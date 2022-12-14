@@ -30,9 +30,6 @@ class CotizadorInsumo(models.TransientModel):
 
     @api.onchange('cantidad')
     def _onchange_cantidad(self):
-        _logger.info(' CANTIDAD ')
-        _logger.info(self.cantidad)
-        _logger.info(self.costo_unitario)
         self.costo_consumo = self.cantidad * self.costo_unitario
 
 #    def create(self,vals):

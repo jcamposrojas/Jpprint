@@ -28,10 +28,10 @@ class CotizadorProducto(models.Model):
     adicional_ids         = fields.One2many("cotizador.adicional",'producto_id', string="Adicionales")
     analytic_account_id   = fields.Many2one('account.analytic.account', 'Cuenta Analítica')
 
-    use_cortes            = fields.Boolean(string='Usa Cortes', default=True,
+    use_cortes            = fields.Boolean(string='Usa Anchos de papel', default=True,
                             help='Usa Cortes o Tamaños de Hoja')
 
-    corte_default = fields.Many2many('cotizador.cortes', string='Cortes por defecto')
+    corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 
     RF    = fields.Integer(string='RF', help='Ancho borde izquierdo y derecho', default=0)
     SX    = fields.Integer(string='SX', help='Espacio entre Etiquetas en Dirección Ancho', default=0)
@@ -68,6 +68,7 @@ class CotizadorProducto(models.Model):
     def get_best_ttr(self, ancho):
         for ttr in self.ttr_ids.sorted('ancho_mm'):
             if ancho <= ttr.ancho:
-                return ttr, ttr.ancho
-        return None, -1
+                return ttr
+        return None
+        #return None, -1
 

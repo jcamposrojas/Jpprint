@@ -18,16 +18,20 @@ class CotizadorProductoTtr(models.Model):
 
 
     #------- Campos largo ancho ---------
+    # En UoM original
     largo = fields.Integer(string='Largo', related='product_product_id.largo')
     ancho = fields.Integer(string='Ancho', related='product_product_id.ancho')
 
-    largo_mm = fields.Integer(string='Largo en mm', compute='_compute_values')
-    ancho_mm = fields.Integer(string='Ancho en mm', compute='_compute_values')
-
+    # UoM
     largo_uom_id = fields.Many2one('uom.uom', string='Uom largo', related='product_product_id.largo_uom_id')
     ancho_uom_id = fields.Many2one('uom.uom', string='Uom ancho', related='product_product_id.ancho_uom_id')
 
-    #------- Area --------
+    # En mm
+    largo_mm = fields.Integer(string='Largo en mm', compute='_compute_values')
+    ancho_mm = fields.Integer(string='Ancho en mm', compute='_compute_values')
+
+
+    #------- Area en m(2)--------
     area  = fields.Float(string='Area', compute='_compute_values')
     def _get_default_area_uom_id(self):
         return self.env.ref('uom.uom_square_meter').id

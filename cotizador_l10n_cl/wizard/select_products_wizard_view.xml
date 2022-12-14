@@ -49,7 +49,7 @@
 			-->
                     </group>
                     <group>
-			<label for="largo" string="Largo X Ancho" />
+			<label for="largo" string="Avance X Ancho" />
 			<div class="o_row" id="largo_ancho" >
                             <field name="largo" />X<field name="ancho" />
                             <span><field name="uom_id" readonly="1" nolabel="1"/></span>
@@ -67,9 +67,10 @@
 			<group>
 			    <group>
 				<field class="d-flex flex-wrap" name="aisa_id" widget="radio_image_aisa" options="{'horizontal': true}"/>
-                                <field name="buje_id" />
 		            </group>
 			    <group>
+                                <field name="buje_id" />
+                                <field name="etiquetas_x_rollo"/>
 				<!--
                                 <field name="adicional_ids"/>
                                 <field name="adicional_ids"  widget="many2many_tags" />
@@ -83,18 +84,7 @@
 		    </page>
 		    <page string="Materias Primas" name="insumos">
 			<group>
-			<field name="insumo_ids" nolabel="1">
-			    <tree editable="bottom" options="{'no_create': True}">
-			        <field name="name"/>
-			        <field name="cantidad"/>
-			        <field name="uom_id"/>
-			        <field name="costo_unitario" invisible="1"/>
-			        <field name="costo_consumo" sum="Costo Total"/>
-			        <field name="merma"/>
-			        <field name="incluido_en_ldm"/>
-			        <field name="flag_adicional" invisible="1"/>
-			    </tree>
-			</field>
+				<field name="insumo_ids" nolabel="1"/>
 		        </group>
 		    </page>
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','ETB'),('codigo_producto','!=','EF')]}">

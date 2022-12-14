@@ -10,7 +10,7 @@ class CotizadorCortes(models.Model):
 
 
     codigo  = fields.Char(string='Descripción', compute='_compute_name', store=True)
-    ancho = fields.Integer(string='Ancho de Corte', required=True)
+    ancho = fields.Integer(string='Ancho de Papel', required=True)
 
     def _get_default_uom_id(self):
         return self.env.ref('uom.product_uom_millimeter')
@@ -18,7 +18,7 @@ class CotizadorCortes(models.Model):
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', default=_get_default_uom_id)
  
     _sql_constraints = [
-        ('ancho_corte_uniq', 'unique (ancho)', 'Los cortes deben ser únicos.'),
+        ('ancho_corte_uniq', 'unique (ancho)', 'Los anchos deben ser únicos.'),
         ]
 
     @api.depends('ancho','uom_id')
@@ -26,7 +26,7 @@ class CotizadorCortes(models.Model):
         for rec in self:
             name = '/'
             if rec.ancho and rec.uom_id:
-                name = 'Corte-%s%s' % (rec.ancho,rec.uom_id.name)
+                name = 'Ancho-%s%s' % (rec.ancho,rec.uom_id.name)
             rec.codigo = name
 
     # ID, ET. AL ANCHO, ANCHO, LARGO(AVANCE)

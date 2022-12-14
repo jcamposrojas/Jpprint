@@ -16,7 +16,7 @@
 	</record>
 
         <record id="cortes_mng_cotizador_action" model="ir.actions.act_window">
-	    <field name="name">Cortes</field>
+	    <field name="name">Anchos de Papel</field>
 	    <field name="res_model">cotizador.cortes</field>
 	    <field name="view_mode">tree</field>
         </record>

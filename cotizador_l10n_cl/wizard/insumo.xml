@@ -2,11 +2,28 @@
 <odoo>
     <data>
 
-        <record id="cotizador_insumo_tree" model="ir.ui.view">
-            <field name="name">cotizador.insumo.tree</field>
+        <record id="insumo_cotizador_tree" model="ir.ui.view">
+            <field name="name">cotizador_insumo_tree</field>
             <field name="model">cotizador.insumo</field>
             <field name="arch" type="xml">
                 <tree editable="bottom">
+                    <field name="name"/>
+                    <field name="cantidad"/>
+                    <field name="uom_id"/>
+                    <field name="costo_unitario" invisible="1"/>
+                    <field name="costo_consumo" sum="Costo Total"/>
+                    <field name="merma"/>
+                    <field name="incluido_en_ldm"/>
+                    <field name="flag_adicional" invisible="1"/>
+                </tree>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>
+<!--
+                <tree editable="bottom" options="{'no_create': False}">
                     <field name="product_product_id" />
                     <field name="cost_currency_id" invisible="1"/>
                     <field name="cantidad" />
@@ -16,9 +33,4 @@
                     <field name="merma" />
                     <field name="incluido_en_ldm" />
                 </tree>
-
-            </field>
-        </record>
-
-    </data>
-</odoo>
+-->

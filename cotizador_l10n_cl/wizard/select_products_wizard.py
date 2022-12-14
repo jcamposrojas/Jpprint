@@ -24,8 +24,9 @@ class SelectProducts(models.TransientModel):
     merma_estimada  = fields.Float(string="Merma sustrato (%)", compute="_compute_merma")
 
     #========== Datos ==========
-    largo         = fields.Integer(string="Largo")
+    largo         = fields.Integer(string="Avance")
     ancho         = fields.Integer(string="Ancho")
+
     # Usar estos datos de largo/ancho (usados despues de aplicar aisa)
     largo_interno = fields.Integer(string="Largo AISA", compute='_compute_interno')
     ancho_interno = fields.Integer(string="Ancho AISA", compute='_compute_interno')
@@ -64,12 +65,12 @@ class SelectProducts(models.TransientModel):
     def _get_default_product_uom_id(self):
         return self.env.ref('uom.product_uom_unit')
 
-    uom_id         = fields.Many2one( 'uom.uom', 'Unidad de medida', default=_get_default_uom_id, required=True)
+    uom_id         = fields.Many2one( 'uom.uom', 'UdM', default=_get_default_uom_id, required=True)
     product_uom_id = fields.Many2one( 'uom.uom', 'Unidad de medida', default=_get_default_product_uom_id, required=True)
 
-    #buje = fields.Selection( string="Buje", required=True,
-    #    selection=[("buje1", "BUJE 1"), ("buje3", "BUJE 3"),("buje40", "BUJE 40")], default="buje1")
-    buje_id = fields.Many2one('cotizador.buje', 'Buje')
+    #----------- Bujes ------------------
+    buje_id           = fields.Many2one('cotizador.buje', 'Buje')
+    etiquetas_x_rollo = fields.Integer(string='Etiquetas por rollo', default=0)
 
     rotulado_embalaje = fields.Boolean(string="Rotulado y embalaje", default=True)
     efecto_espejo     = fields.Boolean(string="Efecto Espejo", default=False)
@@ -80,12 +81,13 @@ class SelectProducts(models.TransientModel):
     nombre_producto   = fields.Char(string="Nombre producto", compute="_compute_codigo_nombre", store=True)
     texto_adicional   = fields.Char(string="Texto adicional")
 
-    def _default_aisa(self):
-        return self.env.ref('cotizador_l10n_cl.aisa_2')
+#    def _default_aisa(self):
+#        return self.env.ref('cotizador_l10n_cl.aisa_2')
 
+    # No es obligatorio. Solo en caso que el cliente lo soclicite
     aisa_id           = fields.Many2one('ir.attachment', string='Etiqueta AISA',
-                        domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]",
-                        default=_default_aisa)
+                        domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]")
+#                        default=_default_aisa)
 
     #========== Valores ==========
     insumo_ids    = fields.One2many('cotizador.insumo','select_id', compute='_update_insumos', copy=True, store=True)
@@ -93,6 +95,7 @@ class SelectProducts(models.TransientModel):
 
     precio_total    = fields.Float(string='Precio Total', compute='_compute_price', store=True)
     precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
+
 
     @api.depends('insumo_ids')
     def _compute_price(self):
@@ -103,15 +106,12 @@ class SelectProducts(models.TransientModel):
             rec.precio_total    = price
             rec.precio_unitario = price / rec.cantidad if rec.cantidad > 0 else 0
 
-    @api.depends('aisa_id', 'largo', 'ancho')
+    @api.depends('largo', 'ancho')
     def _compute_interno(self):
-        if 'aisa3' in self.aisa_id.name or 'aisa4' in self.aisa_id.name or \
-           'aisa7' in self.aisa_id.name or 'aisa8' in self.aisa_id.name:
-            self.largo_interno = self.ancho
-            self.ancho_interno = self.largo
-        else:
-            self.largo_interno = self.largo
-            self.ancho_interno = self.ancho
+        for rec in self:
+            # Largo/ancho en mm
+            rec.largo_interno = rec.uom_id._compute_quantity(rec.largo,self.env.ref('uom.product_uom_millimeter'))
+            rec.ancho_interno = rec.uom_id._compute_quantity(rec.ancho,self.env.ref('uom.product_uom_millimeter'))
 
 # JCR. no se usa
 #    @api.depends('sustrato_id')
@@ -301,7 +301,7 @@ class SelectProducts(models.TransientModel):
             self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
         #--------------------- JETRION ---------------------
-        elif self._area_negocio() == '2':
+        elif self._area_negocio() == '9':
             if self.largo_interno > 0.0 and self.ancho_interno > 0.0 and self.cantidad > 0.0:
                 # Toma el primer corte
                 _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, 0)
@@ -439,41 +439,24 @@ class SelectProducts(models.TransientModel):
         #------------------ Cintas TTR ---------------------
         # Solo para TTR
         if self._area_negocio() == '5':
-            ttr_id, ttr_ancho = self.producto_id.get_best_ttr(self.ancho_interno)
-            _logger.info(' TTR ')
-            _logger.info(ttr_ancho)
+            ttr_id = self.producto_id.get_best_ttr(self.ancho_interno)
+
+            #_logger.info(len(ttr_id))
             if ttr_id:
-                # Nro de etiquetas dentro del ancho de cinta
-                n_etiquetas_al_ancho = ttr_ancho / self.ancho_interno
-                n_cintas_al_ancho = ceil(self.etiquetas_al_ancho / n_etiquetas_al_ancho)
-                # Largo total de cinta en mm
-                largo_total_cinta = self.longitud_papel * n_cintas_al_ancho
+                # ttr_id.area y self.area_ocupada en m2
+                qty                   = self.area_ocupada / ttr_id.area 
+                #qty_productos         = ceil(qty) 
+                qty_productos_c_merma = ceil(qty * (1 + ttr_id.merma / 100.0)) 
 
-            # Largo total en mm
-#            largo_total = self.longitud_papel * self.etiquetas_al_ancho
-            #for line in self.producto_id.ttr_ids:
-                _logger.info('self.ancho_interno')
-                _logger.info(self.ancho_interno)
-                _logger.info('n_etiquetas_al_ancho')
-                _logger.info(n_etiquetas_al_ancho)
-                _logger.info('n_cintas_al_ancho')
-                _logger.info(n_cintas_al_ancho)
-                _logger.info('largo_total_cinta')
-                _logger.info(largo_total_cinta)
-
-                qty_productos = ceil(largo_total_cinta / ttr_id.largo_mm)
-                _logger.info('qty_productos')
-                _logger.info(qty_productos)
                 vals = {
                     'select_id': 0,
-                    #'select_id': self.id,
                     'product_product_id': ttr_id.product_product_id.id,
                     'cost_currency_id'  : ttr_id.cost_currency_id.id,
                     'name'              : ttr_id.product_product_id.name,
-                    'cantidad'          : qty_productos, #line.cantidad * self.area_ocupada * (1 + line.merma / 100.0),
+                    'cantidad'          : qty_productos_c_merma,
                     'costo_unitario'    : ttr_id.standard_price,
-                    'costo_consumo'     : ttr_id.standard_price * qty_productos, #largo_totallargo_totaline.costo_consumo * self.area_ocupada * (1 + line.merma / 100.0),
-                    #'uom_id'            : line.consumo_uom_id.id,
+                    'costo_consumo'     : ttr_id.standard_price * qty_productos_c_merma,
+                    'uom_id'            : ttr_id.product_product_id.uom_id,
                     'merma'             : ttr_id.merma,
                     'incluido_en_ldm'   : ttr_id.incluido_en_ldm,
                     'flag_adicional'    : False,
@@ -483,19 +466,23 @@ class SelectProducts(models.TransientModel):
         # Buje
         if self.buje_id:
             producto = self.buje_id.product_product_id
-            cantidad = round((self.longitud_papel / 1000.0) / self.buje_id.longitud, 0) * self.etiquetas_al_ancho
+            cantidad = ceil((self.longitud_papel / 1000.0) / self.buje_id.longitud) * self.etiquetas_al_ancho
+            if cantidad > 0:
+                self.etiquetas_x_rollo = round(self.cantidad / cantidad,0)
+            else:
+                self.etiquetas_x_rollo = 0
             vals = {
                     'select_id': 0,
                     'product_product_id': producto.id if producto else None,
-                    'cost_currency_id': producto.currency_id.id if producto else None,
-                    'name': self.buje_id.name,
-                    'cantidad': cantidad,
-                    'costo_unitario': self.buje_id.standard_price,
-                    'costo_consumo': cantidad * self.buje_id.standard_price,
-                    'uom_id': self.buje_id.uom_id.id,
-                    'merma': 0,
-                    'incluido_en_ldm': True,
-                    'flag_adicional': False,
+                    'cost_currency_id'  : producto.currency_id.id if producto else None,
+                    'name'              : self.buje_id.name,
+                    'cantidad'          : cantidad,
+                    'costo_unitario'    : self.buje_id.standard_price,
+                    'costo_consumo'     : cantidad * self.buje_id.standard_price,
+                    'uom_id'            : self.buje_id.uom_id.id,
+                    'merma'             : 0,
+                    'incluido_en_ldm'   : True,
+                    'flag_adicional'    : False,
                 }
             self.insumo_ids = [(0,0,vals)]
 
@@ -538,6 +525,17 @@ class SelectProducts(models.TransientModel):
 
 #    product_ids = fields.Many2many('product.product', string='Products')
 #    flag_order  = fields.Char('Flag Order')
+
+    @api.onchange('etiquetas_x_rollo')
+    def _onchange_etiquetas_x_rollo(self):
+        _logger.info(' CAMBIO ')
+        _logger.info(self.etiquetas_x_rollo)
+#        if self.buje_id:
+#            cantidad = ceil(self.cantidad / self.etiquetas_x_rollo)
+#            for lin in self.insumo_ids:
+#                if lin.
+#
+
 
     def add_product(self):
         product = self.create_product()
