@@ -28,7 +28,7 @@ class CotizadorInsumo(models.TransientModel):
     incluido_en_ldm    = fields.Boolean(string="En LdM?", default=False)
     flag_adicional     = fields.Boolean(string="Item agregado por el usuario", default=True)
 
-    @api.onchange('cantidad')
+    @api.onchange('cantidad', 'costo_unitario')
     def _onchange_cantidad(self):
         self.costo_consumo = self.cantidad * self.costo_unitario
 

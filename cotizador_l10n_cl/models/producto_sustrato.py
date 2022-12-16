@@ -10,24 +10,25 @@ class CotizadorSustrato(models.Model):
     _description = 'Relación Producto-Sustratos'
     _order = 'sequence, id'
 
+    sequence         = fields.Integer('Sequence', default=10)
     producto_id      = fields.Many2one('cotizador.producto', string="Sustrato")
     sustrato_id      = fields.Many2one('cotizador.sustrato', string="Sustrato")
 
     name             = fields.Char('Descripción', related="sustrato_id.name")
     codigo           = fields.Char('Código', related="sustrato_id.codigo")
     nombre_corto     = fields.Char('Nombre corto', related="sustrato_id.nombre_corto",
-            help="Texto incluido en el nombre de producto")
-    product_product_id = fields.Many2one('product.product', string="Producto", related="sustrato_id.product_product_id")
-    sequence         = fields.Integer('Sequence', related="sustrato_id.sequence")
+                       help="Texto incluido en el nombre de producto")
+    product_product_id = fields.Many2one('product.product', string="Producto",
+                         related="sustrato_id.product_product_id")
 
 #    def _get_merma_default(self):
 #        return self.producto_id.merma_default
 #    merma = fields.Float(string="Merma por defecto (%)", default=_get_merma_default)
     merma       = fields.Float(string="Merma por defecto (%)", default=0.0)
-    corte_ids   = fields.Many2many('cotizador.cortes', string='Cortes')
-    corte_count = fields.Integer(string='N° Cortes', compute='_count_cortes')
+    corte_ids   = fields.Many2many('cotizador.cortes', string='Anchos')
+    corte_count = fields.Integer(string='N° Anchos', compute='_count_cortes')
 
-    use_cortes  = fields.Boolean(string='Usa Cortes', related="producto_id.use_cortes")
+    use_cortes  = fields.Boolean(string='Usa anchos de papel', related="producto_id.use_cortes")
 
     @api.depends('corte_ids')
     def _count_cortes(self):

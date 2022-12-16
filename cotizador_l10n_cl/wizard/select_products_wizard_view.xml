@@ -44,6 +44,7 @@
 
 			<field name="area_ocupada" />
                         <field name="merma_estimada"/>
+			<field name="area_ocupada_con_merma" />
 			<!--
                         <field name="merma_estimada" widget="percentage"/>
 			-->
@@ -56,7 +57,6 @@
                         </div>
 			<field name="adhesivo_id" />
                         <field name="datos_adicionales" />
-			<field name="area_ocupada_con_merma" />
 			<field name="currency_id" invisible='1'/>
 			<field name="precio_total" string='COSTO TOTAL ($)'/>
 			<field name="precio_unitario" string='COSTO UNITARIO ($)' widget="monetary" options="{'currency_field': 'currency_id'}"/>
@@ -66,7 +66,7 @@
 		    <page string="General" name="general_information">
 			<group>
 			    <group>
-				<field class="d-flex flex-wrap" name="aisa_id" widget="radio_image_aisa" options="{'horizontal': true}"/>
+				<field class="d-flex flex-wrap" name="aisa_id" string='Sentido de Salida' widget="radio_image_aisa" options="{'horizontal': true}"/>
 		            </group>
 			    <group>
                                 <field name="buje_id" />
@@ -84,7 +84,21 @@
 		    </page>
 		    <page string="Materias Primas" name="insumos">
 			<group>
-				<field name="insumo_ids" nolabel="1"/>
+			    <field name="insumo_ids" nolabel="1">
+		                <tree editable="bottom" options="{'no_create': True}">
+                                    <field name="product_product_id" invisible="1"/>
+				    <field name="name" attrs="{'readonly': [('product_product_id','!=',False)]}"/>
+                                    <field name="cantidad"/>
+                                    <field name="uom_id" attrs="{'readonly': [('product_product_id','!=',False)]}"/>
+                                    <field name="costo_unitario" invisible="1"/>
+                                    <field name="costo_consumo" attrs="{'readonly': [('product_product_id','!=',False)]}" sum="Costo Total"/>
+                                    <field name="merma" attrs="{'readonly': [('product_product_id','!=',False)]}"/>
+                                    <field name="incluido_en_ldm" attrs="{'readonly': [('product_product_id','!=',False)]}"/>
+                                    <field name="flag_adicional" invisible="1"/>
+                                </tree>
+	                    </field>
+
+
 		        </group>
 		    </page>
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','ETB'),('codigo_producto','!=','EF')]}">

@@ -4,7 +4,7 @@ from math import floor
 
 class CotizadorCortes(models.Model):
     _name = 'cotizador.cortes'
-    _description = 'Cortes de Papel'
+    _description = 'Anchos de Papel'
     _rec_name = 'codigo'
     _order = 'ancho asc'
 
