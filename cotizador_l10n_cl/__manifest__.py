@@ -46,7 +46,7 @@
         'data/buje.xml',
         'data/aisa.xml',
         'data/uom_data.xml',
-        'data/uom_minute.xml',
+#        'data/uom_minute.xml',
         'security/ir.model.access.csv'
     ],
     'images': [
