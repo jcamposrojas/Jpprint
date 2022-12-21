@@ -17,7 +17,7 @@
         'mrp',
         'account_so_l10n_cl'],
     'data': [
-        'data/uom_minute.xml',
+#        'data/uom_minute.xml',
         'wizard/select_products_wizard_view.xml',
 #        'wizard/insumo.xml',
         'views/menu_root.xml',
