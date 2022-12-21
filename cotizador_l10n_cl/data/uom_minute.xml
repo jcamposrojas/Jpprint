@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- WORKING TIME -->
+    <record id="product_uom_minute" model="uom.uom">
+        <field name="name">Minutos</field>
+        <field name="category_id" ref="uom.uom_categ_wtime"/>
+        <field name="factor" eval="480.0"/>
+        <field name="uom_type">smaller</field>
+    </record>
+
+</odoo>

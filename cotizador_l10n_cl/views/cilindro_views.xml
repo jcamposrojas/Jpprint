@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="cilindro_cotizador_tree" model="ir.ui.view">
+	    <field name="name">cotizador.cilindro.tree</field>
+	    <field name="model">cotizador.cilindro</field>
+	    <field name="arch" type="xml">
+                <tree editable="top">
+                    <field name="z" />
+                    <field name="unidades" />
+		</tree>
+
+	    </field>
+	</record>
+
+        <record id="cilindro_mng_cotizador_action" model="ir.actions.act_window">
+	    <field name="name">Cilindros</field>
+	    <field name="res_model">cotizador.cilindro</field>
+	    <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="cilindro_mng_menu" parent="menu_mng_cotizador" action="cilindro_mng_cotizador_action" sequence="40" />
+
+    </data>
+</odoo>

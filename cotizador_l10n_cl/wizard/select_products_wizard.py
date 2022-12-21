@@ -84,6 +84,7 @@ class SelectProducts(models.TransientModel):
 #    def _default_aisa(self):
 #        return self.env.ref('cotizador_l10n_cl.aisa_2')
 
+    indica_aisa       = fields.Boolean('Indica AISA?', default=False)
     # No es obligatorio. Solo en caso que el cliente lo soclicite
     aisa_id           = fields.Many2one('ir.attachment', string='Etiqueta AISA',
                         domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]")
@@ -91,8 +92,8 @@ class SelectProducts(models.TransientModel):
 
     #========== Valores ==========
     #insumo_ids    = fields.One2many('cotizador.insumo','select_id', compute='_update_insumos', copy=True)
-    insumo_ids    = fields.One2many('cotizador.insumo','select_id', copy=True)
-    adicional_ids = fields.Many2many(comodel_name='cotizador.adicional', string="Entradas Adicionales")
+    insumo_ids    = fields.One2many('cotizador.insumo', 'select_id', copy=True)
+    adicional_ids = fields.Many2many('cotizador.adicional', 'producto_id', string="Entradas Adicionales")
 
     precio_total    = fields.Float(string='Precio Total', compute='_compute_price', store=True)
     precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
@@ -382,7 +383,6 @@ class SelectProducts(models.TransientModel):
         if self.ancho == 0 or self.largo == 0 or self.cantidad == 0:
             return
 
-        _logger.info(' UPDATE 1 ')
         # Copia items insertados automaticamente para luego recalcularlos
         lst_tmp  = []
         for item in self.insumo_ids:
@@ -401,9 +401,8 @@ class SelectProducts(models.TransientModel):
                 lst_tmp.append(line_dict)
                 #self.insumo_ids = [(2,item.id)]
         self.insumo_ids = [(5,0)]
-        _logger.info(' UPDATE 2 ')
 
-        # Sustrato
+        #----------- Sustrato -----------------
         if self.sustrato_id and self.sustrato_id.product_product_id:
             vals = {
                 'select_id': 0,
@@ -420,7 +419,6 @@ class SelectProducts(models.TransientModel):
             }
             self.insumo_ids = [(0,0,vals)]
 
-        _logger.info(' UPDATE 3 ')
         # Consumos obligatorios
         for line in self.producto_id.consumo_ids:
             vals = {
@@ -466,8 +464,41 @@ class SelectProducts(models.TransientModel):
                 }
                 self.insumo_ids = [(0,0,vals)]
 
-        _logger.info(' UPDATE 5 ')
-        # Buje
+        #----------------- HH's --------------------
+        for line in self.producto_id.operation_ids:
+            if line.incluye_hh:
+                #costo_x_min = line.workcenter_id.costs_hour / 60
+                if line.hh_type == 'm':
+                    duracion_estimada = self.longitud_papel / line.metros_x_min # En minutos
+                elif line.hh_type == 't':
+                    time_seg = line.seg_x_etiqueta * self.cantidad
+                    duracion_estimada = time_seg / 60 # En minutos
+
+                costo = duracion_estimada * line.costs_min
+                values = {
+                    'select_id': 0,
+                    'cost_currency_id': line.cost_currency_id.id, #OK
+                    'name'            : 'HH ' + line.name, #OK
+                    'cantidad'        : duracion_estimada, #OK
+                    'costo_unitario'  : line.costs_min, #OK
+                    'costo_consumo'   : costo,#OK
+                    'uom_id'          : line.uom_id_de_consumo.id, #OK
+                    'merma'           : 0, #OK
+                    'incluido_en_ldm' : False,
+                    'flag_adicional'  : False,
+                }
+                self.insumo_ids = [(0,0,values)]
+#                values = {
+#                    'name': operation.name,
+#                    'workcenter_id': operation.workcenter_id.id, #ID
+#                    'bom_id': mrp.id, #ID
+#                    #Agregar resto de campos de mrp.routing.workcenter.tmp
+#                    'worksheet_type': 'text',
+#                    'note': product.lista_parametros,
+#                }
+#                mrp.operation_ids = [(0,0,values)]
+
+        #----------------- Buje --------------------
         if self.buje_id:
             producto = self.buje_id.product_product_id
             cantidad = ceil((self.longitud_papel / 1000.0) / self.buje_id.longitud) * self.etiquetas_al_ancho
@@ -489,49 +520,42 @@ class SelectProducts(models.TransientModel):
                 'flag_adicional'    : False,
             }
             self.insumo_ids = [(0,0,vals)]
-        _logger.info(' UPDATE 6 ')
 
-
+        ##### en desarrollo
         for line in self.producto_id.adicional_ids:
-            if self.producto_id.uom_id.id == line.uom_id.id:
-                costo = line.standard_price * line.cantidad * self.area_ocupada
-            else:
-                costo = line.standard_price * line.cantidad
+            #---- nombre -----
+            nombre = line.name
+            if line.add_data:
+                nombre = nombre + '/' + line.data 
+            #---- cantidad ----
+            if line.tipo_calculo == 'f':
+                cantidad = line.cantidad
+                costo    = line.costo_unitario_consumo
+            elif line.tipo_calculo == 'm2':
+                cantidad = line.cantidad * self.area_ocupada
+                costo = cantidad * line.costo_unitario_consumo
+            elif line.tipo_calculo == 'm':
+                cantidad = line.cantidad * self.longitud_papel
+                costo = cantidad * line.costo_unitario_consumo
+
             vals = {
-                'select_id': 0,
-                #'select_id': self.id,
+                #'producto_id': 0,
                 'cost_currency_id': line.cost_currency_id.id,
-                'name': line.name, # Aun por llenar
-                'cantidad': line.cantidad, # Aun por llenar
-                'costo_unitario': line.standard_price,
-                'costo_consumo': costo,
-                'uom_id': line.uom_id.id,
+                'name'            : nombre,
+                'cantidad'        : cantidad,
+                'costo_unitario'  : line.costo_unitario_consumo,
+                'costo_consumo'   : costo,
+                'uom_id'          : line.uom_id_de_consumo.id,
                 #'merma': 0.0, # por definir
-                'incluido_en_ldm': line.incluido_en_ldm,#line.incluido_en_ldm,
-                'flag_adicional': False,
+                'incluido_en_ldm' : line.incluido_en_ldm,
+                'flag_adicional'  : False,
             }
             self.insumo_ids = [(0,0,vals)]
 
-        _logger.info(' UPDATE 7 ')
         # Reingresa items creados por el usuario
         for lst in lst_tmp:
             self.insumo_ids = [(0,0,lst)]
-        _logger.info(' UPDATE 8 ')
 
-
-    #@api.depends('product_calc_id')
-    #def _compute_sustrato_id_domain(self):
-    #    for rec in self:
-    #        rec.sustrato_id = False
-    #        lista = [data.id for data in self.product_calc_id.sustratos_ids]
-    #        if lista:
-    #            #rec.sustrato_id_domain = json.dumps([('id','in',lista)]) 
-    #            rec.sustrato_id_domain = [('id','in',tuple(lista))]
-    #        else:
-    #            rec.sustrato_id_domain = []
-
-#    product_ids = fields.Many2many('product.product', string='Products')
-#    flag_order  = fields.Char('Flag Order')
 
     @api.onchange('etiquetas_x_rollo')
     def _onchange_etiquetas_x_rollo(self):
@@ -545,10 +569,9 @@ class SelectProducts(models.TransientModel):
 
 
     def add_product(self):
-        _logger.info(' CREAPRODUCTO ')
+        self._update_insumos() # Se vuelve a llamar. Los valores llegaban en 0.
         product = self.create_product()
         if product:
-            _logger.info(' CREAPRODUCTO 1 ')
             product.product_tmpl_id.gen_cotizador = True
 
             ############### FABRICACION ###################
@@ -565,12 +588,10 @@ class SelectProducts(models.TransientModel):
                 'analytic_account_id': self.producto_id.analytic_account_id.id or None, # Actualiza cta analitica en SO line
             }
             mrp = self.env["mrp.bom"].create(vals)
-            _logger.info(' CREAPRODUCTO 2 ')
 
             list_parametros = {'content':[]}
             count_parametros = 0
-            self._update_insumos() # Se vuelve a llamar. Los valores llegaban en 0.
-            _logger.info(' CREAPRODUCTO 3 ')
+            #self._update_insumos() # Se vuelve a llamar. Los valores llegaban en 0.
             for line in self.insumo_ids:
                 # BOM lines
                 if line.incluido_en_ldm:

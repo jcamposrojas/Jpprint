@@ -11,5 +11,5 @@ class CotizadorTroquel(models.Model):
     tipo     = fields.Selection([
         ('digital','Digital'),('laser','Laser'),('solido','Sólido'),('flexible','Flexible')
         ], default='solido')
-    unidades = fields.Integer('Cilindros', required=True)
+    unidades = fields.Integer('Cantidad', required=True)
 

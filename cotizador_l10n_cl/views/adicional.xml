@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+	<record id="cotizador_adicionales_form" model="ir.ui.view">
+	    <field name="name">cotizador_l10n_cl.adicional.form</field>
+	    <field name="model">cotizador.adicional</field>
+	    <field name="arch" type="xml">
+		<form string="Adicional">
+		    <sheet>
+			<div class="oe_title">
+			    <label for="name" string="Nombre" />
+			    <h1>
+			        <field name="name" />
+			    </h1>
+			</div>
+			<group>
+			    <group>
+			        <field name="cost_currency_id" invisible='1'/>
+			        <field name="uom_category_id" invisible='1'/>
+			        <field name="product_product_id" string="Producto inventariado"/>
+				<field name="uom_id" string="UoM de Producto" attrs="{'readonly':[('product_product_id','!=',False)], 'invisible':[('product_product_id','=',False)]}"/>
+			        <field name="standard_price" attrs="{'readonly':[('product_product_id','!=',False)], 'invisible':[('product_product_id','=',False)]}"/>
+			        <field name="uom_id_de_consumo"/>
+			        <field name="costo_unitario_consumo"/>
+			        <field name="incluido_en_ldm" attrs="{'invisible':[('product_product_id','=',False)]}"/>
+			        <field name="add_data" />
+				<field name="data" attrs="{'invisible':[('add_data','=',False)]}"/>
+			        <field name="tipo_calculo" />
+			        <field name="cantidad" />
+			    </group>
+                        </group>
+		    </sheet>
+		</form>
+	    </field>
+	</record>
+
+
+
+        <record id="cotizador_adicional_tree" model="ir.ui.view">
+            <field name="name">cotizador.adicional.tree</field>
+            <field name="model">cotizador.adicional</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="costo_unitario_consumo" string="Costo Unitario"/>
+                    <field string="Moneda" name="cost_currency_id"/>
+                    <field name="cantidad"/>
+                    <field name="uom_id_de_consumo"/>
+                    <field name="tipo_calculo"/>
+                    <field name="incluido_en_ldm"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+
+
+    </data>
+</odoo>

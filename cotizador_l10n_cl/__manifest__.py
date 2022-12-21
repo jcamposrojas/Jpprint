@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.21',
+    'version': '15.0.1.22',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -17,6 +17,7 @@
         'mrp',
         'account_so_l10n_cl'],
     'data': [
+        'data/uom_minute.xml',
         'wizard/select_products_wizard_view.xml',
 #        'wizard/insumo.xml',
         'views/menu_root.xml',
@@ -26,6 +27,7 @@
         'views/mrp_routing_views.xml',
 #        'views/sale_order_view.xml',
         'views/troquel_views.xml',
+        'views/cilindro_views.xml',
 #        'views/rendimiento_adicional_view.xml',
         'views/product_template_view.xml',
         'views/producto_sustrato.xml',
@@ -35,6 +37,7 @@
         'views/hojas.xml',
 #        'views/homologo.xml',
         'views/ttr.xml',
+        'views/adicional.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',
         'data/productos.xml',

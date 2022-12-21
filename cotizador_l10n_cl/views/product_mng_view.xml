@@ -46,15 +46,19 @@
 			    </page>
 			    <page string="Entradas Adicionales">
 			        <group>
-			            <field name="adicional_ids" nolabel="1">
-				        <tree editable="bottom">
+				    <field name="adicional_ids" nolabel="1" />
+					    <!--
+				        <tree>
 			                    <field name="name"/>
-			                    <field name="uom_id"/>
+			                    <field name="standard_price" string="Costo Unitario"/>
 			                    <field string="Moneda" name="cost_currency_id"/>
-			                    <field name="standard_price"/>
 			                    <field name="cantidad"/>
+			                    <field name="uom_id_de_consumo"/>
+			                    <field name="tipo_calculo"/>
+					    <field name="incluido_en_ldm" />
 				        </tree>
 				    </field>
+					    -->
                                 </group>
 			    </page>
 			    <page string="Consumos Obligatorios">

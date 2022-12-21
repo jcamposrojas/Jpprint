@@ -9,4 +9,14 @@
         <field name="uom_type">smaller</field>
     </record>
 
+    <!-- WORKING TIME -->
+    <!--
+    <record id="product_uom_minute" model="uom.uom">
+        <field name="name">Minutos</field>
+        <field name="category_id" ref="uom_categ_wtime"/>
+        <field name="factor" eval="480.0"/>
+        <field name="uom_type">smaller</field>
+    </record>
+    -->
+
 </odoo>
