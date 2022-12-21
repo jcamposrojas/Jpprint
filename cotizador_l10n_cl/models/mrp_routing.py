@@ -39,7 +39,7 @@ class CotizadorMrpRoutingWorkcenter(models.Model):
     seg_x_etiqueta         = fields.Integer(string='Segundos por etiqueta', default=0)
 
     def _get_default_uom_id(self):
-        return self.env.ref('cotizador_l10n_cl.product_uom_minute')
+        return self.env.ref('account_so_l10n_cl.product_uom_minute')
 
     uom_id_de_consumo      = fields.Many2one('uom.uom', string='Unidad de Medida', default=_get_default_uom_id)
 
