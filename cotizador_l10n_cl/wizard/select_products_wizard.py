@@ -40,6 +40,7 @@ class SelectProducts(models.TransientModel):
     # salidas de etiqueta en maquina
     etiquetas_al_ancho      = fields.Integer(string="Etiquetas al ancho", default=2)
 
+
     #========== Valores calculados==========
     count_coincidencias = fields.Integer(string="Número de coincidencias")
     z_calculado      = fields.Float(string='Z calculado', compute="_calc_z", digits=(10,3), store=True)
@@ -51,6 +52,7 @@ class SelectProducts(models.TransientModel):
     area_ocupada_con_merma  = fields.Float(string="Superficie C/MERMA", compute="_calc_z", store=True, digits=(10,3))
     cilindros        = fields.Integer(string='Cilindros', compute="_calc_z", store=True)
     troquel          = fields.Char(string='Troquel', compute="_calc_z", store=True)
+
     #---------- Al ancho (falta uom) -------------
     rf    = fields.Integer('RF', default=3)
     sx    = fields.Integer('SX', compute="_calc_z")
@@ -68,6 +70,8 @@ class SelectProducts(models.TransientModel):
     uom_id         = fields.Many2one( 'uom.uom', 'UdM', default=_get_default_uom_id, required=True)
     product_uom_id = fields.Many2one( 'uom.uom', 'Unidad de medida', default=_get_default_product_uom_id, required=True)
 
+    salidas_x_rollo = fields.Integer(string='Salidas por rollo', default=0)
+
     #----------- Bujes ------------------
     buje_id           = fields.Many2one('cotizador.buje', 'Buje')
     etiquetas_x_rollo = fields.Integer(string='Etiquetas por rollo', default=0)
@@ -81,14 +85,11 @@ class SelectProducts(models.TransientModel):
     nombre_producto   = fields.Char(string="Nombre producto", compute="_compute_codigo_nombre", store=True)
     texto_adicional   = fields.Char(string="Texto adicional")
 
-#    def _default_aisa(self):
-#        return self.env.ref('cotizador_l10n_cl.aisa_2')
-
+    #----------- AISA -------------
     indica_aisa       = fields.Boolean('Indica AISA?', default=False)
-    # No es obligatorio. Solo en caso que el cliente lo soclicite
+    # No es obligatorio. Solo en caso que el cliente lo solicite
     aisa_id           = fields.Many2one('ir.attachment', string='Etiqueta AISA',
                         domain="[('res_model', '=', 'select.products'), ('res_field', '=', 'aisa_id')]")
-#                        default=_default_aisa)
 
     #========== Valores ==========
     #insumo_ids    = fields.One2many('cotizador.insumo','select_id', compute='_update_insumos', copy=True)
@@ -115,15 +116,6 @@ class SelectProducts(models.TransientModel):
             rec.largo_interno = rec.uom_id._compute_quantity(rec.largo,self.env.ref('uom.product_uom_millimeter'))
             rec.ancho_interno = rec.uom_id._compute_quantity(rec.ancho,self.env.ref('uom.product_uom_millimeter'))
 
-# JCR. no se usa
-#    @api.depends('sustrato_id')
-#    def _compute_ancho_papel(self):
-#        if self.sustrato_id and self.sustrato_id.product_product_id:
-#            self.ancho_papel = self.sustrato_id.product_product_id.ancho
-#        else:
-#            self.ancho_papel = 0
-
-
     @api.depends('sustrato_id','producto_id')
     def _compute_merma(self):
         if self.sustrato_id and self.producto_id:
@@ -142,14 +134,9 @@ class SelectProducts(models.TransientModel):
 #    def _get_posible_adicionales(self):
 #        if self.producto_id:
 #            adicionales = self.producto_id.adicional_ids
-            #_logger.info(' ADICIONAL ')
-            #_logger.info(adicionales.id)
-            #_logger.info(adicionales.name)
 
         #line = {}
         #for input_adicional in adicionales:
-        #    _logger.info(' ADICIONAL ')
-        #    _logger.info(input_adicional)
         #    line |= input_adicional
         #self.posible_adicionales = line
 
@@ -303,12 +290,11 @@ class SelectProducts(models.TransientModel):
             self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
         #--------------------- JETRION ---------------------
-        elif self._area_negocio() == '9':
+        elif self._area_negocio() == '2':
             if self.largo_interno > 0.0 and self.ancho_interno > 0.0 and self.cantidad > 0.0:
                 # Toma el primer corte
                 _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, 0)
 
-                #n14 = 210
                 n14 = self.ancho_papel
                 o14 = round(n14 / self.largo_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo largo
                 p14 = round(n14 / self.ancho_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo ancho
@@ -469,7 +455,7 @@ class SelectProducts(models.TransientModel):
             if line.incluye_hh:
                 #costo_x_min = line.workcenter_id.costs_hour / 60
                 if line.hh_type == 'm':
-                    duracion_estimada = self.longitud_papel / line.metros_x_min # En minutos
+                    duracion_estimada = (self.longitud_papel / 1000.0) / line.metros_x_min # En minutos
                 elif line.hh_type == 't':
                     time_seg = line.seg_x_etiqueta * self.cantidad
                     duracion_estimada = time_seg / 60 # En minutos
@@ -501,9 +487,13 @@ class SelectProducts(models.TransientModel):
         #----------------- Buje --------------------
         if self.buje_id:
             producto = self.buje_id.product_product_id
-            cantidad = ceil((self.longitud_papel / 1000.0) / self.buje_id.longitud) * self.etiquetas_al_ancho
+            cantidad = ceil((self.longitud_papel / 1000.0) / self.buje_id.longitud)
             if cantidad > 0:
-                self.etiquetas_x_rollo = round(self.cantidad / cantidad,0)
+                et = round(self.cantidad / cantidad,0)
+                if et == 0:
+                    et = self.cantidad
+
+                self.etiquetas_x_rollo = et
             else:
                 self.etiquetas_x_rollo = 0
             vals = {
@@ -522,7 +512,8 @@ class SelectProducts(models.TransientModel):
             self.insumo_ids = [(0,0,vals)]
 
         ##### en desarrollo
-        for line in self.producto_id.adicional_ids:
+        #for line in self.producto_id.adicional_ids:
+        for line in self.adicional_ids:
             #---- nombre -----
             nombre = line.name
             if line.add_data:
@@ -687,12 +678,6 @@ class SelectProducts(models.TransientModel):
             }
             # Comentado por ahora
             #mrp.bom_line_ids = [(0,0,values)]
-
-            #values = {
-            #    'name': 'PRE PRENSA',
-            #    'workcenter_id': 1, #ID
-            #    'bom_id': mrp.id, #ID
-            #}
 
             for operation in self.producto_id.operation_ids:
                 values = {

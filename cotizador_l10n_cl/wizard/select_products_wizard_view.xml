@@ -83,8 +83,9 @@
 			        <group string="BUJE">
                                     <field name="buje_id" />
                                     <field name="etiquetas_x_rollo"/>
+                                    <field name="salidas_x_rollo"/>
 			        </group>
-			        <group string="Adicionales">
+			        <group string="ADICIONALES">
                                 <field name="adicional_ids" nolabel='1' domain="[('producto_id','=',producto_id)]">
 				    <tree editable='bottom'>
                                         <field name="add_data" invisible='1'/>
@@ -106,8 +107,8 @@
 		    </page>
 		    <page string="Materias Primas" name="insumos">
 			<group>
-			    <field name="insumo_ids" nolabel="1">
-		                <tree editable="bottom" options="{'no_create': True}">
+			    <field name="insumo_ids" nolabel="1" readonly='1'>
+		                <tree options="{'no_create': True}">
                                     <field name="product_product_id" invisible="1"/>
 				    <field name="name" attrs="{'readonly': [('product_product_id','!=',False)]}"/>
                                     <field name="cantidad"/>
