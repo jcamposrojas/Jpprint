@@ -21,12 +21,19 @@
 				<field name="uom_id" string="UoM de Producto" attrs="{'readonly':[('product_product_id','!=',False)], 'invisible':[('product_product_id','=',False)]}"/>
 			        <field name="standard_price" attrs="{'readonly':[('product_product_id','!=',False)], 'invisible':[('product_product_id','=',False)]}"/>
 			        <field name="uom_id_de_consumo"/>
-			        <field name="costo_unitario_consumo"/>
+				<field name="costo_unitario_consumo" attrs="{'readonly':[('product_product_id','=',True)]}"/>
 			        <field name="incluido_en_ldm" attrs="{'invisible':[('product_product_id','=',False)]}"/>
 			        <field name="add_data" />
+			        <field name="tipo_data" attrs="{'invisible':[('add_data','=',False)]}"/>
 				<field name="data" attrs="{'invisible':[('add_data','=',False)]}"/>
 			        <field name="tipo_calculo" />
 			        <field name="cantidad" />
+			    </group>
+			    <group>
+			        <div class="row">
+			                <label for="descripcion" style="font-weight: bold;" string="Descripción del consumo"/>
+			                <field name="descripcion" nolabel='1' readonly='1'/>
+			        </div>
 			    </group>
                         </group>
 		    </sheet>

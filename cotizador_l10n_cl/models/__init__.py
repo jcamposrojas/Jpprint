@@ -17,3 +17,4 @@ from . import product_template
 #from . import homologo
 from . import ttr
 from . import hojas
+from . import tblanca

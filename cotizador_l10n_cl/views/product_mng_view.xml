@@ -26,6 +26,8 @@
                                     <field name="SS" style="max-width:20px"/> / <field name="SX" style="max-width:20px"/> / <field name="RF" style="max-width:20px" />
                                 </div>
 			        <field name="hoja_ids" attrs="{'invisible':[('use_cortes', '=', True)]}" widget="many2many_tags" />
+		                <field name='use_bujes'/>
+		                <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
 			    </group>
 			    <group>
 			        <field name="category_id" />
@@ -47,18 +49,6 @@
 			    <page string="Entradas Adicionales">
 			        <group>
 				    <field name="adicional_ids" nolabel="1" />
-					    <!--
-				        <tree>
-			                    <field name="name"/>
-			                    <field name="standard_price" string="Costo Unitario"/>
-			                    <field string="Moneda" name="cost_currency_id"/>
-			                    <field name="cantidad"/>
-			                    <field name="uom_id_de_consumo"/>
-			                    <field name="tipo_calculo"/>
-					    <field name="incluido_en_ldm" />
-				        </tree>
-				    </field>
-					    -->
                                 </group>
 			    </page>
 			    <page string="Consumos Obligatorios">
@@ -70,6 +60,42 @@
 			        <group>
 			            <field name="ttr_ids" nolabel="1"/>
                                 </group>
+			    </page>
+			    <page string="Tinta Blanca" attrs="{'invisible':[('use_tinta_blanca','=',False)]}">
+				<div class="row">
+				<div class="col-6">
+			            <group>
+                                        <field name="tblanca_name" attrs="{'required':[('use_tinta_blanca','=',True)]}"/>
+			            </group>
+                                <group>
+					<!--	
+                                    <field name="cost_currency_id" invisible='1'/>
+					-->
+                                    <field name="product_uom_category_id" invisible='1'/>
+                                    <field name="product_product_id" string="Producto inventariado"/>
+                                    <field name="product_uom_id" string="UoM de Producto" attrs="{'readonly':[('product_product_id','!=',False)], 'invisible':[('product_product_id','=',False)]}"/>
+                                    <field name="tblanca_standard_price" attrs="{'readonly':[('product_product_id','!=',False)], 'invisible':[('product_product_id','=',False)]}"/>
+                                    <field name="tblanca_uom_id_de_consumo"/>
+				    <field name="tblanca_costo_unitario_consumo" attrs="{'readonly':[('product_product_id','=',True)]}"/>
+                                    <field name="tblanca_incluido_en_ldm" attrs="{'invisible':[('product_product_id','=',False)]}"/>
+                                    <field name="tblanca_tipo_calculo" />
+                                    <field name="tblanca_cantidad" />
+                                </group>
+			        </div>
+				<div class="col-6">
+			        <group>
+                                    <field name="porcentaje_ids">
+				        <tree editable='bottom'>
+                                            <field name="porcentaje" />
+                                            <field name="valor" />
+                                            <field name="tblanca_costo_unitario_consumo" />
+				        </tree>
+				    </field>
+			        </group>
+			        </div>
+			        </div>
+
+
 			    </page>
 		        </notebook>
 		    </sheet>

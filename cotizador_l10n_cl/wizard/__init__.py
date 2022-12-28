@@ -2,3 +2,4 @@
 
 from . import select_products_wizard
 from . import insumo
+from . import lista_adicionales

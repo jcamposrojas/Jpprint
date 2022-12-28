@@ -32,8 +32,3 @@ class CotizadorInsumo(models.TransientModel):
     def _onchange_cantidad(self):
         self.costo_consumo = self.cantidad * self.costo_unitario
 
-#    def create(self,vals):
-#        for rec in self:
-#            if rec.product_product_id:
-#                vals['name'] = rec.product_product_id.name
-#            return super(CotizadorInsumo,self).create(vals)

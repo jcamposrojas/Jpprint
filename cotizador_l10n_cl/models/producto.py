@@ -4,6 +4,14 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+TIPOS_CALCULO = [
+    ('f','Fijo'),
+    ('m','Por metro lineal S/MERMA'),
+    ('m+m','Por metro lineal C/MERMA'),
+    ('m2','Por metro cuadrado S/MERMA'),
+    ('m2+m','Por metro cuadrado C/MERMA'),
+]
+
 class CotizadorProducto(models.Model):
     _name = 'cotizador.producto'
     _description = 'Producto genérico'
@@ -30,6 +38,8 @@ class CotizadorProducto(models.Model):
 
     use_cortes            = fields.Boolean(string='Usa Anchos de papel', default=True,
                             help='Usa Cortes o Tamaños de Hoja')
+    use_bujes             = fields.Boolean(string='Usa Bujes', default=False)
+    use_tinta_blanca      = fields.Boolean(string='Usa Tinta Blanca', default=False)
 
     corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 
@@ -71,4 +81,70 @@ class CotizadorProducto(models.Model):
                 return ttr
         return None
         #return None, -1
+
+####################################################################3
+#    company_id       = fields.Many2one('res.company', default=lambda self: self.env.company)
+#    cost_currency_id = fields.Many2one('res.currency', readonly=True, related='company_id.currency_id')
+
+    # UOM de producto
+    product_product_id = fields.Many2one('product.product', string="Producto/Insumo")
+    product_uom_id     = fields.Many2one('uom.uom', string='UoM de Producto',
+                         related='product_product_id.uom_id')
+    product_uom_category_id = fields.Many2one('uom.category', string='Categoría de Medida',
+                              related='product_product_id.uom_id.category_id')
+
+    # Consumo
+    tblanca_name              = fields.Char('Descripción')
+    tblanca_uom_id_de_consumo = fields.Many2one('uom.uom', string='UoM de consumo')
+    tblanca_standard_price    = fields.Float(string='Costo Producto')
+    tblanca_cantidad          = fields.Float(string="Cantidad", default=1.0)
+    tblanca_costo_unitario_consumo = fields.Float(string='Costo unitario consumo')
+    tblanca_incluido_en_ldm        = fields.Boolean(string="En LdM?", default=False)
+    tblanca_tipo_calculo      = fields.Selection(TIPOS_CALCULO,
+                                string="Tipo consumo", default='m2', required=True,
+                                help="Indica si el consumo es fijo, por metro o metro cuadrado")
+
+
+    porcentaje_ids = fields.One2many('tinta_blanca_lines', 'producto_id')
+
+ 
+    @api.onchange('product_uom_id', 'tblanca_uom_id_de_consumo','tblanca_standard_price')
+    def _onchange_costo_unitario_consumo(self):
+        for rec in self:
+            # Lleva a uom de referencia
+            if rec.product_uom_id.uom_type == 'reference':
+                factor = 1
+            elif rec.product_uom_id.uom_type == 'bigger':
+                factor = rec.product_uom_id.factor_inv
+            else:
+                factor = rec.product_uom_id.factor
+
+            # Calcula en uom de consumo
+            if rec.tblanca_uom_id_de_consumo.uom_type == 'reference':
+                factor2 = 1
+            elif rec.tblanca_uom_id_de_consumo.uom_type == 'bigger':
+                factor2 = rec.tblanca_uom_id_de_consumo.factor
+            else:
+                factor2 = rec.tblanca_uom_id_de_consumo.factor_inv
+
+            factor = factor * factor2
+            rec.tblanca_costo_unitario_consumo = rec.tblanca_standard_price * factor
+
+
+    @api.onchange('product_product_id')
+    def _onchange_product_id(self):
+        if self.product_product_id:
+            self.tblanca_name              = self.product_product_id.name
+            self.tblanca_standard_price    = self.product_product_id.standard_price
+            self.tblanca_incluido_en_ldm   = True
+            self.product_uom_id            = self.product_product_id.uom_id
+            self.product_uom_category_id   = self.product_product_id.uom_id.category_id
+            self.tblanca_uom_id_de_consumo = self.product_product_id.uom_id
+#        else:
+#            self.name              = ''
+#            self.standard_price    = None
+#            self.incluido_en_ldm   = False
+#            self.uom_id            = None
+#            self.uom_category_id   = None
+#            self.uom_id_de_consumo = None
 

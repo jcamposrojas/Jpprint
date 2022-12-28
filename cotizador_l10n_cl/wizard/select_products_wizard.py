@@ -3,6 +3,7 @@ from datetime import datetime
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo import models, fields, api
 from math import ceil, floor
+from odoo.exceptions import UserError, ValidationError
 import json
 
 import logging
@@ -14,12 +15,17 @@ class SelectProducts(models.TransientModel):
     _description = 'Select Products'
 
     company_id      = fields.Many2one('res.company', default=lambda self: self.env.company)
-    producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     currency_id     = fields.Many2one('res.currency', related='company_id.currency_id')
     currency_symbol = fields.Char(string='Símbolo moneda', related='company_id.name')
 
-    codigo_producto = fields.Char(related='producto_id.codigo')
+    use_bujes       = fields.Boolean('Usa bujes', related='producto_id.use_bujes')
+    use_tinta_blanca = fields.Boolean('Usa Cobertura Tinta Blanca', related='producto_id.use_tinta_blanca')
+    use_cobertura_tinta = fields.Boolean('Cobertura Tinta Blanca', default=False)
+    cobertura_tinta = fields.Many2one(comodel_name='tinta_blanca_lines')
+
+    producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
+    codigo_producto = fields.Char(related='producto_id.codigo')
     adhesivo_id     = fields.Many2one(comodel_name="cotizador.adhesivo", string="Adhesivo", required=True)
     merma_estimada  = fields.Float(string="Merma sustrato (%)", compute="_compute_merma")
 
@@ -58,8 +64,10 @@ class SelectProducts(models.TransientModel):
     sx    = fields.Integer('SX', compute="_calc_z")
     ss    = fields.Integer('SS', compute="_calc_z")
     ancho_bobina = fields.Integer('Ancho Bobina (LX)', compute="_calc_z")
-    # Resultado
+    #-------- Longitud de papel -------------
     longitud_papel = fields.Integer(string="Longitud Papel", compute="_calc_z")
+    # Supone que ancho no varia
+    longitud_papel_con_merma = fields.Integer(string="Longitud Papel C/MERMA", compute="_calc_z")
 
     def _get_default_uom_id(self):
         return self.env.ref('uom.product_uom_millimeter').id
@@ -68,9 +76,11 @@ class SelectProducts(models.TransientModel):
         return self.env.ref('uom.product_uom_unit').id
 
     uom_id         = fields.Many2one( 'uom.uom', 'UdM', default=_get_default_uom_id, required=True)
-    product_uom_id = fields.Many2one( 'uom.uom', 'Unidad de medida', default=_get_default_product_uom_id, required=True)
+    product_uom_id = fields.Many2one( 'uom.uom', 'Unidad de medida',
+                     default=_get_default_product_uom_id, required=True)
 
-    salidas_x_rollo = fields.Integer(string='Salidas por rollo', default=0)
+    # Dato de cliente. Numero de etiquetas al ancho solicitada por cliente
+    salidas_x_rollo = fields.Integer(string='Salidas por rollo')
 
     #----------- Bujes ------------------
     buje_id           = fields.Many2one('cotizador.buje', 'Buje')
@@ -94,11 +104,35 @@ class SelectProducts(models.TransientModel):
     #========== Valores ==========
     #insumo_ids    = fields.One2many('cotizador.insumo','select_id', compute='_update_insumos', copy=True)
     insumo_ids    = fields.One2many('cotizador.insumo', 'select_id', copy=True)
-    adicional_ids = fields.Many2many('cotizador.adicional', 'producto_id', string="Entradas Adicionales")
+    #adicional_ids = fields.Many2many('cotizador.adicional', 'producto_id', string="Entradas Adicionales")
+    adicional_ids = fields.Many2many('cotizador.adicional', string="Entradas Adicionales")
+    lista_adicionales_ids = fields.One2many('lista.adicionales', 'select_id')
 
     precio_total    = fields.Float(string='Precio Total', compute='_compute_price', store=True)
     precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
 
+    domain_adicionales_ids = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
+
+    @api.depends('producto_id')
+    def _compute_domain_adicionales_ids(self):
+        for rec in self:
+            #rec.domain_adicionales_ids = []
+            #for elem in rec.producto_id.adicional_ids:
+            #    if elem not in self.lista_adicionales_ids:
+            #        rec.domain_adicionales_ids = [(0,0,elem)]
+            if rec.producto_id:
+                rec.domain_adicionales_ids = rec.producto_id.adicional_ids
+            else:
+                rec.domain_adicionales_ids = []
+            #rec.domain_adicionales_ids = rec.producto_id.adicional_ids - self.lista_adicionales_ids
+            #return {'domain':{'lista_adicionales_ids':[('adicional_id','in',self.producto_id.adicional_ids.ids)]}}
+        #return {'domain':{'lista_adicionales_ids':[('adicional_id','in',[1])]}}
+
+    @api.constrains('salidas_x_rollo')
+    def _check_salidas(self):
+        for rec in self:
+            if rec.salidas_x_rollo <= 0:
+                raise ValidationError('Salidas por rollo debe ser > 0')
 
     @api.depends('insumo_ids')
     def _compute_price(self):
@@ -125,22 +159,25 @@ class SelectProducts(models.TransientModel):
         else:
             self.merma_estimada = 0.0
 
-#    @api.depends('longitud_papel','ancho_bobina')
-#    def _calc_area(self):
-#        self.area_ocupada = round((self.longitud_papel * self.ancho_bobina) / 1000000, 3)
-#        self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
 
-#    @api.onchange('producto_id')
-#    def _get_posible_adicionales(self):
+#    @api.onchange('adicional_ids')
+#    def _onchange_agrega_adicionales(self):
 #        if self.producto_id:
-#            adicionales = self.producto_id.adicional_ids
-
-        #line = {}
-        #for input_adicional in adicionales:
-        #    line |= input_adicional
-        #self.posible_adicionales = line
-
-        #self.possible_values = attr_values.sorted()
+#            #self.lista_adicionales_ids = [(5,0)]
+#
+#            lista = self.lista_adicionales_ids.mapped('adicional_id')
+#
+#            _logger.info(' LISTA ')
+#            _logger.info(lista)
+#            for rec in self.adicional_ids:
+#                #if lista.count(rec.adicional_id) == 0:
+#                if rec.add_data:
+#                    # Agregar si no existe en lista_adicionales_ids
+#                    vals = {
+#                        'select_id': 0,
+#                        'adicional_id': rec.id,
+#                    }
+#                    self.lista_adicionales_ids = [(0,0,vals)]
 
 
     def asigna_z(self,value):
@@ -248,6 +285,7 @@ class SelectProducts(models.TransientModel):
         self.troquel        = ''
         self.ancho_bobina   = 0
         self.longitud_papel = 0
+        self.longitud_papel_con_merma = 0
 
         #------------------ Blanca TROQUELADA -------------------
         if self._area_negocio() == '1' or self._area_negocio() == '3':
@@ -285,6 +323,7 @@ class SelectProducts(models.TransientModel):
 
                 # Longitud
                 self.longitud_papel = (self.etiqueta_con_gap * self.cantidad) / self.etiquetas_al_ancho
+                self.longitud_papel_con_merma = round(self.longitud_papel * (1 + (self.merma_estimada / 100.0)), 3)
 
             # Calcula area
             self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
@@ -303,14 +342,17 @@ class SelectProducts(models.TransientModel):
 
                 self.etiquetas_al_ancho = q14
                 self.longitud_papel = (self.cantidad * f15) / q14
+                self.longitud_papel_con_merma = round(self.longitud_papel * (1 + (self.merma_estimada / 100.0)), 3)
 
                 f15 = f15 / 1000.0
                 self.area_ocupada = round((self.cantidad / q14) * f15 * (self.ancho_papel / 1000.0), 3)
                 self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
             else:
                 #self.etiquetas_al_ancho = 0
-                self.area_ocupada = 0
-                self.area_ocupada_con_merma = 0
+                self.area_ocupada             = 0
+                self.area_ocupada_con_merma   = 0
+                self.longitud_papel           = 0
+                self.longitud_papel_con_merma = 0
         #--------------------- TTR ---------------------
         #--------------------- RESTO ------------------------
         else:
@@ -326,45 +368,49 @@ class SelectProducts(models.TransientModel):
 
                 # Longitud
                 self.longitud_papel = (self.etiqueta_con_gap * self.cantidad) / self.etiquetas_al_ancho
+                self.longitud_papel_con_merma = round(self.longitud_papel * (1 + (self.merma_estimada / 100.0)), 3)
 
                 # Calcula area
                 self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
                 self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
             else:
                 #self.etiquetas_al_ancho = 0
-                self.area_ocupada = 0
-                self.area_ocupada_con_merma = 0
+                self.area_ocupada             = 0
+                self.area_ocupada_con_merma   = 0
+                self.longitud_papel           = 0
+                self.longitud_papel_con_merma = 0
 
-        # Largo en metros
-#        self.largo_ocupado   = ((self.etiqueta_con_gap * self.cantidad ) / self.etiquetas_al_ancho) / 1000.0
-        # Area en metros cuadrados
-        #self.area_ocupada    = (self.largo_ocupado * self.ancho_papel)/1000000.0
-
-        # C/MERMA
-        # Area en metros cuadrados
-        #self.area_ocupada_con_merma   = (self.area_ocupada * (1.0 + self.merma_estimada / 100.0))/1000000.0
 
     @api.onchange('producto_id')
     def _compute_sustrato_id_domain(self):
         for rec in self:
             rec.sustrato_id = False
+            # Adicionales
+            #rec.adicional_ids         = [(5,0)]
+            #rec.lista_adicionales_ids = [(5,0)]
+
             lista = [data.sustrato_id.id for data in self.producto_id.producto_sustrato_ids]
             if lista:
                 domain = [('id','in',tuple(lista))]
             else:
                 domain = []
-            return {'domain': {'sustrato_id':domain}}
+            return {'domain': {'sustrato_id':domain }}
 
     # Actualiza listado de materias primas
     @api.onchange('producto_id',
             'sustrato_id',
-            'adicional_ids',
+#            'adicional_ids',
+            'lista_adicionales_ids',
             'largo_interno',
             'ancho_interno',
             'cantidad',
             'area_ocupada',
             'merma_estimada',
-            'buje_id')
+            'buje_id',
+            'salidas_x_rollo',
+            'use_tinta_blanca',
+            'use_cobertura_tinta',
+            'cobertura_tinta')
     def _update_insumos(self):
         if self.ancho == 0 or self.largo == 0 or self.cantidad == 0:
             return
@@ -422,13 +468,11 @@ class SelectProducts(models.TransientModel):
             }
             self.insumo_ids = [(0,0,vals)]
 
-        _logger.info(' UPDATE 4 ')
         #------------------ Cintas TTR ---------------------
         # Solo para TTR
         if self._area_negocio() == '5':
             ttr_id = self.producto_id.get_best_ttr(self.ancho_interno)
 
-            #_logger.info(len(ttr_id))
             if ttr_id:
                 # ttr_id.area y self.area_ocupada en m2
                 qty                   = self.area_ocupada / ttr_id.area 
@@ -450,15 +494,23 @@ class SelectProducts(models.TransientModel):
                 }
                 self.insumo_ids = [(0,0,vals)]
 
-        #----------------- HH's --------------------
+        #---------HH's de cada Centro ---------
         for line in self.producto_id.operation_ids:
             if line.incluye_hh:
-                #costo_x_min = line.workcenter_id.costs_hour / 60
                 if line.hh_type == 'm':
                     duracion_estimada = (self.longitud_papel / 1000.0) / line.metros_x_min # En minutos
+                elif line.hh_type == 'm+m':
+                    duracion_estimada = (self.longitud_papel_con_merma / 1000.0) / line.metros_x_min # En minutos
+                elif line.hh_type == 'm2':
+                    duracion_estimada = (self.area_ocupada/ 1000.0) / line.metros2_x_min # En minutos
+                elif line.hh_type == 'm2+m':
+                    duracion_estimada = (self.area_ocupada_con_merma/ 1000.0) / line.metros2_x_min # En minutos
                 elif line.hh_type == 't':
-                    time_seg = line.seg_x_etiqueta * self.cantidad
-                    duracion_estimada = time_seg / 60 # En minutos
+                    if self.salidas_x_rollo <= 0:
+                        duracion_estimada = 0
+                    else:
+                        time_seg = (line.seg_x_etiqueta * self.cantidad) / self.salidas_x_rollo
+                        duracion_estimada = time_seg / 60 # En minutos
 
                 costo = duracion_estimada * line.costs_min
                 values = {
@@ -474,89 +526,120 @@ class SelectProducts(models.TransientModel):
                     'flag_adicional'  : False,
                 }
                 self.insumo_ids = [(0,0,values)]
-#                values = {
-#                    'name': operation.name,
-#                    'workcenter_id': operation.workcenter_id.id, #ID
-#                    'bom_id': mrp.id, #ID
-#                    #Agregar resto de campos de mrp.routing.workcenter.tmp
-#                    'worksheet_type': 'text',
-#                    'note': product.lista_parametros,
-#                }
-#                mrp.operation_ids = [(0,0,values)]
 
         #----------------- Buje --------------------
-        if self.buje_id:
+        # Solo para productos tipo etiqueta
+        if self.use_bujes == True:
             producto = self.buje_id.product_product_id
-            cantidad = ceil((self.longitud_papel / 1000.0) / self.buje_id.longitud)
-            if cantidad > 0:
-                et = round(self.cantidad / cantidad,0)
-                if et == 0:
-                    et = self.cantidad
+            if self.buje_id:
+                if self.salidas_x_rollo <= 0:
+                    self.etiquetas_x_rollo = 0
+                    cantidad = 0
+                else:
+                    self.etiquetas_x_rollo = floor(((self.buje_id.longitud * 1000) / (self.largo + self.gap))*self.salidas_x_rollo)
+                    cantidad = ceil(self.cantidad / self.etiquetas_x_rollo)
 
-                self.etiquetas_x_rollo = et
+                vals = {
+                    'select_id': 0,
+                    'product_product_id': producto.id if producto else None,
+                    'cost_currency_id'  : producto.currency_id.id if producto else None,
+                    'name'              : self.buje_id.name,
+                    'cantidad'          : cantidad,
+                    'costo_unitario'    : self.buje_id.standard_price,
+                    'costo_consumo'     : cantidad * self.buje_id.standard_price,
+                    'uom_id'            : self.buje_id.uom_id.id,
+                    'merma'             : 0,
+                    'incluido_en_ldm'   : True,
+                    'flag_adicional'    : False,
+                }
+                self.insumo_ids = [(0,0,vals)]
             else:
                 self.etiquetas_x_rollo = 0
-            vals = {
-                'select_id': 0,
-                'product_product_id': producto.id if producto else None,
-                'cost_currency_id'  : producto.currency_id.id if producto else None,
-                'name'              : self.buje_id.name,
-                'cantidad'          : cantidad,
-                'costo_unitario'    : self.buje_id.standard_price,
-                'costo_consumo'     : cantidad * self.buje_id.standard_price,
-                'uom_id'            : self.buje_id.uom_id.id,
-                'merma'             : 0,
-                'incluido_en_ldm'   : True,
-                'flag_adicional'    : False,
-            }
-            self.insumo_ids = [(0,0,vals)]
+                self.salidas_x_rollo   = None
 
-        ##### en desarrollo
-        #for line in self.producto_id.adicional_ids:
-        for line in self.adicional_ids:
+        #----------------- Adicionales --------------------
+        for line in self.lista_adicionales_ids:
             #---- nombre -----
-            nombre = line.name
-            if line.add_data:
-                nombre = nombre + '/' + line.data 
-            #---- cantidad ----
-            if line.tipo_calculo == 'f':
-                cantidad = line.cantidad
-                costo    = line.costo_unitario_consumo
-            elif line.tipo_calculo == 'm2':
-                cantidad = line.cantidad * self.area_ocupada
-                costo = cantidad * line.costo_unitario_consumo
-            elif line.tipo_calculo == 'm':
-                cantidad = line.cantidad * self.longitud_papel
-                costo = cantidad * line.costo_unitario_consumo
+            adicional = line.adicional_id
+            nombre = adicional.name
+            if adicional.add_data:
+                nombre = nombre + '/' + line.data_text
+
+            #---- cantidad y costo ---
+            cantidad = 0
+            costo    = 0
+            if adicional.tipo_calculo == 'f':
+                cantidad = adicional.cantidad
+                costo    = adicional.costo_unitario_consumo
+            elif adicional.tipo_calculo == 'm2':
+                cantidad = adicional.cantidad * self.area_ocupada
+                costo = cantidad * adicional.costo_unitario_consumo
+            elif adicional.tipo_calculo == 'm':
+                cantidad = adicional.cantidad * self.longitud_papel
+                costo = cantidad * adicional.costo_unitario_consumo
+            elif adicional.tipo_calculo == 'm2+m':
+                cantidad = adicional.cantidad * self.area_ocupada_con_merma
+                costo = cantidad * adicional.costo_unitario_consumo
+            elif adicional.tipo_calculo == 'm+m':
+                cantidad = adicional.cantidad * self.longitud_papel_con_merma
+                costo = cantidad * adicional.costo_unitario_consumo
 
             vals = {
                 #'producto_id': 0,
-                'cost_currency_id': line.cost_currency_id.id,
+                'cost_currency_id': adicional.cost_currency_id.id,
                 'name'            : nombre,
                 'cantidad'        : cantidad,
-                'costo_unitario'  : line.costo_unitario_consumo,
+                'costo_unitario'  : adicional.costo_unitario_consumo,
                 'costo_consumo'   : costo,
-                'uom_id'          : line.uom_id_de_consumo.id,
+                'uom_id'          : adicional.uom_id_de_consumo.id,
                 #'merma': 0.0, # por definir
-                'incluido_en_ldm' : line.incluido_en_ldm,
+                'incluido_en_ldm' : adicional.incluido_en_ldm,
                 'flag_adicional'  : False,
             }
             self.insumo_ids = [(0,0,vals)]
 
+
+        #--------- Tinta Blanca (Jetrion) Cobertura ---------
+        if self.use_tinta_blanca == True and self.use_cobertura_tinta == True:
+            valor        = self.cobertura_tinta.valor
+            qty          = self.producto_id.tblanca_cantidad
+            tipo_calculo = self.producto_id.tblanca_tipo_calculo
+            #---- cantidad ----
+            if tipo_calculo == 'f':
+                cantidad = qty
+                costo    = valor
+            elif tipo_calculo == 'm2':
+                cantidad = qty * self.area_ocupada
+                costo = cantidad * valor
+            elif tipo_calculo == 'm':
+                cantidad = qty * self.longitud_papel
+                costo = cantidad * valor
+            elif tipo_calculo == 'm2+m':
+                cantidad = qty * self.area_ocupada_con_merma
+                costo = cantidad * valor
+            elif tipo_calculo == 'm+m':
+                cantidad = qty * self.longitud_papel_con_merma
+                costo = cantidad * valor
+
+            vals = {
+                #'producto_id': 0,
+                'cost_currency_id': self.currency_id.id, # Currency por defecto
+                'name'            : str(self.producto_id.tblanca_name) + '/' + str(self.cobertura_tinta.name),
+                'cantidad'        : cantidad,
+                'costo_unitario'  : self.cobertura_tinta.tblanca_costo_unitario_consumo,
+                'costo_consumo'   : costo,
+                'uom_id'          : self.producto_id.tblanca_uom_id_de_consumo.id,
+                #'merma': 0.0, # por definir
+                'incluido_en_ldm' : True if self.producto_id.product_product_id else False,
+                'flag_adicional'  : False,
+            }
+            self.insumo_ids = [(0,0,vals)]
+
+
+
         # Reingresa items creados por el usuario
         for lst in lst_tmp:
             self.insumo_ids = [(0,0,lst)]
-
-
-    @api.onchange('etiquetas_x_rollo')
-    def _onchange_etiquetas_x_rollo(self):
-        _logger.info(' CAMBIO ')
-        _logger.info(self.etiquetas_x_rollo)
-#        if self.buje_id:
-#            cantidad = ceil(self.cantidad / self.etiquetas_x_rollo)
-#            for lin in self.insumo_ids:
-#                if lin.
-#
 
 
     def add_product(self):

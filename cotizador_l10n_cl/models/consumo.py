@@ -4,6 +4,11 @@
 from odoo import api, fields, models, _, tools
 
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
+
 class CotizadorConsumoProducto(models.Model):
     _name = 'cotizador.consumo'
     #_order = 'sequence, id'
@@ -30,5 +35,24 @@ class CotizadorConsumoProducto(models.Model):
     @api.depends('consumo_uom_id','standard_price','cantidad')
     def _compute_costo_consumo(self):
         for rec in self:
-            rec.costo_consumo = rec.standard_price * rec.consumo_uom_id.factor_inv * rec.cantidad
+            # Lleva a uom de referencia
+            if rec.uom_id.uom_type == 'reference':
+                factor = 1
+            elif rec.uom_id.uom_type == 'bigger':
+                factor = rec.uom_id.factor_inv
+            else:
+                factor = rec.uom_id.factor
+
+            # Calcula en uom de consumo
+            if rec.consumo_uom_id.uom_type == 'reference':
+                factor2 = 1
+            elif rec.consumo_uom_id.uom_type == 'bigger':
+                factor2 = rec.consumo_uom_id.factor
+            else:
+                factor2 = rec.consumo_uom_id.factor_inv
+
+            factor = factor * factor2
+
+            rec.costo_consumo = rec.standard_price * factor * rec.cantidad
+
 

@@ -14,3 +14,5 @@ access_cotizador_buje,access_cotizador_buje,model_cotizador_buje,base.group_user
 access_cotizador_cortes,access_cotizador_cortes,model_cotizador_cortes,base.group_user,1,1,1,1
 access_producto_ttr,access_producto_ttr,model_producto_ttr,base.group_user,1,1,1,1
 access_producto_hojas,access_producto_hojas,model_producto_hojas,base.group_user,1,1,1,1
+access_lista_adicionales,access_lista_adicionales,model_lista_adicionales,base.group_user,1,1,1,1
+access_tinta_blanca_lines,access_tinta_blanca_lines,model_tinta_blanca_lines,base.group_user,1,1,1,1

@@ -33,6 +33,7 @@
                     <group>
                         <field name="producto_id" />
                         <field name="codigo_producto" invisible="1"/>
+                        <field name="use_bujes" invisible='1'/>
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
 
@@ -56,10 +57,18 @@
                             <span><field name="uom_id" readonly="1" nolabel="1"/></span>
                         </div>
 			<field name="adhesivo_id" />
-                        <field name="datos_adicionales" />
 			<field name="currency_id" invisible='1'/>
+                        <field name="use_tinta_blanca" invisible='1'/>
+                        <!-- Cobertura tinta blanca Jetrion -->
+			<label for="use_cobertura_tinta" attrs="{'invisible':[('use_tinta_blanca','=',False)]}" string="Cobertura Tinta Blanca" />
+			<div class="o_row" id="tinta_cobertura" >
+                            <field name="use_cobertura_tinta" attrs="{'invisible':[('use_tinta_blanca','=',False)]}"/>
+			    <field name="cobertura_tinta" attrs="{'invisible':['|',('use_tinta_blanca','=',False),('use_cobertura_tinta','=',False)]}"/>
+                        </div>
+
 			<field name="precio_total" string='COSTO TOTAL ($)'/>
 			<field name="precio_unitario" string='COSTO UNITARIO ($)' widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="datos_adicionales" />
                     </group>
                 </group>
 		<notebook>
@@ -80,12 +89,34 @@
 			        </group>
 		            </div>
 			    <div class="col-6">
-			        <group string="BUJE">
-                                    <field name="buje_id" />
-                                    <field name="etiquetas_x_rollo"/>
-                                    <field name="salidas_x_rollo"/>
+			        <group string="BUJE" attrs="{'invisible':[('use_bujes','!=',True)]}">
+                                    <field name="buje_id" attrs="{'required':[('use_bujes','=',True)]}"/>
+                                    <field name="salidas_x_rollo" attrs="{'required':[('use_bujes','=',True)]}"/>
+                                    <field name="etiquetas_x_rollo" readonly='1'/>
 			        </group>
 			        <group string="ADICIONALES">
+				<div>
+					<!--
+				    <div class="row">
+				        <field name="adicional_ids" widget="many2many_tags" nolabel='1' domain="[('producto_id','=',producto_id)]"/>
+			            </div>
+					-->
+				    <div class="row">
+				        <field name="domain_adicionales_ids" invisible='1'/>
+				        <field name="lista_adicionales_ids" nolabel='1'>
+					    <tree editable="bottom">
+                                                <field name="add_data" invisible='1'/>
+                                                <field name="tipo_data" invisible='1'/>
+                                                <field name="adicional_id" domain="[('id','in',parent.domain_adicionales_ids)]"/>
+                                                <field name="name" invisible='1'/>
+                                                <field name="texto"/>
+						<field name="data_text" attrs="{'required':[('add_data','=',True)], 'readonly':[('add_data','=',False)]}"/>
+                            <!--<field name="data_text" attrs="{'invisible':[('tipo_data','!=','t')]}"/>-->
+                            <!--<field name="data_selection" attrs="{'invisible':[('tipo_data','!=','s')]}"/>-->
+                                            </tree>
+	                                </field>
+			            </div>
+					<!--
                                 <field name="adicional_ids" nolabel='1' domain="[('producto_id','=',producto_id)]">
 				    <tree editable='bottom'>
                                         <field name="add_data" invisible='1'/>
@@ -93,6 +124,8 @@
 					<field name="data" attrs="{'readonly':[('add_data','!=',True)]}"/>
 				    </tree>		
 				</field>
+					-->
+			        </div>
 			        </group>
 				<!--
                                 <field name="adicional_ids"  widget="many2many_tags" />

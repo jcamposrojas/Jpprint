@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="lista_adicionales_tree" model="ir.ui.view">
+            <field name="name">lista_adicionales_tree</field>
+            <field name="model">lista.adicionales</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="add_data" invisible='1'/>
+                    <field name="tipo_data" invisible='1'/>
+                    <field name="select_id" />
+                    <field name="adicional_id"/>
+                    <field name="name" invisible='1'/>
+		    <field name="data_text" attrs="{'readonly':[('add_data','=',False)]}"/>
+			    <!--<field name="data_text" attrs="{'invisible':[('tipo_data','!=','t')]}"/>-->
+			    <!--<field name="data_selection" attrs="{'invisible':[('tipo_data','!=','s')]}"/>-->
+                </tree>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

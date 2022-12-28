@@ -3,6 +3,13 @@
 
 from odoo import api, fields, models, _, tools
 
+HH_TIPO_CALCULO = [
+        ('m', 'Por metro lineal S/MERMA'),
+        ('m+m', 'Por metro lineal C/MERMA'),
+        ('m2', 'Por metro cuadrado S/MERMA'),
+        ('m2+m', 'Por metro cuadrado C/MERMA'),
+        ('t', 'Por Tiempo'),
+]
 
 class CotizadorMrpRoutingWorkcenter(models.Model):
     _name = 'mrp.routing.workcenter.tmp'
@@ -31,11 +38,11 @@ class CotizadorMrpRoutingWorkcenter(models.Model):
     time_mode_batch        = fields.Integer('Based on', default=10)
 
     incluye_hh             = fields.Boolean(string='Incluye HH', default=False)
-    hh_type                = fields.Selection([ ('m', 'Por Metro'), ('t', 'Por Tiempo')],
-                             default='m', string='Cálculo de HH')
+    hh_type                = fields.Selection(HH_TIPO_CALCULO, default='m', string='Cálculo de HH')
     costs_hour             = fields.Float(string='Costo Hora', related='workcenter_id.costs_hour')
     costs_min              = fields.Float(string='Costo Min', compute='_compute_costs_min')
     metros_x_min           = fields.Float(string='Metros por minuto', default=0)
+    metros2_x_min          = fields.Float(string='Metros cuadrados por minuto', default=0)
     seg_x_etiqueta         = fields.Integer(string='Segundos por etiqueta', default=0)
 
     def _get_default_uom_id(self):

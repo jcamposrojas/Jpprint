@@ -43,6 +43,9 @@
                                 <field name="incluye_hh"/>
                                 <field name="hh_type" attrs="{'invisible':[('incluye_hh','=',False)]}"/>
 				<field name="metros_x_min" attrs="{'invisible':['|',('incluye_hh','=',False),('hh_type','!=','m')]}"/>
+				<field name="metros_x_min" attrs="{'invisible':['|',('incluye_hh','=',False),('hh_type','!=','m+m')]}"/>
+				<field name="metros2_x_min" attrs="{'invisible':['|',('incluye_hh','=',False),('hh_type','!=','m2')]}"/>
+				<field name="metros2_x_min" attrs="{'invisible':['|',('incluye_hh','=',False),('hh_type','!=','m2+m')]}"/>
 				<field name="seg_x_etiqueta" attrs="{'invisible':['|',('incluye_hh','=',False),('hh_type','!=','t')]}"/>
 
 

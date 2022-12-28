@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.23',
+    'version': '15.0.1.24',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -18,7 +18,7 @@
         'account_so_l10n_cl'],
     'data': [
         'wizard/select_products_wizard_view.xml',
-#        'wizard/insumo.xml',
+#        'wizard/lista_adicionales.xml',
         'views/menu_root.xml',
         'views/product_mng_view.xml',
         'views/sustrato_mng_view.xml',
