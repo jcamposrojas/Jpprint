@@ -18,3 +18,4 @@ from . import product_template
 from . import ttr
 from . import hojas
 from . import tblanca
+from . import tabla_troquel

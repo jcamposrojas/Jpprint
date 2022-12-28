@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+	<record id="tabla_troquel_tree" model="ir.ui.view">
+	    <field name="name">tabla_troquel.tree</field>
+	    <field name="model">tabla_troquel</field>
+	    <field name="arch" type="xml">
+                <tree editable="bottom">
+			<field name="largo"/>
+                        <field name="ancho"/>
+                        <field name="etiquetas_al_ancho"/>
+                        <field name="gap"/>
+                        <field name="z"/>
+                        <field name="tipo_troquel"/>
+		</tree>
+	    </field>
+	</record>
+
+    </data>
+</odoo>

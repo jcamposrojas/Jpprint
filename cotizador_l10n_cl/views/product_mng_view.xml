@@ -17,9 +17,12 @@
 			    <group>
 			        <field name="nombre_corto" />
 			        <field name="codigo" />
-
+			        <field name="category_id" />
+			        <field name="uom_id" />
+			        <field name="analytic_account_id" />
+			    </group>
+			    <group>
 		                <field name='use_cortes'/>
-
 			        <field name="corte_default" attrs="{'invisible':[('use_cortes', '!=', True)]}" widget="many2many_tags" />
                                 <label for="SS" string="SS / SX / RF" attrs="{'invisible':[('use_cortes', '!=', True)]}"/>
                                 <div class="o_row" id="ancho_ss_sx" attrs="{'invisible':[('use_cortes', '!=', True)]}">
@@ -28,11 +31,7 @@
 			        <field name="hoja_ids" attrs="{'invisible':[('use_cortes', '=', True)]}" widget="many2many_tags" />
 		                <field name='use_bujes'/>
 		                <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
-			    </group>
-			    <group>
-			        <field name="category_id" />
-			        <field name="uom_id" />
-			        <field name="analytic_account_id" />
+		                <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
 			    </group>
                         </group>
 			<notebook>
@@ -95,7 +94,20 @@
 			        </div>
 			        </div>
 
-
+			    </page>
+			    <page string="Tabla Troqueles" attrs="{'invisible':[('use_tabla_troquel','=',False)]}">
+			        <group>
+			            <field name="tabla_troquel_ids" nolabel="1">
+			                <tree editable="bottom">
+                                            <field name="largo"/>
+                                            <field name="ancho"/>
+                                            <field name="etiquetas_al_ancho"/>
+                                            <field name="gap"/>
+                                            <field name="z"/>
+                                            <field name="tipo_troquel"/>
+                                        </tree>
+				    </field>
+                                </group>
 			    </page>
 		        </notebook>
 		    </sheet>

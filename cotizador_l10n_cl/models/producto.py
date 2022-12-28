@@ -40,6 +40,7 @@ class CotizadorProducto(models.Model):
                             help='Usa Cortes o Tamaños de Hoja')
     use_bujes             = fields.Boolean(string='Usa Bujes', default=False)
     use_tinta_blanca      = fields.Boolean(string='Usa Tinta Blanca', default=False)
+    use_tabla_troquel     = fields.Boolean(string='Usa Tabla Troqueles', default=False)
 
     corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 
@@ -107,7 +108,9 @@ class CotizadorProducto(models.Model):
 
     porcentaje_ids = fields.One2many('tinta_blanca_lines', 'producto_id')
 
- 
+    # Tabla troqueles
+    tabla_troquel_ids = fields.One2many('tabla_troquel', 'producto_id', string='Tabla Troqueles')
+
     @api.onchange('product_uom_id', 'tblanca_uom_id_de_consumo','tblanca_standard_price')
     def _onchange_costo_unitario_consumo(self):
         for rec in self:
