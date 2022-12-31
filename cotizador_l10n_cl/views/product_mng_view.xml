@@ -20,6 +20,7 @@
 			        <field name="category_id" />
 			        <field name="uom_id" />
 			        <field name="analytic_account_id" />
+		                <field name='default_gap' string="Gap por defecto (mm)"/>
 			    </group>
 			    <group>
 		                <field name='use_cortes'/>
@@ -32,6 +33,7 @@
 		                <field name='use_bujes'/>
 		                <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
 		                <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
+		                <field name='use_cinta_ttr' string="Usa Cinta TTR"/>
 			    </group>
                         </group>
 			<notebook>
@@ -55,7 +57,7 @@
 			            <field name="consumo_ids" nolabel="1"/>
                                 </group>
 			    </page>
-			    <page string="Cintas TTR">
+			    <page string="Cintas TTR" attrs="{'invisible':[('use_cinta_ttr','=',False)]}">
 			        <group>
 			            <field name="ttr_ids" nolabel="1"/>
                                 </group>

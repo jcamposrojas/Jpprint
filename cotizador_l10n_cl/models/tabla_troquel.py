@@ -6,12 +6,15 @@ from odoo import api, fields, models, _, tools
 TIPO_TROQUEL = [
         ('p','PLANO'),
         ('m','MACISO'),
+        ('l','LAMINA'),
+        ('s','LASER'),
         ]
 
 class TablaTroquel(models.Model):
     _name = 'tabla_troquel'
 
     producto_id        = fields.Many2one('cotizador.producto', 'Producto', required=True)
+    name               = fields.Char(string='Nombre')
 
     #------- Producto ---------
 #    product_product_id = fields.Many2one('product.product', string='Cinta TTR')
@@ -23,10 +26,10 @@ class TablaTroquel(models.Model):
 
     #------- Campos largo ancho ---------
     # En UoM original
-    largo = fields.Integer(string='Largo')
-    ancho = fields.Integer(string='Ancho')
+    largo = fields.Integer(string='Largo', required=True)
+    ancho = fields.Integer(string='Ancho', required=True)
     etiquetas_al_ancho = fields.Integer(string='Etiquetas al Ancho')
-    gap                = fields.Integer(string='Gap')
+    gap                = fields.Float(string='Gap')
     z                  = fields.Integer(string='Z')
     tipo_troquel       = fields.Selection(TIPO_TROQUEL,string='tipo_troquel')
 
@@ -37,4 +40,10 @@ class TablaTroquel(models.Model):
     # En mm
 #    largo_mm = fields.Integer(string='Largo en mm', compute='_compute_values')
 #    ancho_mm = fields.Integer(string='Ancho en mm', compute='_compute_values')
+
+    def name_get(self):
+        lst = []
+        for rec in self:
+            lst.append((rec.id,"%3s X %3s" % (rec.largo,rec.ancho)))
+        return lst
 

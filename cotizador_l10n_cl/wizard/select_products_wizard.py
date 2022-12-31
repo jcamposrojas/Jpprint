@@ -10,24 +10,32 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class SelectProducts(models.TransientModel):
     _name = 'select.products'
     _description = 'Select Products'
+
+    SELECT_LARGO = []
 
     company_id      = fields.Many2one('res.company', default=lambda self: self.env.company)
     currency_id     = fields.Many2one('res.currency', related='company_id.currency_id')
     currency_symbol = fields.Char(string='Símbolo moneda', related='company_id.name')
 
-    use_bujes       = fields.Boolean('Usa bujes', related='producto_id.use_bujes')
-    use_tinta_blanca = fields.Boolean('Usa Cobertura Tinta Blanca', related='producto_id.use_tinta_blanca')
+    use_bujes           = fields.Boolean('Usa bujes', related='producto_id.use_bujes')
+    use_tinta_blanca    = fields.Boolean('Usa Cobertura Tinta Blanca', related='producto_id.use_tinta_blanca')
     use_cobertura_tinta = fields.Boolean('Cobertura Tinta Blanca', default=False)
-    cobertura_tinta = fields.Many2one(comodel_name='tinta_blanca_lines')
+    cobertura_tinta     = fields.Many2one(comodel_name='tinta_blanca_lines')
+    use_tabla_troquel   = fields.Boolean(string='Usa Tabla Troqueles', related='producto_id.use_tabla_troquel')
+    use_cinta_ttr       = fields.Boolean(string='Usa Cinta TTR', related='producto_id.use_cinta_ttr')
 
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
     codigo_producto = fields.Char(related='producto_id.codigo')
     adhesivo_id     = fields.Many2one(comodel_name="cotizador.adhesivo", string="Adhesivo", required=True)
     merma_estimada  = fields.Float(string="Merma sustrato (%)", compute="_compute_merma")
+
+
+    select_largo    = fields.Many2one(comodel_name='tabla_troquel', string="Avance X Ancho", domain="[('producto_id','=',producto_id.id)]")
 
     #========== Datos ==========
     largo         = fields.Integer(string="Avance")
@@ -112,6 +120,7 @@ class SelectProducts(models.TransientModel):
     precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
 
     domain_adicionales_ids = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
+
 
     @api.depends('producto_id')
     def _compute_domain_adicionales_ids(self):
@@ -258,6 +267,11 @@ class SelectProducts(models.TransientModel):
             return ancho_efectivo
         return 0
 
+    @api.onchange('select_largo')
+    def _onchange_select_largo(self):
+        self.largo = self.select_largo.largo
+        self.ancho = self.select_largo.ancho
+
     #--------------- Calculo de Z ---------------
     @api.depends('producto_id',
             'sustrato_id',
@@ -266,7 +280,7 @@ class SelectProducts(models.TransientModel):
             'aisa_id',
             'cantidad',
             'gap',
-            'engranaje',
+#            'engranaje',
             'etiquetas_al_desarrollo',
             'etiquetas_al_ancho',
             'merma_estimada',
@@ -289,13 +303,23 @@ class SelectProducts(models.TransientModel):
 
         #------------------ Blanca TROQUELADA -------------------
         if self._area_negocio() == '1' or self._area_negocio() == '3':
-            self.z_calculado = ((self.largo_interno + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
+            if self.use_tabla_troquel:
+                if self.select_largo:
+                    self.largo        = self.select_largo.largo
+                    self.ancho        = self.select_largo.ancho
+                    self.z_ingreso    = self.select_largo.z
+                    self.gap_etiqueta = self.select_largo.gap
+                    self.etiqueta_con_gap   = self.select_largo.gap + self.largo_interno
+                    self.etiquetas_al_ancho = self.select_largo.etiquetas_al_ancho
+                    self.etiquetas_al_desarrollo = (self.z_ingreso * self.engranaje) / self.etiqueta_con_gap
+            else:
+                self.z_calculado = ((self.largo_interno + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
 
-            #Ingreso de cilindro
-            self.z_ingreso, self.cilindros, self.troquel = self.asigna_z(self.z_calculado)
+                #Ingreso de cilindro
+                self.z_ingreso, self.cilindros, self.troquel = self.asigna_z(self.z_calculado)
 
-            self.etiqueta_con_gap = (self.z_ingreso * self.engranaje) / self.etiquetas_al_desarrollo
-            self.gap_etiqueta     = self.etiqueta_con_gap - self.largo_interno
+                self.etiqueta_con_gap = (self.z_ingreso * self.engranaje) / self.etiquetas_al_desarrollo
+                self.gap_etiqueta     = self.etiqueta_con_gap - self.largo_interno
 
             if self.etiquetas_al_ancho:
                 if self.etiquetas_al_ancho == 1:
@@ -328,24 +352,52 @@ class SelectProducts(models.TransientModel):
             # Calcula area
             self.area_ocupada = round((self.longitud_papel * self.ancho_papel) / 1000000, 3)
             self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
+
         #--------------------- JETRION ---------------------
         elif self._area_negocio() == '2':
             if self.largo_interno > 0.0 and self.ancho_interno > 0.0 and self.cantidad > 0.0:
                 # Toma el primer corte
                 _, self.ancho_papel = self.producto_id.get_best_corte(self.sustrato_id, 0)
 
-                n14 = self.ancho_papel
-                o14 = round(n14 / self.largo_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo largo
-                p14 = round(n14 / self.ancho_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo ancho
-                f15 = self.ancho_interno if o14 > p14 else self.largo_interno # Avance
-                q14 = max(o14,p14) # Etiquetas al ancho
 
-                self.etiquetas_al_ancho = q14
-                self.longitud_papel = (self.cantidad * f15) / q14
+                self.gap_etiqueta     = self.producto_id.default_gap
+                #--------------- Optimiza rotando la etiqueta -----------
+                max_et_1, a    = self._max_etiquetas_al_ancho(self.ancho_interno,self.ancho_papel)
+                n_col          = ceil(self.cantidad / max_et_1)
+                tot_largo_1    = (self.largo_interno + self.gap_etiqueta) * n_col
+                tot_area_in    = tot_largo_1 * a
+                tot_area_out_1 = tot_largo_1 * self.ancho_papel
+                diff1          = tot_area_out_1 - tot_area_in
+
+                max_et_2, a    = self._max_etiquetas_al_ancho(self.largo_interno,self.ancho_papel)
+                n_col          = ceil(self.cantidad / max_et_2)
+                tot_largo_2    = (self.ancho_interno + self.gap_etiqueta) * n_col
+                tot_area_in    = tot_largo_2 * a
+                tot_area_out_2 = tot_largo_2 * self.ancho_papel
+                diff2          = tot_area_out_2 - tot_area_in
+
+
+                if diff1 < diff2:
+                    self.etiquetas_al_ancho = max_et_1
+                    self.longitud_papel     = tot_largo_1
+                    self.area_ocupada       = tot_area_out_1 / 1000000.0
+                else:
+                    self.etiquetas_al_ancho = max_et_2
+                    self.longitud_papel     = tot_largo_2
+                    self.area_ocupada       = tot_area_out_2 / 1000000.0
+
+                #n14 = self.ancho_papel
+                #o14 = round(n14 / self.largo_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo largo
+                #p14 = round(n14 / self.ancho_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo ancho
+                #f15 = self.ancho_interno if o14 > p14 else self.largo_interno # Avance
+                #q14 = max(o14,p14) # Etiquetas al ancho
+
+                #self.etiquetas_al_ancho = q14
+                #self.longitud_papel = (self.cantidad * f15) / q14
                 self.longitud_papel_con_merma = round(self.longitud_papel * (1 + (self.merma_estimada / 100.0)), 3)
 
-                f15 = f15 / 1000.0
-                self.area_ocupada = round((self.cantidad / q14) * f15 * (self.ancho_papel / 1000.0), 3)
+                #f15 = f15 / 1000.0
+                #self.area_ocupada = round((self.cantidad / q14) * f15 * (self.ancho_papel / 1000.0), 3)
                 self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
             else:
                 #self.etiquetas_al_ancho = 0
@@ -379,6 +431,26 @@ class SelectProducts(models.TransientModel):
                 self.area_ocupada_con_merma   = 0
                 self.longitud_papel           = 0
                 self.longitud_papel_con_merma = 0
+
+    # Usado por Jetrion
+    def _max_etiquetas_al_ancho(self,ancho,total):
+        i = 1
+        c_ancho = 0
+        while True:
+            c_ancho_ant = c_ancho
+
+            if i % 2 == 0: # par
+                c_ancho = self.producto_id.SS + self.producto_id.SX * (i - 2)
+            else: # impar 
+                c_ancho = self.producto_id.SX * (i - 1)
+
+            c_ancho = c_ancho + i * ancho + 2 * self.producto_id.RF
+
+            if c_ancho > total:
+                break
+            i = i + 1
+
+        return i - 1, c_ancho_ant
 
 
     @api.onchange('producto_id')
@@ -470,7 +542,8 @@ class SelectProducts(models.TransientModel):
 
         #------------------ Cintas TTR ---------------------
         # Solo para TTR
-        if self._area_negocio() == '5':
+        #if self._area_negocio() == '5':
+        if self.use_cinta_ttr == True:
             ttr_id = self.producto_id.get_best_ttr(self.ancho_interno)
 
             if ttr_id:

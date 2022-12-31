@@ -22,6 +22,8 @@ class CotizadorProducto(models.Model):
     nombre_corto = fields.Char('Nombre corto', required=True, help="Texto incluido en el nombre de producto")
     category_id  = fields.Many2one('product.category', string="Categoría", required=True)
 
+    default_gap = fields.Float('Gap por defecto', default=0)
+
 #    adicional_ids = fields.Many2many(comodel_name="cotizador.adicional",string="Adicionales")
     def _get_default_product_uom_id(self):
         return self.env.ref('uom.uom_square_meter')
@@ -41,6 +43,7 @@ class CotizadorProducto(models.Model):
     use_bujes             = fields.Boolean(string='Usa Bujes', default=False)
     use_tinta_blanca      = fields.Boolean(string='Usa Tinta Blanca', default=False)
     use_tabla_troquel     = fields.Boolean(string='Usa Tabla Troqueles', default=False)
+    use_cinta_ttr         = fields.Boolean(string='Usa Cinta TTR', default=False)
 
     corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 

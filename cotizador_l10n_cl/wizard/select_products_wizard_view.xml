@@ -34,6 +34,7 @@
                         <field name="producto_id" />
                         <field name="codigo_producto" invisible="1"/>
                         <field name="use_bujes" invisible='1'/>
+                        <field name="use_tabla_troquel" invisible='1'/>
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
 
@@ -51,11 +52,19 @@
 			-->
                     </group>
                     <group>
-			<label for="largo" string="Avance X Ancho" />
-			<div class="o_row" id="largo_ancho" >
+		        <!-- Ingresa o selecciona largo/ancho -->
+			<label for="select_largo" string="Avance X Ancho" attrs="{'invisible':[('use_tabla_troquel','=',False)]}"/>
+			<div class="o_row" id="select_troquel" attrs="{'invisible':[('use_tabla_troquel','=',False)]}">
+		            <field name="select_largo" domain="[('producto_id','=',producto_id)]" />
+                            <span><field name="uom_id" readonly="1" nolabel="1"/></span>
+                        </div>
+
+			<label for="largo" string="Avance X Ancho" attrs="{'invisible':[('use_tabla_troquel','=',True)]}"/>
+			<div class="o_row" id="largo_ancho" attrs="{'invisible':[('use_tabla_troquel','=',True)]}">
                             <field name="largo" />X<field name="ancho" />
                             <span><field name="uom_id" readonly="1" nolabel="1"/></span>
                         </div>
+
 			<field name="adhesivo_id" />
 			<field name="currency_id" invisible='1'/>
                         <field name="use_tinta_blanca" invisible='1'/>
@@ -160,19 +169,16 @@
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','ETB'),('codigo_producto','!=','EF')]}">
 		        <group>
 		            <group>
-                                <field name="engranaje"/>
-                                <field name="etiquetas_al_desarrollo"/>
-                                <field name="etiquetas_al_ancho"/>
-                                <field name="gap"/>
+                                <field name="engranaje" readonly='1'/>
+				<field name="etiquetas_al_desarrollo" attrs="{'readonly':[('use_tabla_troquel','=',True)]}"/>
+                                <field name="etiquetas_al_ancho" attrs="{'readonly':[('use_tabla_troquel','=',True)]}"/>
+                                <field name="gap" attrs="{'invisible':[('use_tabla_troquel','=',True)]}"/>
 			    </group>
 		            <group>
-                                <field name="z_calculado"/>
-				<label for="z_ingreso" string="Troquel / Z / Cilindros" />
-			        <div class="o_row" id="z_unidades" >
-					<field name="troquel" style="max-width:100px"/> / <field name="z_ingreso" style="max-width:20px"/> / <field name="cilindros"/>
-                                </div>
+                                <field name="z_calculado" attrs="{'invisible':[('use_tabla_troquel','=',True)]}"/>
+				<field name="z_ingreso" string="Z" />
+                                <field name="gap_etiqueta" attrs="{'readonly':[('use_tabla_troquel','=',True)]}"/>
                                 <field name="etiqueta_con_gap"/>
-                                <field name="gap_etiqueta"/>
 
 				<label for="ss" string="SS / SX / RF" />
 			        <div class="o_row" id="ancho_ss_sx" >
@@ -189,6 +195,7 @@
 		            <group>
                                 <field name="ancho_papel" readonly='1'/>
                                 <field name="etiquetas_al_ancho" readonly='1'/>
+                                <field name="gap_etiqueta" string="Gap" readonly='1'/>
 			    </group>
 		            <group>
                                 <field name="longitud_papel"/>
