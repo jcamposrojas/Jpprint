@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.26',
+    'version': '15.0.1.27',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -37,6 +37,7 @@
 #        'views/homologo.xml',
         'views/ttr.xml',
         'views/adicional.xml',
+        'views/generico.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',
         'data/productos.xml',
@@ -56,6 +57,7 @@
 
     'assets': {
         'web.assets_backend': [
+            'cotizador_l10n_cl/static/src/css/tinta.css',
             'cotizador_l10n_cl/static/src/js/radio_image_aisa.js',
             'cotizador_l10n_cl/static/src/js/widget_parametros.js',
         ],

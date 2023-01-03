@@ -14,7 +14,7 @@ class TablaTroquel(models.Model):
     _name = 'tabla_troquel'
 
     producto_id        = fields.Many2one('cotizador.producto', 'Producto', required=True)
-    name               = fields.Char(string='Nombre')
+    name               = fields.Char(string='Nombre', compute='_compute_name')
 
     #------- Producto ---------
 #    product_product_id = fields.Many2one('product.product', string='Cinta TTR')
@@ -41,9 +41,12 @@ class TablaTroquel(models.Model):
 #    largo_mm = fields.Integer(string='Largo en mm', compute='_compute_values')
 #    ancho_mm = fields.Integer(string='Ancho en mm', compute='_compute_values')
 
-    def name_get(self):
-        lst = []
+    @api.depends('largo', 'ancho')
+    def _compute_name(self):
         for rec in self:
-            lst.append((rec.id,"%3s X %3s" % (rec.largo,rec.ancho)))
-        return lst
+            rec.name = "%3s X %3s" % (rec.largo,rec.ancho)
+#        lst = []
+#        for rec in self:
+#            lst.append((rec.id,"%3s X %3s" % (rec.largo,rec.ancho)))
+#        return lst
 

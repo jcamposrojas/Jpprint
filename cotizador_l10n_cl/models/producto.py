@@ -44,6 +44,7 @@ class CotizadorProducto(models.Model):
     use_tinta_blanca      = fields.Boolean(string='Usa Tinta Blanca', default=False)
     use_tabla_troquel     = fields.Boolean(string='Usa Tabla Troqueles', default=False)
     use_cinta_ttr         = fields.Boolean(string='Usa Cinta TTR', default=False)
+    use_cuatricomia       = fields.Boolean(string='Usa Cuatricomia', default=False)
 
     corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 
@@ -113,6 +114,33 @@ class CotizadorProducto(models.Model):
 
     # Tabla troqueles
     tabla_troquel_ids = fields.One2many('tabla_troquel', 'producto_id', string='Tabla Troqueles')
+
+    #---------------- Cuatricomia (Flexo) -------------------
+    color_cyan    = fields.Many2one('producto_generico', string='Color Cyan',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color_black   = fields.Many2one('producto_generico', string='Color Black',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color_yellow  = fields.Many2one('producto_generico', string='Color Yellow',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color_magenta = fields.Many2one('producto_generico', string='Color Magenta',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color1        = fields.Many2one('producto_generico', string='Color 1',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color2        = fields.Many2one('producto_generico', string='Color 2',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color3        = fields.Many2one('producto_generico', string='Color 3',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+    color4        = fields.Many2one('producto_generico', string='Color 4',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
+
+    #Cliches
+    def _domain_category_id_cliche(self):
+        domain = "[('category_id','=',%s)]" % (self.env.ref('uom.uom_categ_surface').id)
+        return domain
+
+    cliche_uom_id_de_consumo      = fields.Many2one('uom.uom', domain=_domain_category_id_cliche, string='UoM de consumo')
+    cliche_costo_unitario_consumo = fields.Float(string='Costo unitario consumo')
+
 
     @api.onchange('product_uom_id', 'tblanca_uom_id_de_consumo','tblanca_standard_price')
     def _onchange_costo_unitario_consumo(self):

@@ -34,6 +34,7 @@
 		                <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
 		                <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
 		                <field name='use_cinta_ttr' string="Usa Cinta TTR"/>
+		                <field name='use_cuatricomia' string="Usa Cuatricomia"/>
 			    </group>
                         </group>
 			<notebook>
@@ -110,6 +111,30 @@
                                         </tree>
 				    </field>
                                 </group>
+			    </page>
+			    <page string="Cuatricomia" attrs="{'invisible':[('use_cuatricomia','=',False)]}">
+			        <group string="Colores">
+			            <group>
+                                        <field name="color_cyan" domain="[('producto_id','=',id)]"/>
+                                        <field name="color_yellow" domain="[('producto_id','=',id)]"/>
+                                        <field name="color_black" domain="[('producto_id','=',id)]"/>
+                                        <field name="color_magenta" domain="[('producto_id','=',id)]"/>
+				    </group>
+			            <group>
+                                        <field name="color1" domain="[('producto_id','=',id)]"/>
+                                        <field name="color2" domain="[('producto_id','=',id)]"/>
+                                        <field name="color3" domain="[('producto_id','=',id)]"/>
+                                        <field name="color4" domain="[('producto_id','=',id)]"/>
+				    </group>
+				</group>
+			        <group string="Cliches">
+			            <group>
+                                        <field name="cliche_uom_id_de_consumo" />
+                                        <field name="cliche_costo_unitario_consumo" />
+				    </group>
+			            <group>
+				    </group>
+				</group>
 			    </page>
 		        </notebook>
 		    </sheet>

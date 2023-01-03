@@ -9,4 +9,11 @@
         <field name="uom_type">smaller</field>
     </record>
 
+    <record id="uom_square_cm" model="uom.uom">
+        <field name="name">cm²</field>
+        <field name="category_id" ref="uom.uom_categ_surface"/>
+        <field name="factor">10000</field>
+        <field name="uom_type">smaller</field>
+    </record>
+
 </odoo>

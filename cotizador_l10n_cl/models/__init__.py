@@ -19,3 +19,4 @@ from . import ttr
 from . import hojas
 from . import tblanca
 from . import tabla_troquel
+from . import generico

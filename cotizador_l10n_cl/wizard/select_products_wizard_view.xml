@@ -35,6 +35,7 @@
                         <field name="codigo_producto" invisible="1"/>
                         <field name="use_bujes" invisible='1'/>
                         <field name="use_tabla_troquel" invisible='1'/>
+                        <field name="use_cuatricomia" invisible='1'/>
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
 
@@ -201,6 +202,86 @@
                                 <field name="longitud_papel"/>
 			    </group>
 			</group>
+		    </page>
+		    <page string="Tintas Cuatricomía" attrs="{'invisible':[('use_cuatricomia','=',False)]}">
+		    <div class="row">
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_cyan">
+			        </div>
+			        <div class="o_tinta_text">C</div>
+		            </div> 
+			    <div class="o_tinta_checkbox"><field name="use_cyan" nolabel='1'/></div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_magenta">
+			        </div>
+			        <div class="o_tinta_text">M</div>
+		            </div> 
+			    <div class="o_tinta_checkbox"><field name="use_magenta" nolabel='1'/></div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_yellow">
+			        </div>
+			        <div class="o_tinta_text">Y</div>
+		            </div> 
+			    <div class="o_tinta_checkbox"><field name="use_yellow" nolabel='1'/></div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_black">
+			        </div>
+			        <div class="o_tinta_text">K</div>
+		            </div> 
+			    <div class="o_tinta_checkbox"><field name="use_black" nolabel='1'/></div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_white">
+			        </div>
+			        <div class="o_tinta_text">C1</div>
+		            </div> 
+			    <div class="o_tinta_checkbox">
+			        <field name="use_color1" nolabel='1'/>
+			        <field name="color1" nolabel='1' placeholder="Color?" attrs="{'invisible':[('use_color1','=',False)], 'required':[('use_color1','=',True)]}"/>
+			    </div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_white">
+			        </div>
+			        <div class="o_tinta_text">C2</div>
+		            </div> 
+			    <div class="o_tinta_checkbox">
+			        <field name="use_color2" nolabel='1'/>
+			        <field name="color2" nolabel='1' placeholder="Color?" attrs="{'invisible':[('use_color2','=',False)], 'required':[('use_color2','=',True)]}"/>
+			    </div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_white">
+			        </div>
+			        <div class="o_tinta_text">C3</div>
+		            </div> 
+			    <div class="o_tinta_checkbox">
+			        <field name="use_color3" nolabel='1'/>
+			        <field name="color3" nolabel='1' placeholder="Color?" attrs="{'invisible':[('use_color3','=',False)], 'required':[('use_color3','=',True)]}"/>
+			    </div> 
+		        </div>
+			<div>
+		            <div class="o_tinta">
+			        <div class="o_tinta_detalle o_tinta_white">
+			        </div>
+			        <div class="o_tinta_text">C4</div>
+		            </div> 
+			    <div class="o_tinta_checkbox">
+			        <field name="use_color4" nolabel='1'/>
+			        <field name="color4" nolabel='1' placeholder="Color?" attrs="{'invisible':[('use_color4','=',False)], 'required':[('use_color4','=',True)]}"/>
+			    </div> 
+		        </div>
+		    </div>
 		    </page>
 		    <page string="Cálculo de parámetros" attrs="{'invisible':[('codigo_producto','!=','EIMTTR'),('codigo_producto','!=','EDP'),('codigo_producto','!=','DPVC'),('codigo_producto','!=','IMD'),('codigo_producto','!=','IMDP')]}">
 		        <group>

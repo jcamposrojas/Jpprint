@@ -27,6 +27,7 @@ class SelectProducts(models.TransientModel):
     cobertura_tinta     = fields.Many2one(comodel_name='tinta_blanca_lines')
     use_tabla_troquel   = fields.Boolean(string='Usa Tabla Troqueles', related='producto_id.use_tabla_troquel')
     use_cinta_ttr       = fields.Boolean(string='Usa Cinta TTR', related='producto_id.use_cinta_ttr')
+    use_cuatricomia     = fields.Boolean(string='Usa Cuatricomia', related='producto_id.use_cuatricomia')
 
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
@@ -121,6 +122,20 @@ class SelectProducts(models.TransientModel):
 
     domain_adicionales_ids = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
 
+
+    #---------------- Cuatricomia (Flexo) -------------------
+    use_cyan    = fields.Boolean('Usa Cyan', default=True)
+    use_black   = fields.Boolean('Usa Black', default=True)
+    use_yellow  = fields.Boolean('Usa Yellow', default=True)
+    use_magenta = fields.Boolean('Usa Magenta', default=True)
+    use_color1  = fields.Boolean('Color1', default=False)
+    use_color2  = fields.Boolean('Color2', default=False)
+    use_color3  = fields.Boolean('Color3', default=False)
+    use_color4  = fields.Boolean('Color4', default=False)
+    color1      = fields.Char('Color1')
+    color2      = fields.Char('Color2')
+    color3      = fields.Char('Color3')
+    color4      = fields.Char('Color4')
 
     @api.depends('producto_id')
     def _compute_domain_adicionales_ids(self):
@@ -468,6 +483,49 @@ class SelectProducts(models.TransientModel):
                 domain = []
             return {'domain': {'sustrato_id':domain }}
 
+
+    def _prepare_vals_generico(self, adicional):
+        #---- nombre -----
+        #adicional = 
+        #nombre = adicional.name
+        #if adicional.add_data:
+        #    nombre = nombre + '/' + line.data_text
+        nombre = adicional.name
+
+        #---- cantidad y costo ---
+        cantidad = 0
+        costo    = 0
+        if adicional.tipo_calculo == 'f':
+            cantidad = adicional.cantidad
+            costo    = adicional.costo_unitario_consumo
+        elif adicional.tipo_calculo == 'm2':
+            cantidad = adicional.cantidad * self.area_ocupada
+            costo = cantidad * adicional.costo_unitario_consumo
+        elif adicional.tipo_calculo == 'm':
+            cantidad = adicional.cantidad * self.longitud_papel
+            costo = cantidad * adicional.costo_unitario_consumo
+        elif adicional.tipo_calculo == 'm2+m':
+            cantidad = adicional.cantidad * self.area_ocupada_con_merma
+            costo = cantidad * adicional.costo_unitario_consumo
+        elif adicional.tipo_calculo == 'm+m':
+            cantidad = adicional.cantidad * self.longitud_papel_con_merma
+            costo = cantidad * adicional.costo_unitario_consumo
+
+        vals = {
+            #'producto_id': 0,
+            'cost_currency_id': adicional.cost_currency_id.id,
+            'name'            : nombre,
+            'cantidad'        : cantidad,
+            'costo_unitario'  : adicional.costo_unitario_consumo,
+            'costo_consumo'   : costo,
+            'uom_id'          : adicional.uom_id_de_consumo.id,
+            #'merma': 0.0, # por definir
+            'incluido_en_ldm' : adicional.incluido_en_ldm,
+            'flag_adicional'  : False,
+        }
+        return vals
+
+
     # Actualiza listado de materias primas
     @api.onchange('producto_id',
             'sustrato_id',
@@ -482,7 +540,20 @@ class SelectProducts(models.TransientModel):
             'salidas_x_rollo',
             'use_tinta_blanca',
             'use_cobertura_tinta',
-            'cobertura_tinta')
+            'cobertura_tinta',
+            'use_cuatricomia',
+            'use_cyan',
+            'use_yellow',
+            'use_magenta',
+            'use_black',
+            'use_color1',
+            'use_color2',
+            'use_color3',
+            'use_color4',
+            'color1',
+            'color2',
+            'color3',
+            'color4')
     def _update_insumos(self):
         if self.ancho == 0 or self.largo == 0 or self.cantidad == 0:
             return
@@ -632,43 +703,12 @@ class SelectProducts(models.TransientModel):
 
         #----------------- Adicionales --------------------
         for line in self.lista_adicionales_ids:
-            #---- nombre -----
             adicional = line.adicional_id
+            vals = self._prepare_vals_generico(adicional)
             nombre = adicional.name
             if adicional.add_data:
-                nombre = nombre + '/' + line.data_text
+                vals['name'] = nombre + '/' + line.data_text
 
-            #---- cantidad y costo ---
-            cantidad = 0
-            costo    = 0
-            if adicional.tipo_calculo == 'f':
-                cantidad = adicional.cantidad
-                costo    = adicional.costo_unitario_consumo
-            elif adicional.tipo_calculo == 'm2':
-                cantidad = adicional.cantidad * self.area_ocupada
-                costo = cantidad * adicional.costo_unitario_consumo
-            elif adicional.tipo_calculo == 'm':
-                cantidad = adicional.cantidad * self.longitud_papel
-                costo = cantidad * adicional.costo_unitario_consumo
-            elif adicional.tipo_calculo == 'm2+m':
-                cantidad = adicional.cantidad * self.area_ocupada_con_merma
-                costo = cantidad * adicional.costo_unitario_consumo
-            elif adicional.tipo_calculo == 'm+m':
-                cantidad = adicional.cantidad * self.longitud_papel_con_merma
-                costo = cantidad * adicional.costo_unitario_consumo
-
-            vals = {
-                #'producto_id': 0,
-                'cost_currency_id': adicional.cost_currency_id.id,
-                'name'            : nombre,
-                'cantidad'        : cantidad,
-                'costo_unitario'  : adicional.costo_unitario_consumo,
-                'costo_consumo'   : costo,
-                'uom_id'          : adicional.uom_id_de_consumo.id,
-                #'merma': 0.0, # por definir
-                'incluido_en_ldm' : adicional.incluido_en_ldm,
-                'flag_adicional'  : False,
-            }
             self.insumo_ids = [(0,0,vals)]
 
 
@@ -709,10 +749,93 @@ class SelectProducts(models.TransientModel):
             self.insumo_ids = [(0,0,vals)]
 
 
+        #--------- Cuatricomia (Flexo) ---------
+        if self.use_cuatricomia == True:
+            count_colores = 0
+            if self.use_cyan and self.producto_id.color_cyan:
+                vals = self._prepare_vals_generico(self.producto_id.color_cyan)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_black and self.producto_id.color_black:
+                vals = self._prepare_vals_generico(self.producto_id.color_black)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_magenta and self.producto_id.color_magenta:
+                vals = self._prepare_vals_generico(self.producto_id.color_magenta)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_yellow and self.producto_id.color_yellow:
+                vals = self._prepare_vals_generico(self.producto_id.color_yellow)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_color1 and self.producto_id.color1:
+                vals = self._prepare_vals_generico(self.producto_id.color1)
+                vals['name'] = vals['name'] + ' / ' + str(self.color1)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_color2 and self.producto_id.color2:
+                vals = self._prepare_vals_generico(self.producto_id.color2)
+                vals['name'] = vals['name'] + ' / ' + str(self.color2)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_color3 and self.producto_id.color3:
+                vals = self._prepare_vals_generico(self.producto_id.color3)
+                vals['name'] = vals['name'] + ' / ' + str(self.color3)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+            if self.use_color4 and self.producto_id.color4:
+                vals = self._prepare_vals_generico(self.producto_id.color4)
+                vals['name'] = vals['name'] + ' / ' + str(self.color4)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
+
+            #Cliches
+            if count_colores > 0:
+                factor = self.factor_uom(self.producto_id.cliche_uom_id_de_consumo, self.env.ref('cotizador_l10n_cl.uom_square_mm'))
+
+                #costo_unitario = self.producto_id.cliche_uom_id_de_consumo._compute_quantity(self.producto_id.cliche_costo_unitario_consumo,self.env.ref('cotizador_l10n_cl.uom_square_mm'))
+                costo_unitario = self.producto_id.cliche_costo_unitario_consumo * factor
+
+                costo = count_colores * (self.z_ingreso * self.engranaje - 9.889) * self.ancho_bobina * costo_unitario
+                vals = {
+                    #'producto_id': 0,
+                    'cost_currency_id': self.currency_id.id, # Currency por defecto
+                    'name'            : 'CLICHE',
+                    'cantidad'        : count_colores,
+                    'costo_unitario'  : self.producto_id.cliche_costo_unitario_consumo,
+                    'costo_consumo'   : costo,
+                    'uom_id'          : self.producto_id.cliche_uom_id_de_consumo.id,
+                    #'merma': 0.0, # por definir
+                    'incluido_en_ldm' : False,
+                    'flag_adicional'  : False,
+                }
+                self.insumo_ids = [(0,0,vals)]
+
 
         # Reingresa items creados por el usuario
         for lst in lst_tmp:
             self.insumo_ids = [(0,0,lst)]
+
+    def factor_uom(self, uom_origen, uom_destino):
+        # Lleva a uom de referencia
+        if uom_origen.uom_type == 'reference':
+            factor = 1
+        elif uom_origen.uom_type == 'bigger':
+            factor = uom_origen.factor_inv
+        else:
+            factor = uom_origen.factor
+
+        # Calcula en uom de destino
+        if uom_destino.uom_type == 'reference':
+            factor2 = 1
+        elif uom_destino.uom_type == 'bigger':
+            factor2 = uom_destino.factor
+        else:
+            factor2 = uom_destino.factor_inv
+
+        return factor * factor2
+        #rec.tblanca_costo_unitario_consumo = rec.tblanca_standard_price * factor
+
 
 
     def add_product(self):

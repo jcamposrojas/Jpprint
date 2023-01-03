@@ -1,0 +1,53 @@
+.o_tinta {
+    border: 2px solid #091124;
+    width: 50px;
+    height: 70px;
+    position:relative;
+    padding:0px;
+    margin-left:15px;
+}
+
+.o_tinta_detalle {
+    height: 45px;
+    position:relative;
+    top:0px;
+    left:0px;
+    right:0px;
+    padding:0px;
+    margin:0px;
+    border:0px;
+}
+
+.o_tinta_cyan {
+    background-color: cyan;
+}
+
+.o_tinta_magenta {
+    background-color: magenta;
+}
+
+.o_tinta_yellow {
+    background-color: yellow;
+}
+
+.o_tinta_black {
+    background-color: black;
+}
+
+.o_tinta_white {
+    background-color: white;
+}
+
+.o_tinta_text {
+    text-align:center;
+    vertical-align:middle;
+    font-weight: bold;
+}
+
+.o_tinta_checkbox {
+    width: 50px;
+    position:relative;
+    padding:0px;
+    margin-left:15px;
+    text-align:center;
+}
