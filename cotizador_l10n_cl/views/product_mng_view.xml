@@ -104,9 +104,10 @@
 			                <tree editable="bottom">
                                             <field name="largo"/>
                                             <field name="ancho"/>
-                                            <field name="etiquetas_al_ancho"/>
-                                            <field name="gap"/>
                                             <field name="z"/>
+                                            <field name="etiquetas_al_ancho"/>
+					    <field name="gap" string="Gap >= 3"/>
+                                            <field name="etiquetas_al_desarrollo"/>
                                             <field name="tipo_troquel"/>
                                         </tree>
 				    </field>

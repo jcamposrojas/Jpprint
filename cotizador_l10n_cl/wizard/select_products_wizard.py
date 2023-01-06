@@ -684,13 +684,25 @@ class SelectProducts(models.TransientModel):
         for line in self.producto_id.operation_ids:
             if line.incluye_hh:
                 if line.hh_type == 'm':
-                    duracion_estimada = (self.longitud_papel / 1000.0) / line.metros_x_min # En minutos
+                    if line.metros_x_min > 0:
+                        duracion_estimada = (self.longitud_papel / 1000.0) / line.metros_x_min # En minutos
+                    else:
+                        duracion_estimada = 0
                 elif line.hh_type == 'm+m':
-                    duracion_estimada = (self.longitud_papel_con_merma / 1000.0) / line.metros_x_min # En minutos
+                    if line.metros_x_min > 0:
+                        duracion_estimada = (self.longitud_papel_con_merma / 1000.0) / line.metros_x_min # En minutos
+                    else:
+                        duracion_estimada = 0
                 elif line.hh_type == 'm2':
-                    duracion_estimada = (self.area_ocupada/ 1000.0) / line.metros2_x_min # En minutos
+                    if line.metros2_x_min > 0:
+                        duracion_estimada = (self.area_ocupada/ 1000.0) / line.metros2_x_min # En minutos
+                    else:
+                        duracion_estimada = 0
                 elif line.hh_type == 'm2+m':
-                    duracion_estimada = (self.area_ocupada_con_merma/ 1000.0) / line.metros2_x_min # En minutos
+                    if line.metros2_x_min > 0:
+                        duracion_estimada = (self.area_ocupada_con_merma/ 1000.0) / line.metros2_x_min # En minutos
+                    else:
+                        duracion_estimada = 0
                 elif line.hh_type == 't':
                     if self.salidas_x_rollo <= 0:
                         duracion_estimada = 0
