@@ -36,9 +36,12 @@ class TablaTroquel(models.Model):
     @api.depends('gap')
     def _compute_et_al_desarrollo(self):
         for rec in self:
-            perimetro = round(rec.z * 3.175,3)
-            l = round(perimetro / (rec.largo + rec.gap),0)
-            rec.etiquetas_al_desarrollo = l
+            if rec.gap > 0:
+                perimetro = round(rec.z * 3.175,3)
+                l = round(perimetro / (rec.largo + rec.gap),0)
+                rec.etiquetas_al_desarrollo = l
+            else:
+                rec.etiquetas_al_desarrollo = 0
 
 
     @api.depends('largo', 'ancho')
