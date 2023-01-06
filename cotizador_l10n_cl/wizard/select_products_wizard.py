@@ -27,7 +27,8 @@ class SelectProducts(models.TransientModel):
     cobertura_tinta     = fields.Many2one(comodel_name='tinta_blanca_lines')
     use_tabla_troquel   = fields.Boolean(string='Usa Tabla Troqueles', related='producto_id.use_tabla_troquel')
     use_cinta_ttr       = fields.Boolean(string='Usa Cinta TTR', related='producto_id.use_cinta_ttr')
-    use_cuatricomia     = fields.Boolean(string='Usa Cuatricomia', related='producto_id.use_cuatricomia')
+    use_cuatricomia     = fields.Boolean(string='Usa Colores', related='producto_id.use_cuatricomia')
+    use_cortes          = fields.Boolean(string='Usa Cortes de papel', related='producto_id.use_cortes')
 
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
@@ -124,6 +125,7 @@ class SelectProducts(models.TransientModel):
 
 
     #---------------- Cuatricomia (Flexo) -------------------
+    use_barniz  = fields.Boolean('Usa Barniz', default=True)
     use_cyan    = fields.Boolean('Usa Cyan', default=True)
     use_black   = fields.Boolean('Usa Black', default=True)
     use_yellow  = fields.Boolean('Usa Yellow', default=True)
@@ -136,6 +138,14 @@ class SelectProducts(models.TransientModel):
     color2      = fields.Char('Color2')
     color3      = fields.Char('Color3')
     color4      = fields.Char('Color4')
+
+    #---------------- RICHO --------------------
+    hoja_id           = fields.Many2one('producto_hojas', string='Tamaño Hoja')
+    etiquetas_x_hoja  = fields.Integer(string="Etiquetas por hoja", default=0)
+    n_hojas           = fields.Integer(string="Número de hojas", default=0)
+    n_hojas_con_merma = fields.Integer(string="Número de hojas C/MERMA", default=0)
+    alto_papel        = fields.Integer(string="Alto papel")
+    rota_etiqueta     = fields.Boolean('Rota etiqueta', default=False)
 
     @api.depends('producto_id')
     def _compute_domain_adicionales_ids(self):
@@ -155,7 +165,7 @@ class SelectProducts(models.TransientModel):
     @api.constrains('salidas_x_rollo')
     def _check_salidas(self):
         for rec in self:
-            if rec.salidas_x_rollo <= 0:
+            if rec.use_bujes and rec.salidas_x_rollo <= 0:
                 raise ValidationError('Salidas por rollo debe ser > 0')
 
     @api.depends('insumo_ids')
@@ -300,7 +310,8 @@ class SelectProducts(models.TransientModel):
             'etiquetas_al_ancho',
             'merma_estimada',
             'rf',
-            'etiqueta_con_gap')
+            'etiqueta_con_gap',
+            'hoja_id')
     def _calc_z(self):
         self.ss          = 0
         self.sx          = 0
@@ -326,7 +337,7 @@ class SelectProducts(models.TransientModel):
                     self.gap_etiqueta = self.select_largo.gap
                     self.etiqueta_con_gap   = self.select_largo.gap + self.largo_interno
                     self.etiquetas_al_ancho = self.select_largo.etiquetas_al_ancho
-                    self.etiquetas_al_desarrollo = (self.z_ingreso * self.engranaje) / self.etiqueta_con_gap
+                    self.etiquetas_al_desarrollo = round(self.z_ingreso * self.engranaje,3) / self.etiqueta_con_gap
             else:
                 self.z_calculado = ((self.largo_interno + self.gap)/self.engranaje) * self.etiquetas_al_desarrollo
 
@@ -420,6 +431,34 @@ class SelectProducts(models.TransientModel):
                 self.area_ocupada_con_merma   = 0
                 self.longitud_papel           = 0
                 self.longitud_papel_con_merma = 0
+        #--------------------- RICHO ---------------------
+        elif self._area_negocio() == '7' or self._area_negocio() == '8':
+            if self.hoja_id:
+                #a, b, na, nb = self.hoja_id.get_max(self.largo_interno,self.ancho_interno,self.producto_id.default_gap,self.producto_id.SX,self.producto_id.RF)
+                self.ancho_papel = self.hoja_id.ancho
+                self.alto_papel  = self.hoja_id.alto
+                self.sx          = self.producto_id.SX
+                self.rf          = self.producto_id.RF
+                self.gap         = self.producto_id.default_gap
+
+                self.rota_etiqueta, et_alto, self.etiquetas_al_desarrollo, et_ancho, self.etiquetas_al_ancho = \
+                        self.hoja_id.get_max(self.largo_interno,self.ancho_interno, \
+                        self.gap,self.sx,self.rf)
+                #_logger.info("%s -> %s %s - %s %s" % (rota, et_alto, self.etiquetas_al_desarrollo, et_ancho, self.etiquetas_al_ancho))
+                self.etiquetas_x_hoja  = self.etiquetas_al_desarrollo * self.etiquetas_al_ancho
+                self.n_hojas           = ceil(self.cantidad / self.etiquetas_x_hoja)
+                #self.n_hojas_con_merma
+                area_x_hoja             = self.hoja_id.ancho * self.hoja_id.alto / 1000000
+                self.area_ocupada             = area_x_hoja * self.n_hojas # en m2
+                #self.area_ocupada_con_merma   = 0
+                if self.merma_estimada > 0:
+                    self.n_hojas_con_merma = ceil((self.area_ocupada * (1 + (self.merma_estimada / 100.0))) / area_x_hoja)
+                else:
+                    self.n_hojas_con_merma = self.n_hojas
+                self.area_ocupada_con_merma = self.n_hojas_con_merma * area_x_hoja
+
+            #self.etiqueta_con_gap = self.gap + self.largo_interno
+
         #--------------------- TTR ---------------------
         #--------------------- RESTO ------------------------
         else:
@@ -594,6 +633,9 @@ class SelectProducts(models.TransientModel):
             }
             self.insumo_ids = [(0,0,vals)]
 
+#        #--------- Hojas (Richo) ---------
+#        if self.use_cortes == False:
+
         # Consumos obligatorios
         for line in self.producto_id.consumo_ids:
             vals = {
@@ -752,6 +794,10 @@ class SelectProducts(models.TransientModel):
         #--------- Cuatricomia (Flexo) ---------
         if self.use_cuatricomia == True:
             count_colores = 0
+            if self.use_barniz and self.producto_id.barniz:
+                vals = self._prepare_vals_generico(self.producto_id.barniz)
+                self.insumo_ids = [(0,0,vals)]
+                count_colores = count_colores + 1
             if self.use_cyan and self.producto_id.color_cyan:
                 vals = self._prepare_vals_generico(self.producto_id.color_cyan)
                 self.insumo_ids = [(0,0,vals)]

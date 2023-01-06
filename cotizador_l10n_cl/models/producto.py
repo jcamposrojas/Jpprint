@@ -116,6 +116,8 @@ class CotizadorProducto(models.Model):
     tabla_troquel_ids = fields.One2many('tabla_troquel', 'producto_id', string='Tabla Troqueles')
 
     #---------------- Cuatricomia (Flexo) -------------------
+    barniz        = fields.Many2one('producto_generico', string='Barniz',
+                    context="{'producto_id':id}", domain="[('producto_id','=',id)]")
     color_cyan    = fields.Many2one('producto_generico', string='Color Cyan',
                     context="{'producto_id':id}", domain="[('producto_id','=',id)]")
     color_black   = fields.Many2one('producto_generico', string='Color Black',

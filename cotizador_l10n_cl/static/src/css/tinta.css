@@ -18,6 +18,10 @@
     border:0px;
 }
 
+.o_tinta_mate {
+    background-color: #777B7E;
+}
+
 .o_tinta_cyan {
     background-color: cyan;
 }

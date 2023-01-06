@@ -25,16 +25,16 @@
 			    <group>
 		                <field name='use_cortes'/>
 			        <field name="corte_default" attrs="{'invisible':[('use_cortes', '!=', True)]}" widget="many2many_tags" />
-                                <label for="SS" string="SS / SX / RF" attrs="{'invisible':[('use_cortes', '!=', True)]}"/>
-                                <div class="o_row" id="ancho_ss_sx" attrs="{'invisible':[('use_cortes', '!=', True)]}">
+			        <field name="hoja_ids" attrs="{'invisible':[('use_cortes', '=', True)]}" widget="many2many_tags" />
+                                <label for="SS" string="SS / SX / RF"/>
+                                <div class="o_row" id="ancho_ss_sx">
                                     <field name="SS" style="max-width:20px"/> / <field name="SX" style="max-width:20px"/> / <field name="RF" style="max-width:20px" />
                                 </div>
-			        <field name="hoja_ids" attrs="{'invisible':[('use_cortes', '=', True)]}" widget="many2many_tags" />
 		                <field name='use_bujes'/>
 		                <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
 		                <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
 		                <field name='use_cinta_ttr' string="Usa Cinta TTR"/>
-		                <field name='use_cuatricomia' string="Usa Cuatricomia"/>
+		                <field name='use_cuatricomia' string="Usa Colores"/>
 			    </group>
                         </group>
 			<notebook>
@@ -112,7 +112,7 @@
 				    </field>
                                 </group>
 			    </page>
-			    <page string="Cuatricomia" attrs="{'invisible':[('use_cuatricomia','=',False)]}">
+			    <page string="Colores" attrs="{'invisible':[('use_cuatricomia','=',False)]}">
 			        <group string="Colores">
 			            <group>
                                         <field name="color_cyan" domain="[('producto_id','=',id)]"/>
@@ -133,6 +133,7 @@
                                         <field name="cliche_costo_unitario_consumo" />
 				    </group>
 			            <group>
+                                        <field name="barniz" domain="[('producto_id','=',id)]"/>
 				    </group>
 				</group>
 			    </page>

@@ -29,7 +29,8 @@ class TablaTroquel(models.Model):
     largo = fields.Integer(string='Largo', required=True)
     ancho = fields.Integer(string='Ancho', required=True)
     etiquetas_al_ancho = fields.Integer(string='Etiquetas al Ancho')
-    gap                = fields.Float(string='Gap')
+    gap                = fields.Float(string='Gap', compute='_compute_gap', digits=(10, 3))
+    gap_minimo         = fields.Float(string='Gap Mímino', default=3.0)
     z                  = fields.Integer(string='Z')
     tipo_troquel       = fields.Selection(TIPO_TROQUEL,string='tipo_troquel')
 
@@ -49,4 +50,24 @@ class TablaTroquel(models.Model):
 #        for rec in self:
 #            lst.append((rec.id,"%3s X %3s" % (rec.largo,rec.ancho)))
 #        return lst
+
+    @api.depends('z', 'largo')
+    def _compute_gap(self):
+        for rec in self:
+            if rec.z > 0 and rec.largo > 0:
+                i = 1
+                c_calc = 0
+                c_calc_ant = 0
+                perimetro = rec.z * 3.175
+                while True:
+                    c_calc_ant = c_calc
+                    c_calc = perimetro / i  - rec.largo
+
+                    if c_calc <= rec.gap_minimo:
+                        break
+                    i = i + 1
+                rec.gap = perimetro / (i-1) - rec.largo
+            else:
+                rec.gap = 0
+
 
