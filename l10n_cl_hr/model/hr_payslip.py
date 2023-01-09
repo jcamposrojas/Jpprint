@@ -6,6 +6,9 @@ from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.hr_payroll.models.browsable_object import BrowsableObject
 
+from odoo.tools import date_utils
+
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -109,6 +112,7 @@ class HrPayslip(models.Model):
         attendances = {}
         leaves = []
 
+       
         for line in res:
             entry = self.env['hr.work.entry.type'].search([('id', '=', line.get('work_entry_type_id'))])
 
@@ -116,6 +120,13 @@ class HrPayslip(models.Model):
             #if line.get('work_entry_type_id.code') == 'WORK100':
                 attendances = line
             else:
+                #----------------- Calculo de fines de semana ----------------------
+                if entry.code == 'LEAVE110': # Ausencia por enfermedad
+                    n_dias = self._get_ndays_leave(line.get('work_entry_type_id'))
+                    if n_dias != line.get('number_of_days'):
+                        line.update({'number_of_days':n_dias})
+                #-------------------------------------------------------------------
+
                 leaves.append(line)
         for leave in leaves:
             temp += leave.get('number_of_days') or 0
@@ -157,6 +168,56 @@ class HrPayslip(models.Model):
         res.extend(leaves)
         return res
 
+    @api.model
+    def _get_ndays_leave(self,entry_type_id):
+        # Validar si usa mes o periodo
+        current_month_start = date_utils.start_of(self.date_from, 'month')
+        current_month_end   = date_utils.end_of(self.date_from, 'month')
+        domain = [
+                ('work_entry_type_id', '=', entry_type_id),
+                ('employee_id', '=', self.employee_id.id),
+                ('state','in',('draft','verify')),
+                ('active','=',True),
+            ]
+        entry = self.env['hr.work.entry'].search(domain)
+        #for lin in self.worked_days_line_ids:
+        indices = set([])
+        for lin in entry:
+            #_logger.info("%s, %s %s"%(lin.id,lin.date_start,lin.date_stop))
+            if lin.date_stop.date() >= current_month_start and lin.date_stop.date() <= current_month_end:
+                if lin.leave_id and lin.leave_id.holiday_status_id.is_continued == True:
+                    indices.add(lin.leave_id)
+            #    _logger.info("%s, work_entry_type_id %s, leave_id %s "%(lin.id,lin.work_entry_type_id,lin.leave_id))
+        #_logger.info(' INDICES ')
+        #_logger.info(indices)
+        #indices = list(indices)
+        n_days = 0
+        for lin in indices:
+            if lin.date_from.date() < current_month_start and lin.date_to.date() <= current_month_end:
+                #_logger.info(' 1 ')
+                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                date_ini = current_month_start
+                date_end = lin.date_to.date()
+            if lin.date_from.date() >= current_month_start and lin.date_to.date() > current_month_end:
+                #_logger.info(' 2 ')
+                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                date_ini = lin.date_from.date()
+                date_end = current_month_end
+            if lin.date_from.date() > current_month_start and lin.date_to.date() <= current_month_end:
+                #_logger.info(' 3 ')
+                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                date_ini = lin.date_from.date()
+                date_end = lin.date_to.date()
+            if lin.date_from.date() < current_month_start and lin.date_to.date() > current_month_end:
+                #_logger.info(' 4 ')
+                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                date_ini = current_month_start
+                date_end = current_month_end
+            #_logger.info("(%s,%s)"%(date_ini,date_end))
+            n_days = n_days + (date_end - date_ini).days + 1
+            #_logger.info("n_days,%s"%((date_end - date_ini).days + 1))
+            #_logger.info("n_days,%s"%(n_days))
+        return n_days
 
     @api.model
     def _get_localdict(self):
