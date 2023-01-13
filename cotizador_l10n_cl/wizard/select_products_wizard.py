@@ -695,12 +695,12 @@ class SelectProducts(models.TransientModel):
                         duracion_estimada = 0
                 elif line.hh_type == 'm2':
                     if line.metros2_x_min > 0:
-                        duracion_estimada = (self.area_ocupada/ 1000.0) / line.metros2_x_min # En minutos
+                        duracion_estimada = self.area_ocupada / line.metros2_x_min # En minutos
                     else:
                         duracion_estimada = 0
                 elif line.hh_type == 'm2+m':
                     if line.metros2_x_min > 0:
-                        duracion_estimada = (self.area_ocupada_con_merma/ 1000.0) / line.metros2_x_min # En minutos
+                        duracion_estimada = self.area_ocupada_con_merma / line.metros2_x_min # En minutos
                     else:
                         duracion_estimada = 0
                 elif line.hh_type == 't':
