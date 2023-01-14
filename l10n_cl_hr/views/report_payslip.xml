@@ -131,7 +131,8 @@
                             <t t-set= "f" t-value="f+p.number_of_days"/>
                           </t>
                         </t>
-                        <span><t t-esc="str(int(f))"/></span>
+				<!--<span><t t-esc="str(int(f))"/></span>-->
+                        <span><t t-esc="str(int(o.dias_a_pagar))"/></span>
                       </td>
                       <td align="center">
                         <t t-foreach="o.input_line_ids" t-as="p">
