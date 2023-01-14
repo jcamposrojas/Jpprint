@@ -5,7 +5,7 @@ from odoo import api, fields, models, tools
 
 class HRHolidaysStatus(models.Model):
     _inherit = 'hr.leave.type'
-    is_continued = fields.Boolean('Disccount Weekends')
+    is_continued = fields.Boolean('Cuenta Fines de Semana')
 
 
 class HRHolidays(models.Model):

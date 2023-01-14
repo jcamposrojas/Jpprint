@@ -40,6 +40,37 @@ class HrPayslip(models.Model):
             store=True, copy=True, states={'draft': [('readonly', False)], 'verify': [('readonly', False)]})
 
 
+    #dias_a_pagar = fields.Integer(string='Días a pagar', default=0)
+    dias_a_pagar = fields.Integer(string='Días a pagar', compute="_onchange_dias_a_pagar")
+
+    @api.depends('worked_days_line_ids')
+    def _onchange_dias_a_pagar(self):
+        for rec in self:
+            n_dias = 0
+#            _logger.info(' PAGADO 0 ')
+            for worked in rec.worked_days_line_ids:
+                entry_type = worked.work_entry_type_id
+ #               _logger.info(' > %s'%(entry_type.name))
+                if entry_type and entry_type.unpaid_structure_ids:
+ #                   _logger.info(' PAGADO 1 ')
+                    flag = False
+                    for en in entry_type.unpaid_structure_ids:
+                        if en.id == rec.struct_id.id:
+                            flag = True
+ #                       _logger.info("struct_id %s ID %s=%s"%(rec.struct_id.id,en.id,en.name))
+                    if not flag:
+                        n_dias += worked.number_of_days
+                else:
+                    n_dias += worked.number_of_days
+
+ #           _logger.info("dias trabajados: %s"%(n_dias))
+            if n_dias > 30:
+                n_dias = 30
+#            _logger.info(' DIAS A PAGAR: %s '%(n_dias) )
+            rec.dias_a_pagar = n_dias
+
+
+
     #@api.onchange('employee_id', 'contract_id', 'struct_id', 'date_from', 'date_to')
     #@api.onchange('date_from', 'date_to', 'struct_id')
     def _compute_fest(self):
@@ -110,8 +141,8 @@ class HrPayslip(models.Model):
         temp = 0 
         dias = 0
         attendances = {}
-        leaves = []
-
+        effective   = {}
+        leaves      = []
        
         for line in res:
             entry = self.env['hr.work.entry.type'].search([('id', '=', line.get('work_entry_type_id'))])
@@ -132,15 +163,31 @@ class HrPayslip(models.Model):
             temp += leave.get('number_of_days') or 0
 
         #Dias laborados reales para calcular la semana corrida
+        #if attendances:
+        _logger.info(' ATTENDANCE ')
+        if attendances:
+            _logger.info(' SI ')
+        else:
+            _logger.info(' NO ')
+            entry = self.env['hr.work.entry.type'].search([('code', '=', 'WORK100')])
+            attendances = {
+                'name'              : entry.name,
+                'sequence'          : 25,
+                'payslip_id'        : self.id,
+                'work_entry_type_id': entry.id,
+                'number_of_days'    : 0,
+            }
+
+
         effective = attendances.copy()
         entry_effective = self.env['hr.work.entry.type'].search([('code', '=', 'EFF100')])
         effective.update({
-            'name': _("Dias de trabajo efectivos"),
-            'sequence': 2,
-            #'code': 'EFF100',
-            'payslip_id'    : self.id,
-            'work_entry_type_id': entry_effective.id,
-        })
+                'name': _("Dias de trabajo efectivos"),
+                'sequence': 2,
+                #'code': 'EFF100',
+                'payslip_id'    : self.id,
+                'work_entry_type_id': entry_effective.id,
+            })
 
         # En el caso de que se trabajen menos de 5 días tomaremos los dias trabajados en los demás casos 30 días - las faltas
         # Estos casos siempre se podrán modificar manualmente directamente en la nomina.
@@ -192,6 +239,8 @@ class HrPayslip(models.Model):
         #_logger.info(indices)
         #indices = list(indices)
         n_days = 0
+        date_ini = current_month_start
+        date_end = current_month_end
         for lin in indices:
             if lin.date_from.date() < current_month_start and lin.date_to.date() <= current_month_end:
                 #_logger.info(' 1 ')
@@ -229,10 +278,13 @@ class HrPayslip(models.Model):
 
         employee = self.employee_id
 
+#        _logger.info(' LOCALDICT ')
+#        _logger.info(self.dias_a_pagar)
         res_localdict = {
             **localdict,
             **{
                 'parameters': BrowsableObject(employee.id, parameters, self.env),
+                'dias_a_pagar': self.dias_a_pagar,
             }
         }
         return res_localdict
