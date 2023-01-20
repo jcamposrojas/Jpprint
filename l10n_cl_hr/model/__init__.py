@@ -16,3 +16,4 @@ from . import hr_seguro_complementario
 from . import hr_holidays
 from . import hr_apv
 from . import hr_payslip_input_type
+from . import hr_work_entry_type

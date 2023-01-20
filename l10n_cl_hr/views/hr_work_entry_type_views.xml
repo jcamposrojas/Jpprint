@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- HR WORK ENTRY -->
+    <record id="hr_work_entry_view_inherit_form" model="ir.ui.view">
+        <field name="name">hr.work.entry.inherit.form</field>
+        <field name="model">hr.work.entry.type</field>
+	<field name="inherit_id" ref="hr_payroll.payroll_hr_work_entry_type_view_form_inherit"/>
+        <field name="arch" type="xml">
+            <field name="unpaid_structure_ids" position="after">
+                    <!--
+		    <field name="pay_weekend" attrs="{'invisible':[('unpaid_structure_ids','!=',[])]}"/>
+		    -->
+		    <field name="pay_weekend"/>
+            </field>
+
+        </field>
+    </record>
+
+</odoo>

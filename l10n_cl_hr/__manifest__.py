@@ -18,7 +18,7 @@
         "KONOS",
     ],
     'license': 'AGPL-3',
-    'version': '15.0.1.0.8',
+    'version': '15.0.1.0.9',
     'description': """
 Chilean Payroll & Human Resources.
 ==================================
@@ -42,6 +42,7 @@ Chilean Payroll & Human Resources.
         'views/hr_holiday_views.xml',
         'views/wizard_export_csv_previred_view.xml',
         'views/hr_payslip_input_type.xml',
+        'views/hr_work_entry_type_views.xml',
         'data/hr_work_entry.xml',
         'data/hr_salary_rule_category.xml',
         'data/hr_centros_costos.xml',

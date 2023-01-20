@@ -47,26 +47,26 @@ class HrPayslip(models.Model):
     def _onchange_dias_a_pagar(self):
         for rec in self:
             n_dias = 0
-#            _logger.info(' PAGADO 0 ')
+            _logger.info(' PAGADO 0 ')
             for worked in rec.worked_days_line_ids:
                 entry_type = worked.work_entry_type_id
- #               _logger.info(' > %s'%(entry_type.name))
+                _logger.info(' > %s'%(entry_type.name))
                 if entry_type and entry_type.unpaid_structure_ids:
- #                   _logger.info(' PAGADO 1 ')
+                    _logger.info(' PAGADO 1 ')
                     flag = False
                     for en in entry_type.unpaid_structure_ids:
                         if en.id == rec.struct_id.id:
                             flag = True
- #                       _logger.info("struct_id %s ID %s=%s"%(rec.struct_id.id,en.id,en.name))
-                    if not flag:
+                        _logger.info("struct_id %s ID %s=%s"%(rec.struct_id.id,en.id,en.name))
+                    if flag == False:
                         n_dias += worked.number_of_days
                 else:
                     n_dias += worked.number_of_days
 
- #           _logger.info("dias trabajados: %s"%(n_dias))
+            _logger.info("dias trabajados: %s"%(n_dias))
             if n_dias > 30:
                 n_dias = 30
-#            _logger.info(' DIAS A PAGAR: %s '%(n_dias) )
+            _logger.info(' DIAS A PAGAR: %s '%(n_dias) )
             rec.dias_a_pagar = n_dias
 
 
@@ -152,10 +152,13 @@ class HrPayslip(models.Model):
                 attendances = line
             else:
                 #----------------- Calculo de fines de semana ----------------------
-                if entry.code == 'LEAVE110': # Ausencia por enfermedad
-                    n_dias = self._get_ndays_leave(line.get('work_entry_type_id'))
-                    if n_dias != line.get('number_of_days'):
-                        line.update({'number_of_days':n_dias})
+                #if entry.code == 'LEAVE110': # Ausencia por enfermedad
+                    #n_dias = self._get_ndays_leave(line.get('work_entry_type_id'))
+                n_dias = self._get_ndays_leave(entry.id)
+                _logger.info(' LEAVE ')
+                _logger.info("%s %s"%(entry.id,n_dias))
+                if n_dias > 0 and n_dias != line.get('number_of_days'):
+                    line.update({'number_of_days':n_dias})
                 #-------------------------------------------------------------------
 
                 leaves.append(line)
@@ -177,7 +180,6 @@ class HrPayslip(models.Model):
                 'work_entry_type_id': entry.id,
                 'number_of_days'    : 0,
             }
-
 
         effective = attendances.copy()
         entry_effective = self.env['hr.work.entry.type'].search([('code', '=', 'EFF100')])
@@ -218,8 +220,10 @@ class HrPayslip(models.Model):
     @api.model
     def _get_ndays_leave(self,entry_type_id):
         # Validar si usa mes o periodo
-        current_month_start = date_utils.start_of(self.date_from, 'month')
-        current_month_end   = date_utils.end_of(self.date_from, 'month')
+        #current_month_start = date_utils.start_of(self.date_from, 'month')
+        #current_month_end   = date_utils.end_of(self.date_from, 'month')
+        date_ini = self.date_from
+        date_end = self.date_to
         domain = [
                 ('work_entry_type_id', '=', entry_type_id),
                 ('employee_id', '=', self.employee_id.id),
@@ -227,46 +231,51 @@ class HrPayslip(models.Model):
                 ('active','=',True),
             ]
         entry = self.env['hr.work.entry'].search(domain)
-        #for lin in self.worked_days_line_ids:
-        indices = set([])
-        for lin in entry:
-            #_logger.info("%s, %s %s"%(lin.id,lin.date_start,lin.date_stop))
-            if lin.date_stop.date() >= current_month_start and lin.date_stop.date() <= current_month_end:
-                if lin.leave_id and lin.leave_id.holiday_status_id.is_continued == True:
-                    indices.add(lin.leave_id)
-            #    _logger.info("%s, work_entry_type_id %s, leave_id %s "%(lin.id,lin.work_entry_type_id,lin.leave_id))
-        #_logger.info(' INDICES ')
-        #_logger.info(indices)
-        #indices = list(indices)
-        n_days = 0
-        date_ini = current_month_start
-        date_end = current_month_end
-        for lin in indices:
-            if lin.date_from.date() < current_month_start and lin.date_to.date() <= current_month_end:
-                #_logger.info(' 1 ')
-                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
-                date_ini = current_month_start
-                date_end = lin.date_to.date()
-            if lin.date_from.date() >= current_month_start and lin.date_to.date() > current_month_end:
-                #_logger.info(' 2 ')
-                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
-                date_ini = lin.date_from.date()
-                date_end = current_month_end
-            if lin.date_from.date() > current_month_start and lin.date_to.date() <= current_month_end:
-                #_logger.info(' 3 ')
-                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
-                date_ini = lin.date_from.date()
-                date_end = lin.date_to.date()
-            if lin.date_from.date() < current_month_start and lin.date_to.date() > current_month_end:
-                #_logger.info(' 4 ')
-                #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
-                date_ini = current_month_start
-                date_end = current_month_end
-            #_logger.info("(%s,%s)"%(date_ini,date_end))
-            n_days = n_days + (date_end - date_ini).days + 1
-            #_logger.info("n_days,%s"%((date_end - date_ini).days + 1))
-            #_logger.info("n_days,%s"%(n_days))
-        return n_days
+        if entry:
+            #for lin in self.worked_days_line_ids:
+            indices = set([])
+            for lin in entry:
+                _logger.info("%s, %s %s"%(lin.id,lin.date_start,lin.date_stop))
+                if not (lin.date_stop.date() < date_ini or lin.date_start.date() > date_end):
+                    #if lin.leave_id and lin.leave_id.holiday_status_id.is_continued == True:
+                    if lin.work_entry_type_id.pay_weekend == True:
+                        _logger.info(' PAY WEEKEND ')
+                        if lin.leave_id:
+                            indices.add(lin.leave_id)
+                #    _logger.info("%s, work_entry_type_id %s, leave_id %s "%(lin.id,lin.work_entry_type_id,lin.leave_id))
+            _logger.info(' INDICES ')
+            _logger.info(indices)
+            #indices = list(indices)
+            n_days = 0
+            #date_ini = current_month_start
+            #date_end = current_month_end
+            for lin in indices:
+                if lin.date_from.date() < date_ini and lin.date_to.date() <= date_end:
+                    #_logger.info(' 1 ')
+                    #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                    #date_ini = current_month_start
+                    date_end = lin.date_to.date()
+                if lin.date_from.date() >= date_ini and lin.date_to.date() > date_end:
+                    #_logger.info(' 2 ')
+                    #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                    date_ini = lin.date_from.date()
+                    #date_end = current_month_end
+                if lin.date_from.date() > date_ini and lin.date_to.date() <= date_end:
+                    #_logger.info(' 3 ')
+                    #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                    date_ini = lin.date_from.date()
+                    date_end = lin.date_to.date()
+                #if lin.date_from.date() < date_ini and lin.date_to.date() > current_month_end:
+                    #_logger.info(' 4 ')
+                    #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
+                #    date_ini = current_month_start
+                #    date_end = current_month_end
+                #_logger.info("(%s,%s)"%(date_ini,date_end))
+                n_days = n_days + (date_end - date_ini).days + 1
+                #_logger.info("n_days,%s"%((date_end - date_ini).days + 1))
+                #_logger.info("n_days,%s"%(n_days))
+            return n_days
+        return 0
 
     @api.model
     def _get_localdict(self):
