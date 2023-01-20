@@ -231,6 +231,7 @@ class HrPayslip(models.Model):
                 ('active','=',True),
             ]
         entry = self.env['hr.work.entry'].search(domain)
+        _logger.info("ENTRY DOMAIN %s %s"%(entry_type_id, self.employee_id.id))
         if entry:
             #for lin in self.worked_days_line_ids:
             indices = set([])
@@ -244,7 +245,7 @@ class HrPayslip(models.Model):
                             indices.add(lin.leave_id)
                 #    _logger.info("%s, work_entry_type_id %s, leave_id %s "%(lin.id,lin.work_entry_type_id,lin.leave_id))
             _logger.info(' INDICES ')
-            _logger.info(indices)
+            _logger.info(indices) #11
             #indices = list(indices)
             n_days = 0
             #date_ini = current_month_start
@@ -254,13 +255,15 @@ class HrPayslip(models.Model):
                     #_logger.info(' 1 ')
                     #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
                     #date_ini = current_month_start
-                    date_end = lin.date_to.date()
+                    date_ini = lin.date_from.date()
+                    #date_end = lin.date_to.date()
                 if lin.date_from.date() >= date_ini and lin.date_to.date() > date_end:
                     #_logger.info(' 2 ')
                     #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
-                    date_ini = lin.date_from.date()
+                    #date_ini = lin.date_from.date()
+                    date_end = lin.date_to.date()
                     #date_end = current_month_end
-                if lin.date_from.date() > date_ini and lin.date_to.date() <= date_end:
+                if lin.date_from.date() >= date_ini and lin.date_to.date() <= date_end:
                     #_logger.info(' 3 ')
                     #_logger.info("%s - %s"%(lin.date_from.date(),lin.date_to.date()))
                     date_ini = lin.date_from.date()

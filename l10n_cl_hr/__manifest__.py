@@ -18,7 +18,7 @@
         "KONOS",
     ],
     'license': 'AGPL-3',
-    'version': '15.0.1.0.9',
+    'version': '15.0.1.0.10',
     'description': """
 Chilean Payroll & Human Resources.
 ==================================
