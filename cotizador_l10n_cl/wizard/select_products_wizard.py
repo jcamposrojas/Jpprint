@@ -122,6 +122,7 @@ class SelectProducts(models.TransientModel):
     precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
 
     domain_adicionales_ids = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
+    domain_hoja_ids        = fields.Many2many('producto_hojas', compute="_compute_domain_adicionales_ids")
 
 
     #---------------- Cuatricomia (Flexo) -------------------
@@ -158,6 +159,12 @@ class SelectProducts(models.TransientModel):
                 rec.domain_adicionales_ids = rec.producto_id.adicional_ids
             else:
                 rec.domain_adicionales_ids = []
+
+            if rec.use_cortes == False:
+                rec.domain_hoja_ids = rec.producto_id.hoja_ids
+            else:
+                rec.domain_hoja_ids = []
+
             #rec.domain_adicionales_ids = rec.producto_id.adicional_ids - self.lista_adicionales_ids
             #return {'domain':{'lista_adicionales_ids':[('adicional_id','in',self.producto_id.adicional_ids.ids)]}}
         #return {'domain':{'lista_adicionales_ids':[('adicional_id','in',[1])]}}
@@ -433,7 +440,7 @@ class SelectProducts(models.TransientModel):
                 self.longitud_papel_con_merma = 0
         #--------------------- RICHO ---------------------
         elif self._area_negocio() == '7' or self._area_negocio() == '8':
-            if self.hoja_id:
+            if self.hoja_id and self.largo_interno > 0.0 and self.ancho_interno > 0.0 and self.cantidad > 0.0:
                 #a, b, na, nb = self.hoja_id.get_max(self.largo_interno,self.ancho_interno,self.producto_id.default_gap,self.producto_id.SX,self.producto_id.RF)
                 self.ancho_papel = self.hoja_id.ancho
                 self.alto_papel  = self.hoja_id.alto

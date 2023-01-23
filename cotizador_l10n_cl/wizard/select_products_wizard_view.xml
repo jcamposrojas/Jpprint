@@ -37,6 +37,8 @@
                         <field name="use_tabla_troquel" invisible='1'/>
                         <field name="use_cortes" invisible='1'/>
                         <field name="use_cuatricomia" invisible='1'/>
+		        <field name="domain_adicionales_ids" invisible='1'/>
+		        <field name="domain_hoja_ids" invisible='1'/>
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
 
@@ -46,7 +48,8 @@
                             <field name="product_uom_id" nolabel="1"/>
                         </div>
 
-			<field name="hoja_id" attrs="{'invisible':[('use_cortes','=',True)],'required':[('use_cortes','=',False)]}"/>
+			<field name="hoja_id" domain="[('id','in',domain_hoja_ids)]" attrs="{'invisible':['|',('producto_id','=',False),('use_cortes','=',True)],'required':[('use_cortes','=',False)]}"/>
+
 			<field name="area_ocupada" />
                         <field name="merma_estimada"/>
 			<field name="area_ocupada_con_merma" />
@@ -114,7 +117,6 @@
 			            </div>
 					-->
 				    <div class="row">
-				        <field name="domain_adicionales_ids" invisible='1'/>
 				        <field name="lista_adicionales_ids" nolabel='1'>
 					    <tree editable="bottom">
                                                 <field name="add_data" invisible='1'/>
