@@ -2,7 +2,6 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_cotizador_producto,access_cotizador_producto,model_cotizador_producto,base.group_user,1,1,1,1
 access_cotizador_sustrato,access_cotizador_sustrato,model_cotizador_sustrato,base.group_user,1,1,1,1
 access_cotizador_adhesivo,access_cotizador_adhesivo,model_cotizador_adhesivo,base.group_user,1,1,1,1
-access_cotizador_cilindro,access_cotizador_cilindro,model_cotizador_cilindro,base.group_user,1,1,1,1
 access_cotizador_select_products,access_cotizador_select_products,model_select_products,base.group_user,1,1,1,1
 access_cotizador_mrp_routing,access_cotizador_mrp_routing,model_mrp_routing_workcenter_tmp,base.group_user,1,1,1,1
 access_cotizador_adicional,access_cotizador_adicional,model_cotizador_adicional,base.group_user,1,1,1,1

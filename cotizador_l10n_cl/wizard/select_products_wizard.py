@@ -21,6 +21,7 @@ class SelectProducts(models.TransientModel):
     currency_id     = fields.Many2one('res.currency', related='company_id.currency_id')
     currency_symbol = fields.Char(string='Símbolo moneda', related='company_id.name')
 
+    use_aisa            = fields.Boolean('Usa AISA', related='producto_id.use_aisa')
     use_bujes           = fields.Boolean('Usa bujes', related='producto_id.use_bujes')
     use_tinta_blanca    = fields.Boolean('Usa Cobertura Tinta Blanca', related='producto_id.use_tinta_blanca')
     use_cobertura_tinta = fields.Boolean('Cobertura Tinta Blanca', default=False)
@@ -199,26 +200,6 @@ class SelectProducts(models.TransientModel):
                 self.merma_estimada = prod.merma
         else:
             self.merma_estimada = 0.0
-
-
-#    @api.onchange('adicional_ids')
-#    def _onchange_agrega_adicionales(self):
-#        if self.producto_id:
-#            #self.lista_adicionales_ids = [(5,0)]
-#
-#            lista = self.lista_adicionales_ids.mapped('adicional_id')
-#
-#            _logger.info(' LISTA ')
-#            _logger.info(lista)
-#            for rec in self.adicional_ids:
-#                #if lista.count(rec.adicional_id) == 0:
-#                if rec.add_data:
-#                    # Agregar si no existe en lista_adicionales_ids
-#                    vals = {
-#                        'select_id': 0,
-#                        'adicional_id': rec.id,
-#                    }
-#                    self.lista_adicionales_ids = [(0,0,vals)]
 
 
     def asigna_z(self,value):

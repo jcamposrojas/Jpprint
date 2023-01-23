@@ -30,14 +30,23 @@
                                 <div class="o_row" id="ancho_ss_sx">
                                     <field name="SS" style="max-width:20px"/> / <field name="SX" style="max-width:20px"/> / <field name="RF" style="max-width:20px" />
                                 </div>
-		                <field name='use_bujes'/>
-		                <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
-		                <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
-		                <field name='use_cinta_ttr' string="Usa Cinta TTR"/>
-		                <field name='use_cuatricomia' string="Usa Colores"/>
 			    </group>
                         </group>
 			<notebook>
+			    <page string="Configuración Base">
+			        <group>
+			            <group>
+		                        <field name='use_bujes'/>
+		                        <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
+		                        <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
+		                        <field name='use_cinta_ttr' string="Usa Cinta TTR"/>
+		                        <field name='use_cuatricomia' string="Usa Colores"/>
+                                    </group>
+			            <group>
+		                        <field name='use_aisa'/>
+                                    </group>
+                                </group>
+			    </page>
 			    <page string="Sustratos Permitidos">
 			        <group>
 				    <field name="producto_sustrato_ids" nolabel="1"/>

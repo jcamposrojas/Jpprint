@@ -33,6 +33,7 @@
                     <group>
                         <field name="producto_id" />
                         <field name="codigo_producto" invisible="1"/>
+                        <field name="use_aisa" invisible='1'/>
                         <field name="use_bujes" invisible='1'/>
                         <field name="use_tabla_troquel" invisible='1'/>
                         <field name="use_cortes" invisible='1'/>
@@ -91,19 +92,6 @@
 			<group>
 			<div class='row' style="padding-left:20px">
 			    <div class="col-6">
-			        <group string="AISA">
-				<div>
-			            <div class="row">
-				        <label for="indica_aisa" string="Indica AISA?" />
-                                        <field string='Indica AISA?' name="indica_aisa" />
-				    </div>
-			            <div class="row" attrs="{'invisible':[('indica_aisa','!=',True)]}">
-				        <field class="d-flex flex-wrap" name="aisa_id" nolabel='1' widget="radio_image_aisa" options="{'horizontal': true}"/>
-			            </div>
-			        </div>
-			        </group>
-		            </div>
-			    <div class="col-6">
 			        <group string="BUJE" attrs="{'invisible':[('use_bujes','!=',True)]}">
                                     <field name="buje_id" attrs="{'required':[('use_bujes','=',True)]}"/>
                                     <field name="salidas_x_rollo" attrs="{'required':[('use_bujes','=',True)]}"/>
@@ -111,11 +99,6 @@
 			        </group>
 			        <group string="ADICIONALES">
 				<div>
-					<!--
-				    <div class="row">
-				        <field name="adicional_ids" widget="many2many_tags" nolabel='1' domain="[('producto_id','=',producto_id)]"/>
-			            </div>
-					-->
 				    <div class="row">
 				        <field name="lista_adicionales_ids" nolabel='1'>
 					    <tree editable="bottom">
@@ -148,6 +131,19 @@
                                 <field name="laminado" />
                                 <field name="folia" />
 				-->
+		            </div>
+			    <div class="col-6">
+			        <group string="AISA" attrs="{'invisible':[('use_aisa','=',False)]}">
+				<div>
+			            <div class="row">
+				        <label for="indica_aisa" string="Indica AISA?" />
+                                        <field string='Indica AISA?' name="indica_aisa" />
+				    </div>
+			            <div class="row" attrs="{'invisible':[('indica_aisa','!=',True)]}">
+				        <field class="d-flex flex-wrap" name="aisa_id" nolabel='1' widget="radio_image_aisa" options="{'horizontal': true}"/>
+			            </div>
+			        </div>
+			        </group>
 		            </div>
 		        </div>
 		        </group>

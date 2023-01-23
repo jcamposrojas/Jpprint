@@ -45,6 +45,7 @@ class CotizadorProducto(models.Model):
     use_tabla_troquel     = fields.Boolean(string='Usa Tabla Troqueles', default=False)
     use_cinta_ttr         = fields.Boolean(string='Usa Cinta TTR', default=False)
     use_cuatricomia       = fields.Boolean(string='Usa Cuatricomia', default=False)
+    use_aisa              = fields.Boolean(string='Usa AISA', default=False)
 
     corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 
