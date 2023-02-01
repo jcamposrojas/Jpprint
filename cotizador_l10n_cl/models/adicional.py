@@ -1,4 +1,5 @@
 from odoo import api, fields, models, tools, _
+from odoo.exceptions import ValidationError, UserError
 
 import logging
 
@@ -10,6 +11,8 @@ TIPOS_CALCULO = [
     ('m+m','Por metro lineal C/MERMA'),
     ('m2','Por metro cuadrado S/MERMA'),
     ('m2+m','Por metro cuadrado C/MERMA'),
+    ('h','Por Hoja S/MERMA'),
+    ('hm','Por Hoja C/MERMA'),
 ]
 
 class CotizadorAdicional(models.Model):
@@ -88,13 +91,12 @@ class CotizadorAdicional(models.Model):
             rec.costo_unitario_consumo = rec.standard_price * factor
 
 
-#        else:
-#            self.name              = ''
-#            self.standard_price    = None
-#            self.incluido_en_ldm   = False
-#            self.uom_id            = None
-#            self.uom_category_id   = None
-#            self.uom_id_de_consumo = None
+    @api.onchange('tipo_calculo')
+    def _onchange_tipo_calculo(self):
+        if self.producto_id.use_cortes == True and (self.tipo_calculo == 'h' or self.tipo_calculo == 'hm'):
+            #raise ValidationError("Este producto no usa Hojas")
+            raise UserError("Este producto no usa Hojas")
+
 
     @api.onchange('cantidad', 'tipo_calculo', 'uom_id_de_consumo')
     def _onchange_descripcion(self):

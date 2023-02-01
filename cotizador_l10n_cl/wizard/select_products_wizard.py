@@ -155,7 +155,12 @@ class SelectProducts(models.TransientModel):
     def _compute_domain_adicionales_ids(self):
         for rec in self:
             if rec.producto_id:
-                rec.domain_adicionales_ids = rec.producto_id.adicional_ids
+                #rec.domain_adicionales_ids = rec.producto_id.adicional_ids
+                l = []
+                for lin in  rec.producto_id.adicional_ids:
+                    if lin.obligatorio == False:
+                        l.append(lin.id)
+                rec.domain_adicionales_ids = l
             else:
                 rec.domain_adicionales_ids = []
 
@@ -506,11 +511,6 @@ class SelectProducts(models.TransientModel):
 
 
     def _prepare_vals_generico(self, adicional):
-        #---- nombre -----
-        #adicional = 
-        #nombre = adicional.name
-        #if adicional.add_data:
-        #    nombre = nombre + '/' + line.data_text
         nombre = adicional.name
 
         #---- cantidad y costo ---
@@ -530,6 +530,12 @@ class SelectProducts(models.TransientModel):
             costo = cantidad * adicional.costo_unitario_consumo
         elif adicional.tipo_calculo == 'm+m':
             cantidad = adicional.cantidad * self.longitud_papel_con_merma
+            costo = cantidad * adicional.costo_unitario_consumo
+        elif adicional.tipo_calculo == 'h':
+            cantidad = adicional.cantidad * self.n_hojas
+            costo = cantidad * adicional.costo_unitario_consumo
+        elif adicional.tipo_calculo == 'hm':
+            cantidad = adicional.cantidad * self.n_hojas_con_merma
             costo = cantidad * adicional.costo_unitario_consumo
 
         vals = {
@@ -614,10 +620,9 @@ class SelectProducts(models.TransientModel):
                 'flag_adicional'    : False,
             }
             self.insumo_ids = [(0,0,vals)]
+
         #----------- Obligatorios --------------
         for lin in self.producto_id.adicional_ids:
-            _logger.info(' LISTA ')
-            _logger.info(lin.obligatorio)
             if lin.obligatorio == True:
                 vals = self._prepare_vals_generico(lin)
                 self.insumo_ids = [(0,0,vals)]

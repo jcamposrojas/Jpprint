@@ -107,10 +107,10 @@
 					    <tree editable="bottom">
                                                 <field name="add_data" invisible='1'/>
                                                 <field name="tipo_data" invisible='1'/>
-                                                <field name="adicional_id" domain="[('obligatorio','=',False)]"/>
 						<!--
-                                                <field name="adicional_id" domain="[('id','in',parent.domain_adicionales_ids)]"/>
+                                                <field name="adicional_id" domain="[('obligatorio','=',False)]"/>
 						-->
+                                                <field name="adicional_id" domain="[('id','in',parent.domain_adicionales_ids)]"/>
                                                 <field name="name" invisible='1'/>
                                                 <field name="texto"/>
 						<field name="data_text" attrs="{'required':[('add_data','=',True)], 'readonly':[('add_data','=',False)]}"/>
