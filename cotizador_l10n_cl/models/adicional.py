@@ -44,6 +44,16 @@ class CotizadorAdicional(models.Model):
                          string="Tipo consumo", default='m2', required=True,
                          help="Indica si el consumo es fijo, por metro o metro cuadrado")
     descripcion        = fields.Char(string='Descripción')
+    obligatorio        = fields.Boolean(string="Obligatorio", default=False,
+                         help="El item se agrega automaticamente al cálculo de la cotización")
+
+    @api.onchange('incluido_en_ldm')
+    def _onchange_incluido_en_ldm(self):
+        if self.incluido_en_ldm == True:
+            self.obligatorio = True
+        else:
+            self.obligatorio = False
+
 
     @api.onchange('product_product_id')
     def _onchange_product_id(self):

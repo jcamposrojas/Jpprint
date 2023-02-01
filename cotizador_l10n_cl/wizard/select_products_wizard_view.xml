@@ -38,6 +38,7 @@
                         <field name="use_tabla_troquel" invisible='1'/>
                         <field name="use_cortes" invisible='1'/>
                         <field name="use_cuatricomia" invisible='1'/>
+                        <field name="use_adhesivo" invisible='1'/>
 		        <field name="domain_adicionales_ids" invisible='1'/>
 		        <field name="domain_hoja_ids" invisible='1'/>
 			<field name="sustrato_id" />
@@ -72,7 +73,9 @@
                             <span><field name="uom_id" readonly="1" nolabel="1"/></span>
                         </div>
 
-			<field name="adhesivo_id" />
+			<field name="adhesivo_id" attrs="{'invisible':[('use_adhesivo','=',False)]}"/>
+			<field name="adhesivo_str" string="Adhesivo" attrs="{'invisible':[('use_adhesivo','=',True)]}" readonly="1"/>
+
 			<field name="currency_id" invisible='1'/>
                         <field name="use_tinta_blanca" invisible='1'/>
                         <!-- Cobertura tinta blanca Jetrion -->
@@ -104,7 +107,10 @@
 					    <tree editable="bottom">
                                                 <field name="add_data" invisible='1'/>
                                                 <field name="tipo_data" invisible='1'/>
+                                                <field name="adicional_id" domain="[('obligatorio','=',False)]"/>
+						<!--
                                                 <field name="adicional_id" domain="[('id','in',parent.domain_adicionales_ids)]"/>
+						-->
                                                 <field name="name" invisible='1'/>
                                                 <field name="texto"/>
 						<field name="data_text" attrs="{'required':[('add_data','=',True)], 'readonly':[('add_data','=',False)]}"/>

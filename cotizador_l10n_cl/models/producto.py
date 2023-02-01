@@ -46,6 +46,7 @@ class CotizadorProducto(models.Model):
     use_cinta_ttr         = fields.Boolean(string='Usa Cinta TTR', default=False)
     use_cuatricomia       = fields.Boolean(string='Usa Cuatricomia', default=False)
     use_aisa              = fields.Boolean(string='Usa AISA', default=False)
+    use_adhesivo          = fields.Boolean(string='Usa Adhesivo', default=True)
 
     corte_default = fields.Many2many('cotizador.cortes', string='Ancho por defecto')
 

@@ -23,7 +23,7 @@
 		                <field name='default_gap' string="Gap por defecto (mm)"/>
 			    </group>
 			    <group>
-		                <field name='use_cortes'/>
+		                <field name='use_cortes' widget="boolean_toggle"/>
 			        <field name="corte_default" attrs="{'invisible':[('use_cortes', '!=', True)]}" widget="many2many_tags" />
 			        <field name="hoja_ids" attrs="{'invisible':[('use_cortes', '=', True)]}" widget="many2many_tags" />
                                 <label for="SS" string="SS / SX / RF"/>
@@ -36,14 +36,15 @@
 			    <page string="Configuración Base">
 			        <group>
 			            <group>
-		                        <field name='use_bujes'/>
-		                        <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)"/>
-		                        <field name='use_tabla_troquel' string="Usa Tabla Troqueles"/>
-		                        <field name='use_cinta_ttr' string="Usa Cinta TTR"/>
-		                        <field name='use_cuatricomia' string="Usa Colores"/>
+		                        <field name='use_bujes' widget="boolean_toggle"/>
+		                        <field name='use_tinta_blanca' string="Usa Tinta Blanca (Jetrion)" widget="boolean_toggle"/>
+		                        <field name='use_tabla_troquel' string="Usa Tabla Troqueles" widget="boolean_toggle"/>
+		                        <field name='use_cinta_ttr' string="Usa Cinta TTR" widget="boolean_toggle"/>
+		                        <field name='use_cuatricomia' string="Usa Colores" widget="boolean_toggle"/>
                                     </group>
 			            <group>
-		                        <field name='use_aisa'/>
+		                        <field name='use_aisa' widget="boolean_toggle"/>
+		                        <field name='use_adhesivo' widget="boolean_toggle"/>
                                     </group>
                                 </group>
 			    </page>
@@ -57,12 +58,12 @@
 			            <field name="operation_ids" nolabel="1"/>
                                 </group>
 			    </page>
-			    <page string="Entradas Adicionales">
+			    <page string="Consumos">
 			        <group>
 				    <field name="adicional_ids" nolabel="1" />
                                 </group>
 			    </page>
-			    <page string="Consumos Obligatorios">
+			    <page string="Consumos Obligatorios (NO USAR)">
 			        <group>
 			            <field name="consumo_ids" nolabel="1"/>
                                 </group>

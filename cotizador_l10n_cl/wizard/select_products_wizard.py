@@ -30,11 +30,13 @@ class SelectProducts(models.TransientModel):
     use_cinta_ttr       = fields.Boolean(string='Usa Cinta TTR', related='producto_id.use_cinta_ttr')
     use_cuatricomia     = fields.Boolean(string='Usa Colores', related='producto_id.use_cuatricomia')
     use_cortes          = fields.Boolean(string='Usa Cortes de papel', related='producto_id.use_cortes')
+    use_adhesivo        = fields.Boolean(string='Usa Adhesivo', related='producto_id.use_adhesivo')
 
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
     codigo_producto = fields.Char(related='producto_id.codigo')
     adhesivo_id     = fields.Many2one(comodel_name="cotizador.adhesivo", string="Adhesivo", required=True)
+    adhesivo_str    = fields.Char(string="Adhesivo Str", default="NA")
     merma_estimada  = fields.Float(string="Merma sustrato (%)", compute="_compute_merma")
 
 
@@ -152,10 +154,6 @@ class SelectProducts(models.TransientModel):
     @api.depends('producto_id')
     def _compute_domain_adicionales_ids(self):
         for rec in self:
-            #rec.domain_adicionales_ids = []
-            #for elem in rec.producto_id.adicional_ids:
-            #    if elem not in self.lista_adicionales_ids:
-            #        rec.domain_adicionales_ids = [(0,0,elem)]
             if rec.producto_id:
                 rec.domain_adicionales_ids = rec.producto_id.adicional_ids
             else:
@@ -165,10 +163,6 @@ class SelectProducts(models.TransientModel):
                 rec.domain_hoja_ids = rec.producto_id.hoja_ids
             else:
                 rec.domain_hoja_ids = []
-
-            #rec.domain_adicionales_ids = rec.producto_id.adicional_ids - self.lista_adicionales_ids
-            #return {'domain':{'lista_adicionales_ids':[('adicional_id','in',self.producto_id.adicional_ids.ids)]}}
-        #return {'domain':{'lista_adicionales_ids':[('adicional_id','in',[1])]}}
 
     @api.constrains('salidas_x_rollo')
     def _check_salidas(self):
@@ -620,6 +614,13 @@ class SelectProducts(models.TransientModel):
                 'flag_adicional'    : False,
             }
             self.insumo_ids = [(0,0,vals)]
+        #----------- Obligatorios --------------
+        for lin in self.producto_id.adicional_ids:
+            _logger.info(' LISTA ')
+            _logger.info(lin.obligatorio)
+            if lin.obligatorio == True:
+                vals = self._prepare_vals_generico(lin)
+                self.insumo_ids = [(0,0,vals)]
 
 #        #--------- Hojas (Richo) ---------
 #        if self.use_cortes == False:

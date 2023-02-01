@@ -12,13 +12,12 @@ class ListaAdicionales(models.TransientModel):
 
     select_id          = fields.Many2one('select.products')
     adicional_id       = fields.Many2one('cotizador.adicional')
-
     name               = fields.Char('Nombre', related='adicional_id.name')
+    texto              = fields.Char('Texto', related='adicional_id.data')
     add_data           = fields.Boolean('Agrega campo dato?', related='adicional_id.add_data')
-
+    obligatorio        = fields.Boolean('Obligatorio', related='adicional_id.obligatorio')
 
     tipo_data          = fields.Selection([('t','Texto'),('s','Selección')])
-    texto              = fields.Char('Texto', related='adicional_id.data')
     data_text          = fields.Char('Valor')
     data_selection     = fields.Selection([], string='Selección')
 
