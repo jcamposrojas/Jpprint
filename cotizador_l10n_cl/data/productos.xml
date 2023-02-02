@@ -40,17 +40,19 @@
 	    <field name="category_id" ref="product.product_category_all" />
         </record>
         <record id="producto7" model="cotizador.producto">
-            <field name="name">ET. ADH. IMPRESA RICHO</field>
+            <field name="name">ET. IMPRESA RICHO</field>
             <field name="nombre_corto">RICHO</field>
             <field name="codigo">IMD</field>
 	    <field name="category_id" ref="product.product_category_all" />
         </record>
+	<!--
         <record id="producto8" model="cotizador.producto">
             <field name="name">ET. NO ADH IMPRESA PLANO RICHO</field>
             <field name="nombre_corto">PLANO RICHO</field>
             <field name="codigo">IMDP</field>
 	    <field name="category_id" ref="product.product_category_all" />
         </record>
+	-->
 
     </data>
 </odoo>

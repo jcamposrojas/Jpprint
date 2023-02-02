@@ -39,7 +39,10 @@
                         <field name="use_cortes" invisible='1'/>
                         <field name="use_cuatricomia" invisible='1'/>
                         <field name="use_adhesivo" invisible='1'/>
-		        <field name="domain_adicionales_ids" invisible='1'/>
+		        <field name="domain_lista_adicionales_ids" invisible='1'/>
+		        <field name="domain_adicional_ids" invisible='1'/>
+		        <field name="count_lista_adicionales_ids" invisible='1'/>
+		        <field name="count_adicional_ids" invisible='1'/>
 		        <field name="domain_hoja_ids" invisible='1'/>
 			<field name="sustrato_id" />
                         <field name="texto_adicional" placeholder="Texto Adicional"/>
@@ -95,39 +98,23 @@
 			<group>
 			<div class='row' style="padding-left:20px">
 			    <div class="col-6">
-			        <group string="BUJE" attrs="{'invisible':[('use_bujes','!=',True)]}">
-                                    <field name="buje_id" attrs="{'required':[('use_bujes','=',True)]}"/>
-                                    <field name="salidas_x_rollo" attrs="{'required':[('use_bujes','=',True)]}"/>
-                                    <field name="etiquetas_x_rollo" readonly='1'/>
+			        <group string="ADICIONALES" attrs="{'invisible':[('count_adicional_ids','=',0)]}">
+                                    <field name="adicional_ids" nolabel="1" domain="[('id','in',domain_adicional_ids)]" widget="many2many_tags"/>
 			        </group>
-			        <group string="ADICIONALES">
+			        <group string="VALORES ADICIONALES" attrs="{'invisible':[('count_lista_adicionales_ids','=',0)]}">
 				<div>
 				    <div class="row">
 				        <field name="lista_adicionales_ids" nolabel='1'>
 					    <tree editable="bottom">
                                                 <field name="add_data" invisible='1'/>
                                                 <field name="tipo_data" invisible='1'/>
-						<!--
-                                                <field name="adicional_id" domain="[('obligatorio','=',False)]"/>
-						-->
-                                                <field name="adicional_id" domain="[('id','in',parent.domain_adicionales_ids)]"/>
+                                                <field name="adicional_id" domain="[('id','in',parent.domain_lista_adicionales_ids)]"/>
                                                 <field name="name" invisible='1'/>
                                                 <field name="texto"/>
 						<field name="data_text" attrs="{'required':[('add_data','=',True)], 'readonly':[('add_data','=',False)]}"/>
-                            <!--<field name="data_text" attrs="{'invisible':[('tipo_data','!=','t')]}"/>-->
-                            <!--<field name="data_selection" attrs="{'invisible':[('tipo_data','!=','s')]}"/>-->
                                             </tree>
 	                                </field>
 			            </div>
-					<!--
-                                <field name="adicional_ids" nolabel='1' domain="[('producto_id','=',producto_id)]">
-				    <tree editable='bottom'>
-                                        <field name="add_data" invisible='1'/>
-                                        <field name="name" />
-					<field name="data" attrs="{'readonly':[('add_data','!=',True)]}"/>
-				    </tree>		
-				</field>
-					-->
 			        </div>
 			        </group>
 				<!--
@@ -139,6 +126,11 @@
 				-->
 		            </div>
 			    <div class="col-6">
+			        <group string="BUJE" attrs="{'invisible':[('use_bujes','!=',True)]}">
+                                    <field name="buje_id" attrs="{'required':[('use_bujes','=',True)]}"/>
+                                    <field name="salidas_x_rollo" attrs="{'required':[('use_bujes','=',True)]}"/>
+                                    <field name="etiquetas_x_rollo" readonly='1'/>
+			        </group>
 			        <group string="AISA" attrs="{'invisible':[('use_aisa','=',False)]}">
 				<div>
 			            <div class="row">

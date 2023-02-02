@@ -119,12 +119,16 @@ class SelectProducts(models.TransientModel):
     insumo_ids    = fields.One2many('cotizador.insumo', 'select_id', copy=True)
     #adicional_ids = fields.Many2many('cotizador.adicional', 'producto_id', string="Entradas Adicionales")
     adicional_ids = fields.Many2many('cotizador.adicional', string="Entradas Adicionales")
+    domain_adicional_ids = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
+    count_adicional_ids  = fields.Integer(string="Count adicionales", compute="_compute_domain_adicionales_ids")
+
     lista_adicionales_ids = fields.One2many('lista.adicionales', 'select_id')
+    domain_lista_adicionales_ids     = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
+    count_lista_adicionales_ids      = fields.Integer(string="Count lista adicionales", compute="_compute_domain_adicionales_ids")
 
     precio_total    = fields.Float(string='Precio Total', compute='_compute_price', store=True)
     precio_unitario = fields.Float(string='Precio Unitario', compute='_compute_price', store=True)
 
-    domain_adicionales_ids = fields.Many2many('cotizador.adicional', compute="_compute_domain_adicionales_ids")
     domain_hoja_ids        = fields.Many2many('producto_hojas', compute="_compute_domain_adicionales_ids")
 
 
@@ -155,14 +159,27 @@ class SelectProducts(models.TransientModel):
     def _compute_domain_adicionales_ids(self):
         for rec in self:
             if rec.producto_id:
-                #rec.domain_adicionales_ids = rec.producto_id.adicional_ids
-                l = []
-                for lin in  rec.producto_id.adicional_ids:
+                l           = []
+                lsolo       = []
+                count_l     = 0
+                count_lsolo = 0
+                for lin in rec.producto_id.adicional_ids:
                     if lin.obligatorio == False:
-                        l.append(lin.id)
-                rec.domain_adicionales_ids = l
+                        if lin.add_data == False:
+                            lsolo.append(lin.id)
+                            count_lsolo = count_lsolo + 1
+                        else:
+                            l.append(lin.id)
+                            count_l = count_l + 1
+                rec.domain_lista_adicionales_ids = l
+                rec.domain_adicional_ids         = lsolo
+                rec.count_lista_adicionales_ids  = count_l
+                rec.count_adicional_ids          = count_lsolo
             else:
-                rec.domain_adicionales_ids = []
+                rec.domain_lista_adicionales_ids = []
+                rec.domain_adicional_ids         = []
+                rec.count_lista_adicionales_ids  = 0
+                rec.count_adicional_ids          = 0
 
             if rec.use_cortes == False:
                 rec.domain_hoja_ids = rec.producto_id.hoja_ids
@@ -556,7 +573,7 @@ class SelectProducts(models.TransientModel):
     # Actualiza listado de materias primas
     @api.onchange('producto_id',
             'sustrato_id',
-#            'adicional_ids',
+            'adicional_ids',
             'lista_adicionales_ids',
             'largo_interno',
             'ancho_interno',
@@ -626,6 +643,11 @@ class SelectProducts(models.TransientModel):
             if lin.obligatorio == True:
                 vals = self._prepare_vals_generico(lin)
                 self.insumo_ids = [(0,0,vals)]
+
+        #----------- Opcionales (Adicionales) --------------
+        for lin in self.adicional_ids:
+            vals = self._prepare_vals_generico(lin)
+            self.insumo_ids = [(0,0,vals)]
 
 #        #--------- Hojas (Richo) ---------
 #        if self.use_cortes == False:
@@ -754,7 +776,7 @@ class SelectProducts(models.TransientModel):
             adicional = line.adicional_id
             vals = self._prepare_vals_generico(adicional)
             nombre = adicional.name
-            if adicional.add_data:
+            if adicional.add_data and line.data_text:
                 vals['name'] = nombre + '/' + line.data_text
 
             self.insumo_ids = [(0,0,vals)]
