@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
+    <data noupdate="1">
 
         <!-- Productos -->
         <!-- Producto 1 -->
@@ -217,7 +217,7 @@
 	    <field name="sustrato_id" ref="sustrato15"/>
         </record>
 
-        <!-- Producto 8 -->
+        <!-- Producto 8
         <record id="producto8_sustrato16" model="producto.sustrato">
 	    <field name="producto_id" ref="producto8"/>
 	    <field name="sustrato_id" ref="sustrato16"/>
@@ -226,6 +226,7 @@
 	    <field name="producto_id" ref="producto8"/>
 	    <field name="sustrato_id" ref="sustrato17"/>
         </record>
+        -->
 
     </data>
 </odoo>
