@@ -1006,21 +1006,6 @@ class SelectProducts(models.TransientModel):
 
             product.lista_parametros = json.dumps(list_parametros)
 
-#            if self.sustrato_id.product_product_id:
-#                vals = {
-#                    'bom_id': mrp.id,
-#                    'product_id': self.sustrato_id.product_product_id.id,
-#                    'product_qty': 0,
-#                }
-#                mrp.bom_line_ids = [(0,0,vals)]
-#            for adicional in self.posible_adicionales:
-#                values = {
-#                    'bom_id': mrp.id,
-#                    'product_id': adicional.product_product_id.id,
-#                    'product_qty': 0,
-#                }
-#                mrp.bom_line_ids = [(0,0,values)]
-
 
             values = {
                 #"product_id": 21, #ID

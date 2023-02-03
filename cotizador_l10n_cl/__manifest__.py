@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.36',
+    'version': '15.0.1.37',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """

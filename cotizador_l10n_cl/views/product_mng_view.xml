@@ -119,6 +119,7 @@
 					    <field name="gap" string="Gap >= 3"/>
                                             <field name="etiquetas_al_desarrollo"/>
                                             <field name="tipo_troquel"/>
+                                            <field name="descripcion"/>
                                         </tree>
 				    </field>
                                 </group>

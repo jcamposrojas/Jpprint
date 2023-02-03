@@ -7,12 +7,13 @@
 	    <field name="model">tabla_troquel</field>
 	    <field name="arch" type="xml">
                 <tree editable="bottom">
-			<field name="largo"/>
-                        <field name="ancho"/>
-                        <field name="etiquetas_al_ancho"/>
-                        <field name="gap"/>
-                        <field name="z"/>
-                        <field name="tipo_troquel"/>
+		    <field name="largo"/>
+                    <field name="ancho"/>
+                    <field name="etiquetas_al_ancho"/>
+                    <field name="gap"/>
+                    <field name="z"/>
+                    <field name="tipo_troquel"/>
+                    <field name="descripcion"/>
 		</tree>
 	    </field>
 	</record>

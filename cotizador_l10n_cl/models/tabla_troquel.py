@@ -14,13 +14,16 @@ TIPO_TROQUEL = [
         ('m','MACISO'),
         ('l','LAMINA'),
         ('s','LASER'),
+        ('g','MAGNETICO'),
         ]
 
 class TablaTroquel(models.Model):
     _name = 'tabla_troquel'
+    _rec_name = 'name'
 
     producto_id        = fields.Many2one('cotizador.producto', 'Producto', required=True)
-    name               = fields.Char(string='Nombre', compute='_compute_name')
+    name               = fields.Char(string='Nombre', compute='_compute_name', store=True)
+    descripcion        = fields.Char(string='Descripción')
 
     #------- Campos largo ancho ---------
     # En UoM original
@@ -47,7 +50,7 @@ class TablaTroquel(models.Model):
     @api.depends('largo', 'ancho')
     def _compute_name(self):
         for rec in self:
-            rec.name = "%3s X %3s" % (rec.largo,rec.ancho)
+            rec.name = "%3s X %3s (Z=%s,S=%s)" % (rec.largo,rec.ancho,rec.z,rec.etiquetas_al_ancho)
 
     @api.depends('z', 'largo')
     def _compute_gap(self):
@@ -69,4 +72,12 @@ class TablaTroquel(models.Model):
             else:
                 rec.gap = 0
 
-
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        recs = self.search([('name', operator, name)] + args, limit=limit)
+        if not recs.ids:
+            return super(TablaTroquel, self).name_search(name=name, args=args,
+                                                   operator=operator,
+                                                   limit=limit)
+        return recs.name_get()
