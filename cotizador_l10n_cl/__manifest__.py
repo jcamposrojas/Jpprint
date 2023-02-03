@@ -38,6 +38,7 @@
         'views/ttr.xml',
         'views/adicional.xml',
         'views/generico.xml',
+        'views/tabla_troquel.xml',
         'data/ir_sequence_data.xml',
         'data/sustratos.xml',
         'data/productos.xml',
