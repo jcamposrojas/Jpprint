@@ -36,68 +36,55 @@ class TablaTroquel(models.Model):
     etiquetas_al_ancho      = fields.Integer(string='Etiquetas al Ancho')
     gap                     = fields.Float(string='Gap', compute='_compute_gap', digits=(10, 3))
     gap_minimo              = fields.Float(string='Gap Mímino', default=1.0)
-    etiquetas_al_desarrollo = fields.Integer(string='Etiquetas al Desarrollo', compute='_compute_et_al_desarrollo')
+    etiquetas_al_desarrollo = fields.Integer(string='Etiquetas al Desarrollo', compute='_compute_gap')
 
-    @api.depends('gap')
-    def _compute_et_al_desarrollo(self):
-        for rec in self:
-            if rec.gap > 0:
-                perimetro = round(rec.z * 3.175,3)
-                l = round(perimetro / (rec.largo + rec.gap),0)
-                rec.etiquetas_al_desarrollo = l
-            else:
-                rec.etiquetas_al_desarrollo = 0
+#    @api.depends('gap')
+#    def _compute_et_al_desarrollo(self):
+#        for rec in self:
+#            if rec.gap > 0:
+#                perimetro = round(rec.z * 3.175,3)
+#                l = round(perimetro / (rec.largo + rec.gap),0)
+#                rec.etiquetas_al_desarrollo = l
+#            else:
+#                rec.etiquetas_al_desarrollo = 0
 
     @api.depends('largo', 'ancho')
     def _compute_name(self):
         for rec in self:
             rec.name = "%3s X %3s (Z=%s,S=%s)" % (rec.largo,rec.ancho,rec.z,rec.etiquetas_al_ancho)
 
-    @api.depends('z', 'largo')
-    def _compute_gap(self):
-        for rec in self:
-            if rec.z > 0 and rec.largo > 0:
-                i = 1
-                c_calc = 0
-                c_calc_ant = 0
-                # Muy importante el redondeo!!!
-                perimetro = round(rec.z * 3.175,3)
-                while True:
-                    c_calc_ant = c_calc
-                    c_calc = perimetro / i  - rec.largo
-
-                    if c_calc <= rec.gap_minimo:
-                        break
-                    i = i + 1
-                rec.gap = perimetro / (i-1) - rec.largo
-            else:
-                rec.gap = 0
-
-#    @api.depends('z', 'largo')
+#    @api.depends('z', 'largo', 'gap_minimo')
 #    def _compute_gap(self):
 #        for rec in self:
 #            if rec.z > 0 and rec.largo > 0:
-#                rec.gap_minimo = 1
+#                i = 1
+#                c_calc = 0
+#                c_calc_ant = 0
+#                # Muy importante el redondeo!!!
 #                perimetro = round(rec.z * 3.175,3)
-#                c_calc = perimetro / rec.largo
-#                if c_calc < 1:
-#                    raise UserError("Etiqueta no aplica para este Z")
-#                n = perimetro // rec.largo
+#                while True:
+#                    c_calc_ant = c_calc
+#                    c_calc = perimetro / i  - rec.largo
 #
-#                diff = perimetro - (n * rec.largo)
-#
-#                _logger.info("diff %s"%(diff))
-#                _logger.info("n %s"%(n))
-#                _logger.info("rec.gap_minimo  %s"%(rec.gap_minimo))
-#                if diff / n >= rec.gap_minimo:
-#                    rec.gap = diff / n 
-#                else:
-#                    n = n  - 1
-#                    if n < 1:
-#                        raise UserError("No cumple con Gap mínimo %s"%(rec.gap_minimo))
-#                    rec.gap = diff / n 
+#                    if c_calc < rec.gap_minimo:
+#                        break
+#                    i = i + 1
+#                rec.gap = perimetro / (i-1) - rec.largo
 #            else:
 #                rec.gap = 0
+
+    @api.depends('z', 'largo', 'gap_minimo')
+    def _compute_gap(self):
+        for rec in self:
+            if rec.z > 0 and rec.largo > 0:
+                # Muy importante el redondeo!!!
+                perimetro = round(rec.z * 3.175,3)
+                c_calc = perimetro / (rec.gap_minimo + rec.largo)
+                rec.etiquetas_al_desarrollo = floor(c_calc)
+                rec.gap = perimetro / rec.etiquetas_al_desarrollo - rec.largo
+            else:
+                rec.gap = 0
+                rec.etiquetas_al_desarrollo = 0
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):

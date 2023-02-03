@@ -116,7 +116,8 @@
                                             <field name="ancho"/>
                                             <field name="z"/>
                                             <field name="etiquetas_al_ancho"/>
-					    <field name="gap" string="Gap >= 3"/>
+					    <field name="gap_minimo"/>
+					    <field name="gap" string="Gap calculado"/>
                                             <field name="etiquetas_al_desarrollo"/>
                                             <field name="tipo_troquel"/>
                                             <field name="descripcion"/>
