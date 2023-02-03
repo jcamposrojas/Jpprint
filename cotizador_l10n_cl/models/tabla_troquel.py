@@ -35,7 +35,7 @@ class TablaTroquel(models.Model):
     tipo_troquel = fields.Selection(TIPO_TROQUEL,string='tipo_troquel')
     etiquetas_al_ancho      = fields.Integer(string='Etiquetas al Ancho')
     gap                     = fields.Float(string='Gap', compute='_compute_gap', digits=(10, 3))
-    gap_minimo              = fields.Float(string='Gap Mímino', default=0.0)
+    gap_minimo              = fields.Float(string='Gap Mímino', default=1.0)
     etiquetas_al_desarrollo = fields.Integer(string='Etiquetas al Desarrollo', compute='_compute_et_al_desarrollo')
 
     @api.depends('gap')
@@ -47,7 +47,6 @@ class TablaTroquel(models.Model):
                 rec.etiquetas_al_desarrollo = l
             else:
                 rec.etiquetas_al_desarrollo = 0
-
 
     @api.depends('largo', 'ancho')
     def _compute_name(self):
@@ -74,27 +73,31 @@ class TablaTroquel(models.Model):
             else:
                 rec.gap = 0
 
-    @api.depends('z', 'largo')
-    def _compute_gap(self):
-        for rec in self:
-            if rec.z > 0 and rec.largo > 0:
-                perimetro = round(rec.z * 3.175,3)
-                c_calc = perimetro / rec.largo
-                if c_calc < 1:
-                    raise UserError("Etiqueta no aplica para este Z")
-                n = perimetro // rec.largo
-
-                diff = perimetro - (n * rec.largo)
-
-                if diff / n >= rec.gap_minimo:
-                    rec.gap = diff / n 
-                else:
-                    n = n  - 1
-                    if n < 1:
-                        raise UserError("No cumple con Gap mínimo %s"%(rec.gap_minimo))
-                    rec.gap = diff / n 
-            else:
-                rec.gap = 0
+#    @api.depends('z', 'largo')
+#    def _compute_gap(self):
+#        for rec in self:
+#            if rec.z > 0 and rec.largo > 0:
+#                rec.gap_minimo = 1
+#                perimetro = round(rec.z * 3.175,3)
+#                c_calc = perimetro / rec.largo
+#                if c_calc < 1:
+#                    raise UserError("Etiqueta no aplica para este Z")
+#                n = perimetro // rec.largo
+#
+#                diff = perimetro - (n * rec.largo)
+#
+#                _logger.info("diff %s"%(diff))
+#                _logger.info("n %s"%(n))
+#                _logger.info("rec.gap_minimo  %s"%(rec.gap_minimo))
+#                if diff / n >= rec.gap_minimo:
+#                    rec.gap = diff / n 
+#                else:
+#                    n = n  - 1
+#                    if n < 1:
+#                        raise UserError("No cumple con Gap mínimo %s"%(rec.gap_minimo))
+#                    rec.gap = diff / n 
+#            else:
+#                rec.gap = 0
 
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
