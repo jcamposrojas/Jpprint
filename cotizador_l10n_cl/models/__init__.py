@@ -1,4 +1,5 @@
 from . import product_template
+from . import product_product
 from . import adhesivo
 #from . import cilindro
 from . import mrp_routing
@@ -20,3 +21,6 @@ from . import hojas
 from . import tblanca
 from . import tabla_troquel
 from . import generico
+#from . import m2
+from . import tarifa
+from . import product_pricelist

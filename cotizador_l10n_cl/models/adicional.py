@@ -34,7 +34,8 @@ class CotizadorAdicional(models.Model):
     standard_price   = fields.Float(string='Costo Producto')
     cantidad         = fields.Float(string="Cantidad", default=1.0)
     costo_unitario_consumo = fields.Float(string='Costo unitario consumo')
-    incluido_en_ldm  = fields.Boolean(string="En LdM?", default=False)
+    incluido_en_ldm        = fields.Boolean(string="En LdM?", default=False)
+    merma                  = fields.Float(string="Merma (%)", default=0.0)
 
     # Adicionales
     product_product_id = fields.Many2one('product.product', string="Producto/Insumo")
@@ -46,7 +47,7 @@ class CotizadorAdicional(models.Model):
     tipo_calculo       = fields.Selection(TIPOS_CALCULO,
                          string="Tipo consumo", default='m2', required=True,
                          help="Indica si el consumo es fijo, por metro o metro cuadrado")
-    descripcion        = fields.Char(string='Descripción')
+    descripcion        = fields.Char(string='Descripción', compute='_compute_descripcion')
     obligatorio        = fields.Boolean(string="Obligatorio", default=False,
                          help="El item se agrega automaticamente al cálculo de la cotización")
 
@@ -98,8 +99,10 @@ class CotizadorAdicional(models.Model):
             raise UserError("Este producto no usa Hojas")
 
 
-    @api.onchange('cantidad', 'tipo_calculo', 'uom_id_de_consumo')
-    def _onchange_descripcion(self):
+    #@api.onchange('cantidad', 'tipo_calculo', 'uom_id_de_consumo')
+    @api.depends('cantidad', 'tipo_calculo', 'uom_id_de_consumo')
+    def _compute_descripcion(self):
+#    def _onchange_descripcion(self):
         if self.cantidad and self.tipo_calculo and self.uom_id_de_consumo:
             self.descripcion = str(self.cantidad) + ' ' + str(self.uom_id_de_consumo.name) + ' ' + dict(self._fields['tipo_calculo'].selection)[self.tipo_calculo]
         else:

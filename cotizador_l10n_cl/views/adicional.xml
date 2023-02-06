@@ -23,11 +23,12 @@
 			        <field name="uom_id_de_consumo"/>
 				<field name="costo_unitario_consumo" attrs="{'readonly':[('product_product_id','=',True)]}"/>
 			        <field name="incluido_en_ldm" attrs="{'invisible':[('product_product_id','=',False)]}" widget="boolean_toggle"/>
-			        <field name="add_data" />
+				<field name="add_data" attrs="{'invisible':['|',('incluido_en_ldm','=',True),('obligatorio','=',True)]}"/>
 			        <field name="tipo_data" attrs="{'invisible':[('add_data','=',False)]}"/>
 				<field name="data" attrs="{'invisible':[('add_data','=',False)]}"/>
 			        <field name="tipo_calculo" />
 			        <field name="cantidad" />
+			        <field name="merma" string="Merma adicional (%)"/>
 			    </group>
 			    <group>
 			        <field name="obligatorio" widget="boolean_toggle"/>
@@ -50,6 +51,7 @@
                     <field name="cantidad"/>
                     <field name="uom_id_de_consumo"/>
                     <field name="tipo_calculo"/>
+                    <field name="merma"/>
                     <field name="incluido_en_ldm"/>
                     <field name="obligatorio"/>
                 </tree>

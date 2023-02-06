@@ -137,6 +137,9 @@ class CotizadorProducto(models.Model):
     color4        = fields.Many2one('producto_generico', string='Color 4',
                     context="{'producto_id':id}", domain="[('producto_id','=',id)]")
 
+   # m2_ids = fields.One2many('tabla_m2', 'producto_id', string='Metros Cuadrados')
+    tarifa_ids = fields.One2many('tarifa', 'producto_id', string='Tarifa')
+
     #Cliches
     def _domain_category_id_cliche(self):
         domain = "[('category_id','=',%s)]" % (self.env.ref('uom.uom_categ_surface').id)

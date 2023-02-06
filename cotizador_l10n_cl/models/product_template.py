@@ -30,3 +30,14 @@ class ProductTemplate(models.Model):
     ancho_uom_id = fields.Many2one('uom.uom', string='Unidad de Medida Ancho',
                          default=_get_default_largo_ancho_uom_id)
 
+    #tarifa
+    def price_compute(self, price_type, uom=False, currency=False, company=False):
+        """Return dummy not falsy prices when computation is done from supplier
+        info for avoiding error on super method. We will later fill these with
+        correct values.
+        """
+        if price_type == "cotizador":
+            return dict.fromkeys(self.ids, 1.0)
+        return super().price_compute(
+            price_type, uom=uom, currency=currency, company=company
+        )

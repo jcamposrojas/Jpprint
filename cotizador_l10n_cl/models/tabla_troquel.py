@@ -42,7 +42,7 @@ class TablaTroquel(models.Model):
     @api.depends('largo', 'ancho','z','etiquetas_al_ancho')
     def _compute_name(self):
         for rec in self:
-            rec.name = "%3s X %3s (Z=%s,S=%s)" % (rec.largo,rec.ancho,rec.z,rec.etiquetas_al_ancho)
+            rec.name = "%s X %s (Z=%s,S=%s)" % (rec.largo,rec.ancho,rec.z,rec.etiquetas_al_ancho)
 
     @api.depends('z', 'largo', 'gap_minimo')
     def _compute_gap(self):

@@ -52,7 +52,7 @@
 		    <th style="text-align:right;padding-right:5px;padding-left:5px"><strong>Monto</strong></th>
 		    <th style="text-align:right;padding-right:5px;padding-left:5px"><strong>Merma</strong></th>
 		    <th style="text-align:right;white-space: nowrap;padding-right:5px;padding-left:5px"><strong>En LdM</strong></th>
-		    <th style="text-align:right;padding-right:5px;padding-left:5px"><strong>Adicional</strong></th>
+			    <!--<th style="text-align:right;padding-right:5px;padding-left:5px"><strong>Adicional</strong></th>-->
 	    </tr>
             <t t-foreach="lines" t-as="line">
                 <tr>
@@ -79,6 +79,7 @@
 			    <span>NO</span>
 		        </t>
                     </td>
+		    <!-- 
                     <td style="text-align:right;">
 			<t t-if="line.flag_adicional">
 			    <span>SI</span>
@@ -87,6 +88,7 @@
 			    <span>NO</span>
 		        </t>
                     </td>
+		    -->
                 </tr>
             </t>
             </table>

@@ -35,7 +35,7 @@ class SelectProducts(models.TransientModel):
     producto_id     = fields.Many2one(comodel_name="cotizador.producto", string="Producto", required=True)
     sustrato_id     = fields.Many2one(comodel_name="cotizador.sustrato", string="Sustrato", required=True)
     codigo_producto = fields.Char(related='producto_id.codigo')
-    adhesivo_id     = fields.Many2one(comodel_name="cotizador.adhesivo", string="Adhesivo", required=True)
+    adhesivo_id     = fields.Many2one(comodel_name="cotizador.adhesivo", string="Adhesivo")
     adhesivo_str    = fields.Char(string="Adhesivo Str", default="NA")
     merma_estimada  = fields.Float(string="Merma sustrato (%)", compute="_compute_merma")
 
@@ -227,9 +227,6 @@ class SelectProducts(models.TransientModel):
             if value == cil.z:
                 return cil.z, cil.unidades, cil.name
             if value > cil.z:
-                #if valor_propuesto == 0.0:
-                #    return valor_propuesto, cilindros, name
-                    #return cil.z, cil.unidades, cil.name
                 return valor_propuesto, cilindros, name
             valor_propuesto = cil.z
             cilindros       = cil.unidades
@@ -257,7 +254,7 @@ class SelectProducts(models.TransientModel):
         if self.ancho > 0:
             nombre += "X" + str(self.ancho) + self.uom_id.name
 
-        if self.adhesivo_id:
+        if self.use_adhesivo == True and self.adhesivo_id:
             nombre += " " + self.adhesivo_id.name
 
         if self.texto_adicional:
@@ -416,18 +413,8 @@ class SelectProducts(models.TransientModel):
                     self.longitud_papel     = tot_largo_2
                     self.area_ocupada       = tot_area_out_2 / 1000000.0
 
-                #n14 = self.ancho_papel
-                #o14 = round(n14 / self.largo_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo largo
-                #p14 = round(n14 / self.ancho_interno - 0.5,0) # Nro etiquetas (enteras) puestas a lo ancho
-                #f15 = self.ancho_interno if o14 > p14 else self.largo_interno # Avance
-                #q14 = max(o14,p14) # Etiquetas al ancho
-
-                #self.etiquetas_al_ancho = q14
-                #self.longitud_papel = (self.cantidad * f15) / q14
                 self.longitud_papel_con_merma = round(self.longitud_papel * (1 + (self.merma_estimada / 100.0)), 3)
 
-                #f15 = f15 / 1000.0
-                #self.area_ocupada = round((self.cantidad / q14) * f15 * (self.ancho_papel / 1000.0), 3)
                 self.area_ocupada_con_merma = round(self.area_ocupada * (1 + (self.merma_estimada / 100.0)), 3)
             else:
                 #self.etiquetas_al_ancho = 0
@@ -559,11 +546,11 @@ class SelectProducts(models.TransientModel):
             #'producto_id': 0,
             'cost_currency_id': adicional.cost_currency_id.id,
             'name'            : nombre,
-            'cantidad'        : cantidad,
+            'cantidad'        : cantidad * (1 + adicional.merma / 100.0),
             'costo_unitario'  : adicional.costo_unitario_consumo,
-            'costo_consumo'   : costo,
+            'costo_consumo'   : costo * (1 + adicional.merma / 100.0),
             'uom_id'          : adicional.uom_id_de_consumo.id,
-            #'merma': 0.0, # por definir
+            'merma'           : adicional.merma,
             'incluido_en_ldm' : adicional.incluido_en_ldm,
             'flag_adicional'  : False,
         }
@@ -652,7 +639,7 @@ class SelectProducts(models.TransientModel):
 #        #--------- Hojas (Richo) ---------
 #        if self.use_cortes == False:
 
-        # Consumos obligatorios
+        # Consumos obligatorios (NO SE USA)
         for line in self.producto_id.consumo_ids:
             vals = {
                 'select_id': 0,
@@ -976,6 +963,7 @@ class SelectProducts(models.TransientModel):
             list_parametros['data']['longitud_papel']    = self.longitud_papel
             list_parametros['data']['area_ocupada']      = self.area_ocupada
             list_parametros['data']['area_ocupada_con_merma'] = self.area_ocupada_con_merma
+
             if self.aisa_id:
                 list_parametros['data']['aisa'] = self.aisa_id.name.replace('.png','').upper()
             else:
@@ -1006,7 +994,6 @@ class SelectProducts(models.TransientModel):
 
             product.lista_parametros = json.dumps(list_parametros)
 
-
             values = {
                 #"product_id": 21, #ID
                 #"product_id": self.sustrato_id.product_id.id, #ID
@@ -1024,7 +1011,8 @@ class SelectProducts(models.TransientModel):
                     'bom_id': mrp.id, #ID
                     #Agregar resto de campos de mrp.routing.workcenter.tmp
                     'worksheet_type': 'text',
-                    'note': product.lista_parametros,
+                    #JCR prueba de formato
+                    'note': self._get_html_parametros(list_parametros),#product.lista_parametros,
                 }
                 mrp.operation_ids = [(0,0,values)]
 
@@ -1077,18 +1065,18 @@ class SelectProducts(models.TransientModel):
         else:
             return False
 
-    def genera_descripcion(self):
-        texto = ""
-        if self.buje_id:
-            texto =  "BUJE: " + self.buje_id.name +"<br>"
-        if self.aisa_id:
-            texto += "AISA: " + self.aisa_id.name +"<br>"
-        if self.adhesivo_id:
-            texto += "ADHESIVO: " + self.adhesivo_id.name +"<br>"
-        if self.datos_adicionales:
-            texto += "DATOS ADICIONALES:<br>" + self.datos_adicionales +"<br>"
-
-        return texto
+#    def genera_descripcion(self):
+#        texto = ""
+#        if self.buje_id:
+#            texto =  "BUJE: " + self.buje_id.name +"<br>"
+#        if self.aisa_id:
+#            texto += "AISA: " + self.aisa_id.name +"<br>"
+#        if self.adhesivo_id:
+#            texto += "ADHESIVO: " + self.adhesivo_id.name +"<br>"
+#        if self.datos_adicionales:
+#            texto += "DATOS ADICIONALES:<br>" + self.datos_adicionales +"<br>"
+#
+#        return texto
 
 
     def _area_negocio(self):
@@ -1112,3 +1100,27 @@ class SelectProducts(models.TransientModel):
         elif self.producto_id.id == self.env.ref('cotizador_l10n_cl.producto8').id:
             return '8'
 
+
+    def _get_html_parametros(self, parametros):
+        data = parametros['data']
+
+        html = "<table>"
+        html = html + "<tr><td><strong>Largo</strong></td><td>" + str(data['largo']) + "</td></tr>"
+        html = html + "<tr><td><strong>Ancho</strong></td><td>" + str(data['ancho']) + "</td></tr>"
+        html = html + "<tr><td><strong>Comentarios</strong></td><td><textarea rows='4' cols='50' readonly>" + str(data['datos_adicionales']) + "</textarea></td></tr>"
+        if data['aisa']:
+            html = html + "<tr><td><strong>AISA</strong></td><td>" + data['aisa'] + "</td></tr>"
+        html = html + "</table>"
+
+        html = html + "<table>"
+        html = html + "<tr><td><strong>Producto</strong></td><td><strong>Cantidad</strong></td><td><strong>UdM</strong></td></tr>"
+        for item in parametros['content']:
+            html = html + "<tr>"
+            html = html + "<td>" + item['producto'] + "</td>"
+            html = html + "<td>" + str(item['cantidad']) + "</td>"
+            html = html + "<td>" + item['uom'] + "</td>"
+            html = html + "</tr>"
+        html = html + "</table>"
+
+
+        return html

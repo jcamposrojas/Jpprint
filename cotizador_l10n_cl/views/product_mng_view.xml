@@ -63,7 +63,7 @@
 				    <field name="adicional_ids" nolabel="1" />
                                 </group>
 			    </page>
-			    <page string="Consumos Obligatorios (NO USAR)">
+			    <page string="Consumos Obligatorios (NO USAR)" invisible="1">
 			        <group>
 			            <field name="consumo_ids" nolabel="1"/>
                                 </group>
@@ -148,6 +148,18 @@
 			            <group>
                                         <field name="barniz" domain="[('producto_id','=',id)]"/>
 				    </group>
+				</group>
+			    </page>
+			    <page string="Tarifa">
+			        <group>
+				    <field name="tarifa_ids" nolabel="1">
+				        <tree editable="bottom"> 
+					    <field name="m2"/>
+					    <field name="sustrato_id" domain="[('producto_id','=',parent.id)]"/>
+					    <field name="porcentaje"/>
+					</tree> 
+				    </field>
+
 				</group>
 			    </page>
 		        </notebook>
