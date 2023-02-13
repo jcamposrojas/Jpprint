@@ -16,7 +16,7 @@ class Tarifa(models.Model):
     _name = 'tarifa'
 
     producto_id = fields.Many2one('cotizador.producto', string="Sustrato", required=True)
-    sustrato_id = fields.Many2one('producto.sustrato', string='Sustrato')
+    sustrato_id = fields.Many2one('cotizador.sustrato', string='Sustrato')
     m2          = fields.Integer(string='Metro Cuadrado')
     porcentaje  = fields.Integer(string='Porcentaje')
 
@@ -35,7 +35,7 @@ class Tarifa(models.Model):
 
     @api.model
     def get_porcentaje(self,sustrato_id,m2):
-        registro = self.env['tarifa'].search([('producto_id','=',self.producto_id.id),('sustrato_id','=',sustrato_id.id)])
+        registro = self.env['tarifa'].search([('producto_id','=',self.producto_id.id),('sustrato_id','=',sustrato_id.id)], order='m2 asc')
         _logger.info(' GETPORCENTAJE ')
         for rec in registro:
             _logger.info(rec.m2)

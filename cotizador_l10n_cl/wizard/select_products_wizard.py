@@ -904,6 +904,12 @@ class SelectProducts(models.TransientModel):
         product = self.create_product()
         if product:
             product.product_tmpl_id.gen_cotizador = True
+            # Campos necesario para calcular precio (tarifa)
+            product.product_tmpl_id.producto_id   = self.producto_id
+            product.product_tmpl_id.sustrato_id   = self.sustrato_id
+            product.product_tmpl_id.area_ocupada_con_merma = self.area_ocupada_con_merma
+            product.product_tmpl_id.list_price = product.product_tmpl_id._get_tarifa_pricelist_price()
+            product.list_price = product.product_tmpl_id.list_price
 
             ############### FABRICACION ###################
             #------- Rutas de producto (MTO y Fabricar) --------
@@ -1057,7 +1063,7 @@ class SelectProducts(models.TransientModel):
                 #"description": self.datos_adicionales,
                 "categ_id"       : self.producto_id.category_id.id,
                 "standard_price" : self.precio_unitario,
-                "list_price"     : self.precio_unitario,
+                #"list_price"     : self.precio_unitario,
                 "uom_id"         : self.product_uom_id.id,
             }
             product = self.env["product.product"].create(vals)

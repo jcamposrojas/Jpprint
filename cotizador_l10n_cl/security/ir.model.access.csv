@@ -18,3 +18,4 @@ access_tinta_blanca_lines,access_tinta_blanca_lines,model_tinta_blanca_lines,bas
 access_tabla_troquel,access_tabla_troquel,model_tabla_troquel,base.group_user,1,1,1,1
 access_producto_generico,access_producto_generico,model_producto_generico,base.group_user,1,1,1,1
 access_tarifa,access_tarifa,model_tarifa,base.group_user,1,1,1,1
+access_import_tarifa,access_import_tarifa,model_import_tarifa,base.group_user,1,1,1,1

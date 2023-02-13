@@ -21,14 +21,15 @@ class ProductPricelist(models.Model):
         context = self.env.context
         for product, qty, _partner in products_qty_partner:
             rule = rule_obj.browse(result[product.id][1])
-            if rule.compute_price == "formula" and rule.base == "cotizador":
+            if rule.compute_price == "formula" and rule.base == "cotizador" and product.gen_cotizador == 1:
                 result[product.id] = (
                     #product.sudo()._get_supplierinfo_pricelist_price(
                     #    rule,
                     #    date=date or context.get("date", fields.Date.today()),
                     #    quantity=qty,
                     #),
-                    1000,
+                    product.sudo()._get_tarifa_pricelist_price(),
+                    #1000,
                     rule.id,
                 )
         return result

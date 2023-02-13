@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="wizard_import_tarifa" model="ir.ui.view">
+	    <field name="name">wizard.import.tarifa</field>
+	    <field name="model">import.tarifa</field>
+	    <field name="arch" type="xml">
+		<form string="Importar Tarifa" >
+                    <group>
+                        <field string="Archivo .csv" name="archivo" filename="name"/>
+                    </group>	
+
+		    <footer>
+			<button string="Importar" name="import_file" type="object" class="oe_highlight" />
+			<button string="Cancelar" class="oe_link" special="cancel" />
+		    </footer>
+	        </form>
+            </field>
+        </record>
+
+        <record id="action_import_tarifa" model="ir.actions.act_window">
+		<field name="name">Importar Tarifa</field>
+		<field name="res_model">import.tarifa</field>
+		<field name="view_mode">form</field>
+		<field name="view_id" ref="wizard_import_tarifa" />
+		<field name="target">new</field>
+        </record>
+
+	</data>
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates xml:space="preserve">
+
+    <t t-name="ShowTarifaWidget" >
+            <table style="width:100%;">
+            <tr>
+		    <th style="text-align:left;padding-right:5px;padding-left:5px"><strong>M2</strong></th>
+		    <th style="text-align:right;padding-right:5px;padding-left:5px"><strong>Cantidad</strong></th>
+		    <th style="text-align:right;padding-right:5px;padding-left:5px"><strong>UdM</strong></th>
+	    </tr>
+            <t t-foreach="data" t-as="line">
+                <tr>
+                    <td style="text-align:left;white-space: nowrap;padding-right:5px;padding-left:5px">
+                        <t t-esc="line.m2"/>
+                    </td>
+                    <td style="text-align:right;padding-right:5px;padding-left:5px">
+			<t t-esc="line.sustrato_id"/>
+                    </td>
+                    <td style="text-align:right;padding-right:5px;padding-left:5px">
+			    <t t-esc="line.porcentaje"/>
+                    </td>
+                </tr>
+            </t>
+            </table>
+    </t>
+
+</templates>
+

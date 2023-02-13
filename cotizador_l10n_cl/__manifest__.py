@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Cotizador de Productos',
-    'version': '15.0.1.41',
+    'version': '15.0.1.42',
     'category': 'Sales',
     'summary': 'Cotizador de Productos',
     'description': """
@@ -18,6 +18,7 @@
         'account_so_l10n_cl'],
     'data': [
         'wizard/select_products_wizard_view.xml',
+        'wizard/wizard_import_tarifa.xml',
 #        'wizard/lista_adicionales.xml',
         'views/menu_root.xml',
         'views/product_mng_view.xml',
@@ -55,12 +56,12 @@
         'static/description/so_po_multi_product_banner.png',
     ],
 
-
     'assets': {
         'web.assets_backend': [
             'cotizador_l10n_cl/static/src/css/tinta.css',
             'cotizador_l10n_cl/static/src/js/radio_image_aisa.js',
             'cotizador_l10n_cl/static/src/js/widget_parametros.js',
+            'cotizador_l10n_cl/static/src/js/widget_tarifa.js',
         ],
         'web.assets_qweb': [
             'cotizador_l10n_cl/static/src/xml/**/*',

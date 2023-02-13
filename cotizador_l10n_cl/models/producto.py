@@ -139,6 +139,20 @@ class CotizadorProducto(models.Model):
 
    # m2_ids = fields.One2many('tabla_m2', 'producto_id', string='Metros Cuadrados')
     tarifa_ids = fields.One2many('tarifa', 'producto_id', string='Tarifa')
+#    tarifa_txt_ids = fields.Text(string='Tarifas', compute="_compute_tarifa_text")
+
+#    @api.depends('tarifa_ids')
+#    def _compute_tarifa_text(self):
+#        txt = ""
+#        m2 = 0
+#        list_parametros = {'content':[]}
+#
+#        for tarifa in self.tarifa_ids:
+#            if tarifa.m2 != m2:
+#                linea = {'m2' : m2,
+#                        '' :}
+#                m2 = tarifa.m2
+
 
     #Cliches
     def _domain_category_id_cliche(self):
@@ -189,3 +203,13 @@ class CotizadorProducto(models.Model):
 #            self.uom_category_id   = None
 #            self.uom_id_de_consumo = None
 
+    def action_import_tarifa(self):
+        return {
+            'name': "Importar Tarifa",
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'import.tarifa',
+            'view_id': self.env.ref('cotizador_l10n_cl.wizard_import_tarifa').id,
+            'target': 'new',
+            }
