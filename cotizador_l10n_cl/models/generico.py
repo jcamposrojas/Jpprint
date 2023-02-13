@@ -4,6 +4,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 TIPOS_CALCULO = [
     ('f','Fijo'),
     ('m','Por metro lineal S/MERMA'),
