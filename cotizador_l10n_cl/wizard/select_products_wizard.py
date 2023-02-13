@@ -594,15 +594,16 @@ class SelectProducts(models.TransientModel):
         for item in self.insumo_ids:
             if item.flag_adicional == True:
                 line_dict = {
-                    'name'             : item.name,
-                    'cantidad'         : item.cantidad,
-                    'uom_id'           : item.uom_id.id,
-                    'costo_unitario'   : item.costo_unitario,
-                    'costo_consumo'    : item.costo_consumo,
-                    'cost_currency_id' : item.cost_currency_id.id,
-                    'merma'            : item.merma,
-                    'incluido_en_ldm'  : item.incluido_en_ldm,
-                    'flag_adicional'   : item.flag_adicional,
+                    'name'              : item.name,
+                    'product_product_id': item.product_product_id.id,
+                    'cantidad'          : item.cantidad,
+                    'uom_id'            : item.uom_id.id,
+                    'costo_unitario'    : item.costo_unitario,
+                    'costo_consumo'     : item.costo_consumo,
+                    'cost_currency_id'  : item.cost_currency_id.id,
+                    'merma'             : item.merma,
+                    'incluido_en_ldm'   : item.incluido_en_ldm,
+                    'flag_adicional'    : item.flag_adicional,
                 }
                 lst_tmp.append(line_dict)
                 #self.insumo_ids = [(2,item.id)]
@@ -707,6 +708,7 @@ class SelectProducts(models.TransientModel):
                     else:
                         duracion_estimada = 0
                 elif line.hh_type == 't':
+                    # IMPORTANTE. El calculo de HHs de TTR depende que se seleccione use_bujes!!
                     if self.salidas_x_rollo <= 0:
                         duracion_estimada = 0
                     else:
