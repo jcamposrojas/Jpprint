@@ -32,6 +32,7 @@ class ProductoGenerico(models.Model):
     cantidad         = fields.Float(string="Cantidad", default=1.0)
     costo_unitario_consumo = fields.Float(string='Costo unitario consumo')
     incluido_en_ldm  = fields.Boolean(string="En LdM?", default=False)
+    merma            = fields.Float(string="Merma (%)", default=0.0)
 
     # Adicionales
     product_product_id = fields.Many2one('product.product', string="Producto/Insumo")
