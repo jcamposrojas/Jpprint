@@ -542,17 +542,23 @@ class SelectProducts(models.TransientModel):
             cantidad = adicional.cantidad * self.n_hojas_con_merma
             costo = cantidad * adicional.costo_unitario_consumo
 
+        if adicional.product_product_id:
+            product_id = adicional.product_product_id.id
+        else:
+            product_id = None
+
         vals = {
             #'producto_id': 0,
-            'cost_currency_id': adicional.cost_currency_id.id,
-            'name'            : nombre,
-            'cantidad'        : cantidad * (1 + adicional.merma / 100.0),
-            'costo_unitario'  : adicional.costo_unitario_consumo,
-            'costo_consumo'   : costo * (1 + adicional.merma / 100.0),
-            'uom_id'          : adicional.uom_id_de_consumo.id,
-            'merma'           : adicional.merma,
-            'incluido_en_ldm' : adicional.incluido_en_ldm,
-            'flag_adicional'  : False,
+            'cost_currency_id'  : adicional.cost_currency_id.id,
+            'name'              : nombre,
+            'product_product_id': product_id,
+            'cantidad'          : cantidad * (1 + adicional.merma / 100.0),
+            'costo_unitario'    : adicional.costo_unitario_consumo,
+            'costo_consumo'     : costo * (1 + adicional.merma / 100.0),
+            'uom_id'            : adicional.uom_id_de_consumo.id,
+            'merma'             : adicional.merma,
+            'incluido_en_ldm'   : adicional.incluido_en_ldm,
+            'flag_adicional'    : False,
         }
         return vals
 
@@ -793,17 +799,23 @@ class SelectProducts(models.TransientModel):
                 cantidad = qty * self.longitud_papel_con_merma
                 costo = cantidad * valor
 
+            if self.producto_id.product_product_id:
+                product_id = self.producto_id.product_product_id.id
+            else:
+                product_id = None
+
             vals = {
                 #'producto_id': 0,
-                'cost_currency_id': self.currency_id.id, # Currency por defecto
-                'name'            : str(self.producto_id.tblanca_name) + '/' + str(self.cobertura_tinta.name),
-                'cantidad'        : cantidad,
-                'costo_unitario'  : self.cobertura_tinta.tblanca_costo_unitario_consumo,
-                'costo_consumo'   : costo,
-                'uom_id'          : self.producto_id.tblanca_uom_id_de_consumo.id,
+                'product_product_id': product_id,
+                'cost_currency_id'  : self.currency_id.id, # Currency por defecto
+                'name'              : str(self.producto_id.tblanca_name) + '/' + str(self.cobertura_tinta.name),
+                'cantidad'          : cantidad,
+                'costo_unitario'    : self.cobertura_tinta.tblanca_costo_unitario_consumo,
+                'costo_consumo'     : costo,
+                'uom_id'            : self.producto_id.tblanca_uom_id_de_consumo.id,
                 #'merma': 0.0, # por definir
-                'incluido_en_ldm' : True if self.producto_id.product_product_id else False,
-                'flag_adicional'  : False,
+                'incluido_en_ldm'   : True if self.producto_id.product_product_id else False,
+                'flag_adicional'    : False,
             }
             self.insumo_ids = [(0,0,vals)]
 
