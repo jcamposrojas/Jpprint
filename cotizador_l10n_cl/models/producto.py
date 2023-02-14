@@ -219,6 +219,10 @@ class CotizadorProducto(models.Model):
     @api.depends('tarifa_ids')
     def _get_html_tarifas(self):
         tarifas = self.tarifa_ids
+        if len(tarifas) == 0:
+            self.tarifa_txt_ids = ''
+            return
+            
         m2 = -1
         matriz = {}
         for item in tarifas:
@@ -243,17 +247,13 @@ class CotizadorProducto(models.Model):
             html = html + "<td style='width:60px'><strong>" + sus.codigo + "</strong></td>"
         html = html + "</tr>"
 
-        _logger.info(' INDEX ')
-        _logger.info(list(matriz.keys())[0])
         i = 0
         for k in matriz.keys():
-            _logger.info(k)
             if i % 2 == 1:
                 html = html + "<tr style='background-color:#f6f7fa'><td style='border-right: 1px solid black'>" + str(k) + "</td>"
             else:
                 html = html + "<tr><td style='border-right: 1px solid black'>" + str(k) + "</td>"
             for v in matriz[k].keys():
-                _logger.info(" %s"%(matriz[k][v]))
                 html = html + "<td>" + str(matriz[k][v]) + "% </td>"
             i = i + 1
             html = html + "</tr>"
