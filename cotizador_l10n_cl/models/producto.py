@@ -138,7 +138,9 @@ class CotizadorProducto(models.Model):
                     context="{'producto_id':id}", domain="[('producto_id','=',id)]")
 
    # m2_ids = fields.One2many('tabla_m2', 'producto_id', string='Metros Cuadrados')
-    tarifa_ids = fields.One2many('tarifa', 'producto_id', string='Tarifa')
+    tarifa_ids     = fields.One2many('tarifa', 'producto_id', string='Tarifa')
+    tarifa_txt_ids = fields.Html(string="Texto Tarifa", compute='_get_html_tarifas')
+
 #    tarifa_txt_ids = fields.Text(string='Tarifas', compute="_compute_tarifa_text")
 
 #    @api.depends('tarifa_ids')
@@ -213,3 +215,50 @@ class CotizadorProducto(models.Model):
             'view_id': self.env.ref('cotizador_l10n_cl.wizard_import_tarifa').id,
             'target': 'new',
             }
+
+    @api.depends('tarifa_ids')
+    def _get_html_tarifas(self):
+        tarifas = self.tarifa_ids
+        m2 = -1
+        matriz = {}
+        for item in tarifas:
+            if item.m2 != m2:
+                m2 = item.m2
+                matriz[m2] = {}
+                matriz[m2][item.sustrato_id.id] = item.porcentaje
+            else:
+                matriz[m2][item.sustrato_id.id] = item.porcentaje
+
+        html = "<table>"
+
+        html = html + "<tr style='border-bottom: 1px solid black;'>"
+        html = html + "<td style='width:60px;border-right: 1px solid black;'><strong>M2</strong></td>"
+        first_m2 = list(matriz.keys())[0]
+        for k in matriz[first_m2]:
+            sus = self.env['cotizador.sustrato'].search([('id','=',k)])
+            if sus:
+                sus_codigo = sus.codigo
+            else:
+                sus_codigo = ""
+            html = html + "<td style='width:60px'><strong>" + sus.codigo + "</strong></td>"
+        html = html + "</tr>"
+
+        _logger.info(' INDEX ')
+        _logger.info(list(matriz.keys())[0])
+        i = 0
+        for k in matriz.keys():
+            _logger.info(k)
+            if i % 2 == 1:
+                html = html + "<tr style='background-color:#f6f7fa'><td style='border-right: 1px solid black'>" + str(k) + "</td>"
+            else:
+                html = html + "<tr><td style='border-right: 1px solid black'>" + str(k) + "</td>"
+            for v in matriz[k].keys():
+                _logger.info(" %s"%(matriz[k][v]))
+                html = html + "<td>" + str(matriz[k][v]) + "% </td>"
+            i = i + 1
+            html = html + "</tr>"
+
+        html = html + "</table>"
+
+        self.tarifa_txt_ids = html
+

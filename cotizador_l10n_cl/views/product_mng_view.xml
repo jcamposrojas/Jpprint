@@ -156,15 +156,16 @@
 			    </page>
 			    <page string="Tarifa">
 			        <group>
+				    <field name="tarifa_txt_ids" nolabel="1"/>
+				<!--
 				    <field name="tarifa_ids" nolabel="1">
 				        <tree editable="bottom"> 
 					    <field name="m2" readonly="1"/>
-					    <!--<field name="sustrato_id" domain="[('producto_id','=',parent.id)]"/>-->
 					    <field name="sustrato_id" readonly="1"/>
 					    <field name="porcentaje" readonly="1"/>
 					</tree> 
 				    </field>
-
+				-->
 				</group>
 			    </page>
 		        </notebook>

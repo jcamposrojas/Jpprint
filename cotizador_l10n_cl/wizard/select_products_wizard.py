@@ -1142,5 +1142,4 @@ class SelectProducts(models.TransientModel):
             html = html + "</tr>"
         html = html + "</table>"
 
-
         return html
